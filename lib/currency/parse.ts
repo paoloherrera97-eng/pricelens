@@ -16,6 +16,25 @@ export function sanitizeAmountInput(raw: string): string {
 }
 
 /**
+ * Decides whether a lone separator is grouping a thousand rather than marking a
+ * decimal.
+ *
+ * The genuinely ambiguous case is a single separator, and the shipping locale
+ * settles it: in Spanish, `.` groups thousands and `,` marks decimals, so
+ * `1.890` is one thousand eight hundred ninety — not 1.89. A traveler pasting a
+ * price from a Spanish page means the former, and the earlier locale-agnostic
+ * rule got it exactly backwards.
+ *
+ * Grouping requires *exactly* three following digits and a plausible leading
+ * group, so `12,50` and `0.500` stay decimals — nobody writes zero thousands.
+ */
+function isGroupingPair(head: string, tail: string): boolean {
+  if (tail.length !== 3) return false;
+  if (head.length === 0 || head.length > 3) return false;
+  return !head.startsWith('0');
+}
+
+/**
  * Parses a user-typed amount.
  *
  * Handles both decimal conventions, because a European traveler types `12,50`
@@ -27,6 +46,8 @@ export function sanitizeAmountInput(raw: string): string {
  *   "1,234.56"   → 1234.56
  *   "1 890"      → 1890      (thin spaces from some keyboards)
  *   "1.234.567"  → 1234567   (repeated separator ⇒ grouping)
+ *   "1.890"      → 1890      (lone separator + 3 digits ⇒ grouping)
+ *   "0.500"      → 0.5       (…but nobody writes zero thousands)
  *
  * Returns `null` for input that is not a number, and `0` for empty input —
  * empty is a valid, neutral state rather than an error (PRD E1).
@@ -53,8 +74,14 @@ export function parseAmount(input: string): number | null {
       normalised = trimmed;
     } else {
       const parts = trimmed.split(sep);
-      // Repeated separator can only be grouping: "1.234.567".
-      normalised = parts.length > 2 ? parts.join('') : parts.join('.');
+      if (parts.length > 2) {
+        // Repeated separator can only be grouping: "1.234.567".
+        normalised = parts.join('');
+      } else {
+        normalised = isGroupingPair(parts[0] ?? '', parts[1] ?? '')
+          ? parts.join('')
+          : parts.join('.');
+      }
     }
   }
 

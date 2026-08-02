@@ -63,20 +63,20 @@ anyone who wants historical data. Serving them would compromise the primary user
 
 ### 4.1 In scope for V1
 
-| #   | Requirement                            | Notes                                         |
-| --- | -------------------------------------- | --------------------------------------------- |
-| S1  | Manual amount input                    | Numeric, decimal-aware, mobile numeric keypad |
-| S2  | Foreign (source) currency selector     | Searchable, 160+ currencies                   |
-| S3  | Home (target) currency selector        | Same component, persisted                     |
-| S4  | Live exchange rates                    | Refreshed hourly server-side                  |
-| S5  | Conversion result                      | The visual centerpiece                        |
-| S6  | Swap direction                         | One tap, no reload                            |
-| S7  | Rate freshness indicator               | Timestamp + degraded-state messaging          |
-| S8  | Responsive, mobile-first UI            | 320px → desktop                               |
-| S9  | Fast first load                        | See §6                                        |
-| S10 | Full keyboard + screen-reader support  | WCAG 2.2 AA                                   |
-| S11 | Installable, offline-capable PWA       | Manifest + service worker, from V1            |
-| S12 | Spanish UI, internationalisation-ready | All copy in a message catalogue               |
+| #   | Requirement                            | Notes                                          |
+| --- | -------------------------------------- | ---------------------------------------------- |
+| S1  | Manual amount input                    | Numeric, decimal-aware, mobile numeric keypad  |
+| S2  | Country selector (drives the currency) | Searchable, 195 countries with flags (ADR-014) |
+| S3  | Home (target) currency selector        | Same component, persisted                      |
+| S4  | Live exchange rates                    | Refreshed hourly server-side                   |
+| S5  | Conversion result                      | The visual centerpiece                         |
+| S6  | Swap direction                         | One tap, no reload                             |
+| S7  | Rate freshness indicator               | Timestamp + degraded-state messaging           |
+| S8  | Responsive, mobile-first UI            | 320px → desktop                                |
+| S9  | Fast first load                        | See §6                                         |
+| S10 | Full keyboard + screen-reader support  | WCAG 2.2 AA                                    |
+| S11 | Installable, offline-capable PWA       | Manifest + service worker, from V1             |
+| S12 | Spanish UI, internationalisation-ready | All copy in a message catalogue                |
 
 ### 4.2 Explicitly out of scope for V1
 
@@ -110,6 +110,8 @@ last rate table, holding no user data and no history.
 | ------------------------------------ | --------------------------------------------------------------------------------- |
 | **PWA moved from V2 into V1** (S11)  | Installability and offline support are now MVP requirements, not comfort features |
 | **Spanish is the shipping UI** (S12) | Copy is Spanish; the architecture stays locale-agnostic (ADR-009)                 |
+| **Country-first selection** (S2)     | The foreign side is chosen by country; the currency is derived (ADR-014)          |
+| **No bundled fallback rates**        | Offline falls back to real cached rates, never to invented ones (ADR-013)         |
 
 The PWA move is worth stating plainly, because v1.0 of this document argued for deferring it. That
 argument was that installability is comfort rather than comprehension. Offline capability is not
@@ -125,20 +127,28 @@ explicit costs a manifest and a service worker.
 
 - Accepts digits and a single decimal separator.
 - Accepts both `.` and `,` as decimal separators (a European traveler types `12,50`).
+- A lone separator followed by exactly three digits is read as **grouping**, not a decimal: the app
+  ships in Spanish, where `1.890` means one thousand eight hundred ninety. This is what makes a
+  pasted price parse the way the user meant it.
+- Pasting is not special-cased — the same sanitising that ignores stray characters is what lets
+  `฿1.890` be pasted straight in.
 - Rejects letters and multiple separators without an error message — invalid characters simply never
   appear. Punishing a user with an error for a keystroke we could ignore is a design failure.
 - Empty input is a valid state showing a neutral zero result, not an error.
 - Triggers `inputmode="decimal"` so phones show a numeric keypad.
 - No maximum, but values beyond safe display precision are formatted in compact notation.
 
-### FR-2 — Currency selection
+### FR-2 — Country and currency selection
 
-- Both selectors draw from the same currency dataset and the same component.
-- Searchable by **code** (`JPY`), **name** (`Japanese Yen`), and **country/common name** (`Japan`) —
-  travelers know the country, not always the currency code.
-- Each option shows the code, the name, and the symbol.
-- Selecting the currency already chosen in the other field triggers an automatic swap rather than an
-  invalid same-currency state.
+- The **foreign side is chosen by country**, and the currency is derived (ADR-014). Travelers know
+  they are going to Japan; asking them for "JPY" makes them do the translation the app should do.
+- The **home side is a currency picker** — you know your own currency, and it is remembered.
+- Both are the same searchable `Select` primitive, so behaviour and accessibility are identical.
+- The country picker shows a flag, the country name, and its currency code; it matches on country
+  name, country code, currency code, and currency name, and ignores accents.
+- Choosing a country whose currency is already the home currency swaps rather than producing an
+  invalid 1:1 state; the same applies in reverse.
+- After a swap, the country selector moves to a representative country for the new foreign currency.
 
 ### FR-3 — Conversion
 

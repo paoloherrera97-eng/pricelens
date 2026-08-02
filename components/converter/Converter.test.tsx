@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 
 import { APP_CONFIG } from '@/config';
-import { render, screen, waitFor, within } from '@/tests/render';
+import { render, screen, waitFor } from '@/tests/render';
 
 import { Converter } from './Converter';
 
@@ -163,14 +163,94 @@ describe('Converter — swap', () => {
     const user = userEvent.setup();
     render(<Converter />);
 
-    // Home is EUR by default; choosing EUR as the foreign currency should swap.
-    await user.click(await screen.findByRole('button', { name: /Moneda local/ }));
-    await user.click(screen.getByRole('option', { name: /EUR/ }));
+    // Home is EUR by default; visiting a euro country would otherwise produce a
+    // 1:1 dead end, so the home currency moves aside.
+    await user.click(await screen.findByRole('button', { name: /país viajas/ }));
+    await user.type(screen.getByRole('combobox'), 'España');
+    await user.click(screen.getByRole('option', { name: /España/ }));
 
-    const from = screen.getByRole('button', { name: /Moneda local/ });
-    const to = screen.getByRole('button', { name: /Tu moneda/ });
-    expect(within(from).getByText('EUR')).toBeInTheDocument();
-    expect(to).toHaveTextContent('USD');
+    expect(screen.getByRole('button', { name: /Tu moneda/ })).toHaveTextContent('USD');
+  });
+});
+
+describe('Converter — country-first selection (ADR-014)', () => {
+  it('asks which country the traveler is visiting', async () => {
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    expect(await screen.findByRole('button', { name: /país viajas/ })).toBeInTheDocument();
+  });
+
+  it('derives the currency from the chosen country', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.click(await screen.findByRole('button', { name: /país viajas/ }));
+    await user.type(screen.getByRole('combobox'), 'Tailandia');
+    await user.click(screen.getByRole('option', { name: /Tailandia/ }));
+
+    // The traveler picked a country; the app worked out THB.
+    await waitFor(() => expect(screen.getByText(/1 THB =/)).toBeInTheDocument());
+  });
+
+  it('searches countries by name, and by currency code for those who know it', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.click(await screen.findByRole('button', { name: /país viajas/ }));
+    const search = screen.getByRole('combobox');
+
+    await user.type(search, 'Japon');
+    expect(screen.getByRole('option', { name: /Japón/ })).toBeInTheDocument();
+
+    await user.clear(search);
+    await user.type(search, 'JPY');
+    expect(screen.getByRole('option', { name: /Japón/ })).toBeInTheDocument();
+  });
+
+  it('moves the country selector to match after a swap', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.click(await screen.findByRole('button', { name: /país viajas/ }));
+    await user.type(screen.getByRole('combobox'), 'Tailandia');
+    await user.click(screen.getByRole('option', { name: /Tailandia/ }));
+
+    await user.click(screen.getByRole('button', { name: 'Intercambiar monedas' }));
+
+    // THB→EUR becomes EUR→THB: the country side must now show a euro country.
+    await waitFor(() => expect(screen.getByText(/1 EUR =/)).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Tu moneda/ })).toHaveTextContent('THB');
+  });
+});
+
+describe('Converter — paste', () => {
+  it('accepts a pasted price with symbol and separators', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const input = await screen.findByLabelText('Importe');
+    await user.click(input);
+    await user.paste('฿1.890');
+
+    // The symbol is dropped, the value survives — no paste handler required.
+    // The symbol is dropped and "1.890" reads as 1890 in the Spanish locale.
+    expect(input).toHaveValue('1.890');
+    await waitFor(async () => expect(await resultText()).toMatch(/1738,80/));
+  });
+});
+
+describe('Converter — loading', () => {
+  it('shows a skeleton shaped like the real layout, not a spinner', async () => {
+    // Never resolves: holds the loading state open.
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})));
+    render(<Converter />);
+
+    const busy = await screen.findByLabelText('Cargando tasas');
+    expect(busy).toHaveAttribute('aria-busy', 'true');
   });
 });
 
@@ -237,7 +317,7 @@ describe('Converter — accessibility', () => {
 
     await screen.findByLabelText('Importe');
     expect(screen.getByRole('button', { name: 'Intercambiar monedas' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Moneda local/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /país viajas/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Tu moneda/ })).toBeInTheDocument();
   });
 });

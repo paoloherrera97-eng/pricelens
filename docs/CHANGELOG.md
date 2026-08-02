@@ -9,6 +9,51 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — Phase 5: The Complete User Experience
+
+The journey a traveler actually takes: open, pick the country, enter or paste a price, read the
+answer.
+
+- **Country-first selection** (ADR-014) — `config/countries.ts`, 195 countries with flags, Spanish
+  names, and the currency each one uses. Searchable by country name, country code, currency code, or
+  currency name, accent-insensitive.
+- **`CountryPicker`** — flags lead, because a flag is recognised faster than any string.
+- **`ConverterSkeleton`** — a loading state that mirrors the real layout block for block and in the
+  same order, so nothing moves when the rates land.
+- **Offline banner** — a quiet status line when the device is offline but real cached rates are still
+  driving the conversion.
+- **`scripts/generate-countries.mjs`** — the curated mapping is explicit and reviewable; names come
+  from ICU and flags are computed from the country code.
+- **19 new tests** (147 total), covering country data invariants, the country-first flow, paste, and
+  the skeleton.
+
+### Changed
+
+- **The foreign currency badge was removed.** The country selector already shows the currency code
+  and the amount field already shows its symbol; a third copy was the same information competing with
+  itself. The amount field now takes the full width.
+- **A lone separator with three trailing digits now parses as grouping.** The app ships in Spanish,
+  where `1.890` means one thousand eight hundred ninety — the previous locale-agnostic rule read it
+  as 1.89, which is exactly wrong for a pasted Spanish price. `0.500` and `12.50` still parse as
+  decimals, since nobody writes zero thousands.
+
+### Decisions recorded
+
+- **ADR-014 — Country-first selection.** A currency selector asks the traveler to translate their
+  situation into a code before the app can help: _I am in Thailand → Thailand uses the baht → the
+  baht is THB → select THB_. Three steps the app could have done for them. The same instinct as
+  ADR-001, applied to the interface rather than the network.
+
+### Verified
+
+- `format:check`, `lint`, `typecheck`, **147 tests**, `build` all pass
+- The six-step journey end to end in a real browser: pick Tailandia → paste `฿1.890` → **49,12 €**,
+  rate line and update time present, swap in one tap moves the country selector to 🇪🇸 España
+- Skeleton, offline banner, and error state all render; error state contains zero fabricated rates
+- 320px / 390px / 768px: no overflow, no sub-44px target, no unnamed button, no console errors
+
+---
+
 ### Added — Phase 4: The Conversion Screen (MVP)
 
 PriceLens now converts prices. The first usable MVP.

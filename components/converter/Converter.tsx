@@ -6,45 +6,60 @@ import { useTranslations } from 'next-intl';
 import { Button, Card, Input } from '@/components/ui';
 import {
   APP_CONFIG,
-  LOCALE_FORMATTING,
   DEFAULT_LOCALE,
+  LOCALE_FORMATTING,
+  countryForCurrency,
+  getCountry,
   getCurrency,
   isCurrencyCode,
   type CurrencyCode,
 } from '@/config';
-import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRates } from '@/hooks/useRates';
 import { convert, getRate } from '@/lib/currency/convert';
 import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency/format';
 import { parseAmount, sanitizeAmountInput } from '@/lib/currency/parse';
 
 import { ConversionResult } from './ConversionResult';
+import { ConverterSkeleton } from './ConverterSkeleton';
+import { CountryPicker } from './CountryPicker';
 import { CurrencyPicker } from './CurrencyPicker';
 import { RateFreshness } from './RateFreshness';
 import { SwapButton } from './SwapButton';
 
 const LOCALE = LOCALE_FORMATTING[DEFAULT_LOCALE];
 
+/** The country shown on a cold start, derived from the configured default. */
+const DEFAULT_COUNTRY = countryForCurrency(APP_CONFIG.defaultForeignCurrency)?.code ?? 'US';
+
 /**
  * The conversion screen.
  *
- * Holds the only mutable state in the app: the amount and the two currencies.
- * Everything else — the converted value, the rate, the freshness — is derived,
- * because derived state that gets stored is state that gets stale.
+ * Holds the only mutable state in the app: the amount, the country being
+ * visited, and the home currency. Everything else — the converted value, the
+ * rate, the freshness — is derived, because derived state that gets stored is
+ * state that gets stale.
  */
 export function Converter() {
   const t = useTranslations('converter');
+  const tRates = useTranslations('rates');
   const tError = useTranslations('errors');
   const rates = useRates();
   const isOnline = useOnlineStatus();
 
   const [amountText, setAmountText] = useState('');
-  const [from, setFrom] = useState<CurrencyCode>(APP_CONFIG.defaultForeignCurrency);
+
+  // The country is the affordance; the currency is derived from it. Travelers
+  // know where they are, not always what it is called there (ADR-014).
+  const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY);
+  const country = getCountry(countryCode);
+  const from: CurrencyCode = country?.currency ?? APP_CONFIG.defaultForeignCurrency;
 
   // The home currency is the one value worth remembering between visits: it does
   // not change between trips, and re-picking it every time taxes the 3-second
-  // promise (ADR-005). The foreign currency is deliberately not persisted.
+  // promise (ADR-005). The country is deliberately not persisted — it changes
+  // per trip, and a stale value would be actively misleading.
   const [to, setTo] = useLocalStorage<CurrencyCode>(
     APP_CONFIG.storageKeys.homeCurrency,
     APP_CONFIG.defaultHomeCurrency,
@@ -66,7 +81,6 @@ export function Converter() {
     if (rate === null || converted === null) return null;
 
     return {
-      rate,
       converted: formatCurrency(converted, to, LOCALE),
       rateLine: t('rateLine', { from, to, rate: formatRate(rate, LOCALE) }),
     };
@@ -84,25 +98,44 @@ export function Converter() {
   }, [rates]);
 
   const handleAmountChange = useCallback((raw: string) => {
-    // Invalid characters never appear rather than producing an error (PRD FR-1).
+    // Invalid characters never appear rather than producing an error. This is
+    // also what makes pasting "฿1.890" work without any paste handling.
     setAmountText(sanitizeAmountInput(raw));
   }, []);
 
   const handleSwap = useCallback(() => {
-    setFrom(to);
+    // Swapping is currency-level; the country selector follows to whichever
+    // country best represents the new foreign currency.
+    setCountryCode(countryForCurrency(to)?.code ?? countryCode);
     setTo(from);
-  }, [from, to, setTo]);
+  }, [from, to, countryCode, setTo]);
 
-  // Choosing the currency already selected on the other side swaps instead of
-  // producing a 1:1 dead end (PRD E8).
-  const handleFromChange = useCallback(
-    (next: CurrencyCode) => (next === to ? handleSwap() : setFrom(next)),
-    [to, handleSwap],
+  // Choosing a country whose currency is already the home currency swaps instead
+  // of producing a 1:1 dead end (PRD E8).
+  const handleCountryChange = useCallback(
+    (next: string) => {
+      const nextCurrency = getCountry(next)?.currency;
+      if (nextCurrency && nextCurrency === to) {
+        setTo(from);
+      }
+      setCountryCode(next);
+    },
+    [from, to, setTo],
   );
-  const handleToChange = useCallback(
-    (next: CurrencyCode) => (next === from ? handleSwap() : setTo(next)),
-    [from, handleSwap, setTo],
+
+  const handleHomeChange = useCallback(
+    (next: CurrencyCode) => {
+      if (next === from) {
+        setCountryCode(countryForCurrency(to)?.code ?? countryCode);
+      }
+      setTo(next);
+    },
+    [from, to, countryCode, setTo],
   );
+
+  if (rates.status === 'loading') {
+    return <ConverterSkeleton label={tRates('loading')} />;
+  }
 
   if (rates.status === 'error') {
     return (
@@ -120,46 +153,46 @@ export function Converter() {
 
   return (
     <Card className="flex flex-col gap-2">
-      {/* `min-w-0` on the growing child is load-bearing: a flex item defaults to
-          `min-width: auto`, so without it the amount field refuses to shrink and
-          pushes the currency picker off the side of a phone screen. */}
-      <div className="flex items-end gap-1">
-        <div className="min-w-0 flex-1">
-          <Input
-            label={t('amountLabel')}
-            className="text-lg"
-            isEmphasised
-            inputMode="decimal"
-            // A numeric keypad and a focused field mean the traveler can start
-            // typing without a single tap.
-            autoFocus
-            enterKeyHint="done"
-            placeholder={t('amountPlaceholder')}
-            leading={getCurrency(from).symbol}
-            value={amountText}
-            onChange={(event) => handleAmountChange(event.target.value)}
-          />
-        </div>
-        <CurrencyPicker
-          label={t('fromLabel')}
-          value={from}
-          onChange={handleFromChange}
-          className="w-14 shrink-0"
-          isCompact
-        />
-      </div>
+      {!isOnline && (
+        <p
+          role="status"
+          className="bg-warning-50 text-warning-600 rounded-md px-2 py-1 text-center text-xs font-medium"
+        >
+          {tRates('offlineBanner')}
+        </p>
+      )}
+
+      <CountryPicker label={t('countryLabel')} value={countryCode} onChange={handleCountryChange} />
+
+      {/* No currency selector here: the country above already determines the
+          currency, and its symbol leads the field. Repeating the code would be
+          the same information twice on the screen the user reads fastest. */}
+      <Input
+        label={t('amountLabel')}
+        className="text-lg"
+        isEmphasised
+        inputMode="decimal"
+        // A numeric keypad and a focused field mean the traveler can start
+        // typing without a single tap.
+        autoFocus
+        enterKeyHint="done"
+        placeholder={t('amountPlaceholder')}
+        leading={getCurrency(from).symbol}
+        value={amountText}
+        onChange={(event) => handleAmountChange(event.target.value)}
+      />
 
       <div className="flex justify-center">
         <SwapButton onSwap={handleSwap} />
       </div>
 
-      <CurrencyPicker label={t('toLabel')} value={to} onChange={handleToChange} />
+      <CurrencyPicker label={t('toLabel')} value={to} onChange={handleHomeChange} />
 
       <ConversionResult
         original={originalFormatted}
         converted={conversion?.converted ?? null}
         rateLine={conversion?.rateLine ?? null}
-        isLoading={rates.status === 'loading'}
+        isLoading={false}
       />
 
       {freshness && (

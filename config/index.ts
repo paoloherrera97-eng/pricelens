@@ -6,6 +6,8 @@
  */
 
 export { APP_CONFIG } from './app';
+export { COUNTRIES, countryForCurrency, getCountry } from './countries';
+export type { Country } from './countries';
 export { CURRENCIES, getCurrency, isCurrencyCode } from './currencies';
 export type { CurrencyCode, CurrencyMeta } from './currencies';
 export { FEATURES, isEnabled } from './features';

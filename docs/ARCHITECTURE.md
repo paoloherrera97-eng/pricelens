@@ -174,10 +174,11 @@ components/
     Skeleton.tsx
     index.ts                 Barrel
   converter/                 Feature composition, domain-aware
-    Converter.tsx            Orchestrates the screen
-    AmountInput.tsx
-    CurrencyPicker.tsx
-    ConversionResult.tsx     The visual centerpiece
+    Converter.tsx            Orchestrates the screen; holds the only state
+    CountryPicker.tsx        "Which country are you visiting?" (ADR-014)
+    CurrencyPicker.tsx       The home-currency side
+    ConversionResult.tsx     The visual centrepiece
+    ConverterSkeleton.tsx    Loading state, mirrors the real layout
     SwapButton.tsx
     RateFreshness.tsx
 
@@ -186,6 +187,7 @@ components/
 
 config/                      Centralised configuration (ADR-008)
   app.ts                     App settings, cache windows, storage keys
+  countries.ts               GENERATED country → currency map — do not hand-edit
   currencies.ts              GENERATED currency metadata — do not hand-edit
   features.ts                Feature flags, including the deliberately-off ones
   i18n.ts                    Locales and formatting tags
@@ -223,6 +225,7 @@ types/
   index.ts                   Shared domain types
 
 scripts/
+  generate-countries.mjs     Regenerates config/countries.ts
   generate-currencies.mjs    Regenerates config/currencies.ts from ICU
   generate-icons.mjs         Regenerates the PWA icon set
 
@@ -636,6 +639,43 @@ to nothing.
 `false`. The seam is exercised today (the gallery renders a camera `IconButton` in the trailing slot)
 and asserted by a test, so "no redesign required" is a claim that fails loudly if it stops being
 true.
+
+---
+
+### ADR-014 — Country-first selection
+
+**Decision.** The primary selector asks **which country you are visiting**, not which currency you
+need. The currency is derived from the country.
+
+**Alternatives.** (a) Currency-first, with country names as search keywords (what Phases 3–4
+shipped). (b) Both selectors offered side by side.
+
+**Rationale.** A currency selector asks the traveler to translate their situation into a code before
+the app can help: _I am in Thailand → Thailand uses the baht → the baht is THB → select THB._ Three
+steps of translation, every one of which the app could have done for them. Country-first does the
+translation: _I am in Thailand → select Thailand._
+
+This is the same instinct as ADR-001, applied to the interface rather than the network: do the work
+in the product so the user does not have to. It is also why the currency badge next to the amount was
+removed — the country already determines the currency, and showing the code twice is the same
+information competing with itself on the screen the user reads fastest.
+
+(b) was rejected because two selectors for one concept is exactly the clutter this product is
+defined against.
+
+**Consequences.** A curated ISO 3166 → ISO 4217 mapping is now part of the product's data
+(`config/countries.ts`, 195 countries). Unlike exchange rates this is stable reference data a
+reviewer can verify row by row, and a test asserts every country maps to a currency the app can
+actually convert.
+
+Two facts had to be handled: several countries share a currency (twenty use the euro), so
+`countryForCurrency` names an explicit representative for the swap to land on; and some countries use
+a currency that is not their own (Ecuador and El Salvador use USD), which the mapping captures
+correctly. Currency-level search still works — the picker matches on code and currency name too, for
+the traveler who does know.
+
+The home side stays a **currency** picker: you know your own currency, and it is the value we
+remember between visits.
 
 ---
 

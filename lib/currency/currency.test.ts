@@ -57,6 +57,23 @@ describe('parseAmount', () => {
     expect(parseAmount('1,234,567')).toBe(1234567);
   });
 
+  it('reads a lone separator with three trailing digits as grouping', () => {
+    // The app ships in Spanish, where "." groups thousands: a price pasted as
+    // "1.890" means one thousand eight hundred ninety, not 1.89.
+    expect(parseAmount('1.890')).toBe(1890);
+    expect(parseAmount('1,890')).toBe(1890);
+    expect(parseAmount('25.000')).toBe(25000);
+    expect(parseAmount('250.000')).toBe(250000);
+  });
+
+  it('still reads a lone separator as decimal when grouping is implausible', () => {
+    expect(parseAmount('12.50')).toBe(12.5);
+    expect(parseAmount('0.500')).toBe(0.5); // nobody writes zero thousands
+    expect(parseAmount('0,750')).toBe(0.75);
+    expect(parseAmount('1234.5')).toBe(1234.5);
+    expect(parseAmount('12.3456')).toBe(12.3456);
+  });
+
   it('ignores spaces used as thousands separators', () => {
     expect(parseAmount('1 890')).toBe(1890);
     expect(parseAmount('250 000')).toBe(250000);
