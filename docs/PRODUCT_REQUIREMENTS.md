@@ -53,7 +53,9 @@ anyone who wants historical data. Serving them would compromise the primary user
   need to think in the local currency instead.
 - As a traveler, I want to know whether the rate I'm seeing is current, so I know how much to trust
   it.
-- As a traveler on bad Wi-Fi, I want a usable answer rather than an error screen.
+- As a traveler whose connection drops mid-trip, I want to keep converting with the rates I already
+  have, rather than hitting an error screen. (If I have never loaded the app at all, I would rather
+  be told the rates are unavailable than be shown a number nobody fetched — see ADR-013.)
 
 ---
 
@@ -153,15 +155,15 @@ explicit costs a manifest and a service worker.
 
 ### FR-5 — Rate freshness and degradation
 
-| State                                   | Behavior                                                                                         |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **Fresh**                               | Show the result and a quiet `Updated <relative time>` line                                       |
-| **Loading**                             | Show the layout with a skeleton in the result slot — never a blank screen or a spinner-only page |
-| **Stale** (cached, older than expected) | Show the result with a visible but non-alarming staleness note                                   |
-| **Provider failure**                    | Fall back to bundled snapshot rates, clearly labeled as approximate and dated                    |
-| **Offline**                             | Same as provider failure, plus an offline indicator                                              |
+| State                                   | Behavior                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Fresh**                               | Show the result and a quiet `Updated <relative time>` line                                                    |
+| **Loading**                             | Show the layout with a skeleton in the result slot — never a blank screen or a spinner-only page              |
+| **Stale** (cached, older than expected) | Show the result with a visible but non-alarming staleness note                                                |
+| **Provider failure**                    | Show the last real table the service worker holds; if there is none, an explicit unavailable state with retry |
+| **Offline**                             | Same as provider failure, plus an offline indicator                                                           |
 
-The app must never (a) show a number without indicating how current it is, or (b) present fallback
+The app must never (a) show a number without indicating how current it is, (b) present cached
 data as if it were live. Requirement FR-5 exists to protect Value #4 in the Project Bible.
 
 ### FR-6 — Persistence
@@ -193,22 +195,22 @@ data as if it were live. Requirement FR-5 exists to protect Value #4 in the Proj
 
 Each must have a designed, implemented, and tested behavior.
 
-| #   | Case                                                              | Required behavior                                                                    |
-| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| E1  | Empty amount                                                      | Neutral zero result. Not an error.                                                   |
-| E2  | Amount is `0`                                                     | Show zero in the target currency. Valid.                                             |
-| E3  | Decimal separator ambiguity (`12,50`)                             | Parsed as 12.5                                                                       |
-| E4  | Zero-decimal currency (JPY, KRW, VND)                             | Rounded to 0 decimals                                                                |
-| E5  | Three-decimal currency (KWD, BHD, OMR)                            | Rounded to 3 decimals                                                                |
-| E6  | Very large amount (₫250,000,000)                                  | Formatted readably; no overflow, no layout break                                     |
-| E7  | Very small result (< 0.01)                                        | Show meaningful precision rather than `0.00` — `$0.0031` is useful, `$0.00` is a lie |
-| E8  | Same currency selected in both fields                             | Auto-swap; never a 1:1 dead end                                                      |
-| E9  | Rate provider returns malformed data                              | Reject the payload at the boundary, fall back, log server-side                       |
-| E10 | Rate provider unreachable / times out                             | Fallback rates + labeled degraded state                                              |
-| E11 | User goes offline mid-session                                     | Conversion continues working from the in-memory table                                |
-| E12 | Currency present in the app but missing from the provider payload | Excluded from selectors rather than producing a broken conversion                    |
-| E13 | `localStorage` unavailable or throws                              | Session-only operation, no crash                                                     |
-| E14 | Extremely long currency name in the selector                      | Truncates with ellipsis; layout holds                                                |
+| #   | Case                                                              | Required behavior                                                                     |
+| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| E1  | Empty amount                                                      | Neutral zero result. Not an error.                                                    |
+| E2  | Amount is `0`                                                     | Show zero in the target currency. Valid.                                              |
+| E3  | Decimal separator ambiguity (`12,50`)                             | Parsed as 12.5                                                                        |
+| E4  | Zero-decimal currency (JPY, KRW, VND)                             | Rounded to 0 decimals                                                                 |
+| E5  | Three-decimal currency (KWD, BHD, OMR)                            | Rounded to 3 decimals                                                                 |
+| E6  | Very large amount (₫250,000,000)                                  | Formatted readably; no overflow, no layout break                                      |
+| E7  | Very small result (< 0.01)                                        | Show meaningful precision rather than `0.00` — `$0.0031` is useful, `$0.00` is a lie  |
+| E8  | Same currency selected in both fields                             | Auto-swap; never a 1:1 dead end                                                       |
+| E9  | Rate provider returns malformed data                              | Reject the payload at the boundary, fall back, log server-side                        |
+| E10 | Rate provider unreachable / times out                             | Cached rates if available, otherwise an honest unavailable state with retry (ADR-013) |
+| E11 | User goes offline mid-session                                     | Conversion continues working from the in-memory table                                 |
+| E12 | Currency present in the app but missing from the provider payload | Excluded from selectors rather than producing a broken conversion                     |
+| E13 | `localStorage` unavailable or throws                              | Session-only operation, no crash                                                      |
+| E14 | Extremely long currency name in the selector                      | Truncates with ellipsis; layout holds                                                 |
 
 ---
 

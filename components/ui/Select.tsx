@@ -28,6 +28,12 @@ export interface SelectProps {
   noResultsLabel: string;
   className?: string;
   disabled?: boolean;
+  /**
+   * Shows only the option's code on the trigger, not its description.
+   * For narrow placements where a truncated description ("THB b…") reads as
+   * broken rather than abbreviated.
+   */
+  isCompact?: boolean;
 }
 
 function matches(option: SelectOption, query: string): boolean {
@@ -63,6 +69,7 @@ export function Select({
   noResultsLabel,
   className,
   disabled = false,
+  isCompact = false,
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -208,7 +215,7 @@ export function Select({
       >
         <span className="flex min-w-0 items-baseline gap-1">
           <span className="font-medium text-neutral-900">{selected?.label ?? value}</span>
-          {selected?.description && (
+          {!isCompact && selected?.description && (
             <span className="truncate text-sm text-neutral-500">{selected.description}</span>
           )}
         </span>

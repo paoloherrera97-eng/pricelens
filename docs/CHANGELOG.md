@@ -9,6 +9,58 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — Phase 4: The Conversion Screen (MVP)
+
+PriceLens now converts prices. The first usable MVP.
+
+- **Conversion engine** (`lib/currency/`) — separator-tolerant parsing, triangulated conversion, and
+  currency-aware formatting. Pure, framework-free, and exhaustively unit-tested against every edge
+  case in `PRODUCT_REQUIREMENTS.md` §7.
+- **Live rate provider** (`services/rates/exchangerate-api.ts`) with strict payload validation, plus
+  a provider chain that reports which providers were tried and why they failed.
+- **`/api/rates`** route handler — server-side proxy with Next's Data Cache, one upstream call per
+  hour per deployment.
+- **Hooks** — `useRates`, `useLocalStorage` (built on `useSyncExternalStore`), `useOnlineStatus`.
+- **The converter UI** — amount field with the currency symbol inline, searchable currency pickers,
+  one-tap swap, the result as the visual centre, the effective rate, and rate freshness.
+- **Home currency restored from `localStorage`** on load; corrupt values fall back to the default.
+- **52 new tests** (128 total), including 18 end-to-end flow tests for the screen.
+
+### Changed
+
+- **`PROVIDER_CHAIN` no longer ends in a bundled-snapshot provider** (ADR-013, below). The fixture
+  provider described in Phase 1 was never built.
+- `RateTable` moved to `types/` so pure `lib/` code can use it without crossing a layer boundary.
+- `Select` gained `isCompact` for narrow placements, where a truncated description ("THB b…") reads
+  as broken rather than abbreviated.
+
+### Decisions recorded
+
+- **ADR-013 — No bundled fallback rates; fail honestly instead.** Supersedes the fixture element of
+  ADR-002. We have no source of real rate data at build time, so any committed table would be
+  invented numbers — and to a traveler deciding whether to spend money they would look exactly like
+  fetched ones. Labelling them "approximate" does not help: the decision is made before the caption
+  is read. Offline continuity comes from the service worker replaying rates the user genuinely
+  received; with none, the UI says so and offers a retry.
+
+### Fixed
+
+- **The currency picker rendered 77px off-screen** on a 390px viewport. Both flex children carried
+  `w-full`, and a flex item's default `min-width: auto` stopped the amount field from shrinking.
+  Found by measuring the DOM in a real browser — jsdom has no layout engine, so all 18 flow tests
+  passed while the screen was visibly broken.
+
+### Verified
+
+- `format:check`, `lint`, `typecheck`, **128 tests**, `build` all pass
+- Real browser, iPhone 13 viewport: ฿1,890 → **49,12 €** (arithmetically correct), rate line and
+  freshness present, swap works, home currency restored from `localStorage`
+- **Recompute-to-paint measured at 11.2ms**, inside the one-frame budget FR-3 asks for
+- Error state renders with a retry and **zero fabricated rate lines**
+- No horizontal overflow and no sub-44px targets at 320px; no console errors
+
+---
+
 ### Added — Phase 3: Design System
 
 Six reusable primitives in `components/ui/`, plus the tokens they are built from. No conversion

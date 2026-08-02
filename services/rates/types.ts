@@ -8,12 +8,13 @@
  */
 
 import type { CurrencyCode, ProviderId } from '@/config';
+import type { RateTable } from '@/types';
 
 /**
- * Rates expressed against a single base currency (ADR-001). Every pair is
- * derived from this table by triangulation, so one table serves all conversions.
+ * Rates expressed against a single base currency (ADR-001). Defined in `types/`
+ * so pure `lib/` code can use it without importing across a boundary.
  */
-export type RateTable = Readonly<Record<string, number>>;
+export type { RateTable };
 
 export interface RateSnapshot {
   /** The currency all rates in `rates` are quoted against. */

@@ -6,7 +6,7 @@
  * `services/rates` knows which provider produced a table (ADR-002).
  */
 
-export type ProviderId = 'exchangerate-api' | 'fixture';
+export type ProviderId = 'exchangerate-api';
 
 export interface ProviderConfig {
   readonly id: ProviderId;
@@ -35,18 +35,16 @@ export const RATE_PROVIDERS: Record<ProviderId, ProviderConfig> = {
     requiresApiKey: false,
     coverage: 160,
   },
-  fixture: {
-    id: 'fixture',
-    label: 'Tasas aproximadas',
-    kind: 'fallback',
-    requiresApiKey: false,
-    coverage: 160,
-  },
 };
 
 /**
- * Resolution order. The first provider to return a valid table wins; the chain
- * must always end with a `fallback` provider so the app can never fail to
- * render a result (PRD FR-5, E10, E11).
+ * Resolution order. The first provider to return a valid table wins.
+ *
+ * There is deliberately no bundled-snapshot provider at the end of this chain.
+ * Shipping rates we invented would be indistinguishable, to a user, from rates
+ * we fetched — and a confidently wrong price is the one failure this product
+ * cannot have. Offline continuity comes from the service worker replaying the
+ * last table the user genuinely received; when there is none, the UI says so
+ * (ADR-013).
  */
-export const PROVIDER_CHAIN: readonly ProviderId[] = ['exchangerate-api', 'fixture'];
+export const PROVIDER_CHAIN: readonly ProviderId[] = ['exchangerate-api'];

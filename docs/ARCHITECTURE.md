@@ -35,7 +35,8 @@ flowchart TD
     HOOK -->|"one request per session"| API["/api/rates route handler"]
     API -->|"revalidate: 3600"| CACHE["Next.js Data Cache"]
     CACHE -->|"cache miss only"| PROV["Rate provider (open.er-api.com)"]
-    API -->|"on provider failure"| FIX["Bundled snapshot fixture"]
+    API -->|"all providers failed"| ERR["503 → honest unavailable state"]
+    SW["Service worker cache"] -->|"offline: last real table"| HOOK
     HOOK --> TABLE["In-memory rate table"]
     TABLE --> CONV["lib/currency/convert (pure)"]
     CONV --> FMT["lib/currency/format (Intl)"]
@@ -102,7 +103,8 @@ sequenceDiagram
             P-->>R: rates payload
             R-->>H: validated table (fresh)
         else Provider fails
-            R-->>H: fixture table (degraded, dated)
+            R-->>H: 503 rates_unavailable
+            Note over H: Service worker may replay the last<br/>real table. With none, the UI says<br/>rates are unavailable (ADR-013)
         end
     end
     H-->>C: table + freshness
@@ -347,14 +349,13 @@ change terms, and we should never be architecturally hostage to one.
 
 ### Fallback chain
 
-`services/rates/index.ts` tries providers in order and returns the first success:
+`services/rates/index.ts` tries providers in order and returns the first success. Today the chain has
+one entry — `exchangerate-api` (`open.er-api.com`, keyless, 160+ currencies) — and when it fails,
+`resolveRates` throws `RatesUnavailableError` rather than substituting anything.
 
-1. **`exchangerate-api`** — `open.er-api.com`, keyless, 160+ currencies, daily refresh.
-2. **`fixture`** — a dated snapshot committed to the repo. Always succeeds. Returns `degraded: true`.
-
-The fixture provider is not a testing convenience — it is a **production reliability component**.
-It guarantees the app renders a useful answer with the provider entirely unreachable
-(PRD requirement FR-5, E10, E11), and it is what makes the app work offline.
+**There is deliberately no bundled-snapshot provider** (ADR-013). Offline continuity comes from the
+service worker replaying the last table the user genuinely received; when there is none, the UI says
+rates are unavailable and offers a retry.
 
 ### Validation at the boundary
 
@@ -393,15 +394,18 @@ needed for caching, and why we can stay comfortably inside a free provider's lim
 
 ## 9. Error and Degradation Strategy
 
-We degrade rather than fail. The hierarchy, in order of preference:
+We degrade rather than fail — but never past the point where the number stops being real. The
+hierarchy, in order of preference:
 
 1. **Fresh live rates** — normal operation.
-2. **Cached rates** — served from the Data Cache; user sees the fetch timestamp.
-3. **Fixture rates** — provider down or unreachable; clearly labeled as approximate and dated.
-4. **Never** — a blank screen, a raw error, or a number with no indication of its provenance.
+2. **Cached rates** — from Next's Data Cache, or from the service worker when the device is offline.
+   These are real rates the user previously received; the UI shows their age.
+3. **An honest "rates unavailable" screen** with a retry — when there is nothing real to show.
+4. **Never** — a blank screen, a raw error, or **a number nobody fetched**.
 
-The rule underneath all four: **the app never presents degraded data as if it were live.** A wrong
-number shown confidently costs more trust than a missing feature ever could.
+The rule underneath all four: **the app never presents data as more current or more real than it
+is.** A wrong number shown confidently costs more trust than a missing feature ever could — which is
+exactly why step 3 is an error state rather than a bundled snapshot (ADR-013).
 
 Server-side failures are logged with the provider id and status. Client-side, the user sees a plain
 sentence, never a stack trace or an error code.
@@ -632,6 +636,38 @@ to nothing.
 `false`. The seam is exercised today (the gallery renders a camera `IconButton` in the trailing slot)
 and asserted by a test, so "no redesign required" is a claim that fails loudly if it stops being
 true.
+
+---
+
+### ADR-013 — No bundled fallback rates; fail honestly instead
+
+**Supersedes** the fixture-provider element of ADR-002.
+
+**Decision.** Ship no snapshot of exchange rates. When every provider fails and no cached table
+exists, show an explicit "rates unavailable" state with a retry.
+
+**Alternatives.** (a) Commit a dated snapshot as a last-resort provider, labelled "approximate".
+(b) Fall back to a small set of major-currency rates.
+
+**Rationale.** The original design called for a bundled fixture, and it was wrong for a reason worth
+recording: **we have no source of real rate data at build time.** Any committed table would be
+numbers someone made up, and to a traveler standing in a shop they would be indistinguishable from
+rates we fetched — same typography, same confident presentation, on the screen they are using to
+decide whether to spend money.
+
+Labelling them "approximate" does not fix this. A user who sees `฿1,890 = €48` has already made the
+decision by the time they read the caption, and a caption cannot un-anchor a number.
+
+This is the direct application of Value #4 in `PROJECT_BIBLE.md`: honesty about uncertainty. "Handle
+errors gracefully" means degrading in a way the user can reason about — not manufacturing data to
+avoid an empty state.
+
+**Consequences.** A first-ever visit while completely offline shows an error rather than a
+conversion. That is the honest outcome, and it is narrow: after one successful load the service
+worker holds a real table, which covers the actual travel scenario (connection lost _during_ a trip).
+`PROVIDER_CHAIN` still supports multiple providers, so adding a second _real_ source later is a
+config entry. If a genuine offline dataset is ever licensed, it can be added as a provider with a
+real `fetchedAt` — the interface already allows it.
 
 ---
 

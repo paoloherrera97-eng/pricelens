@@ -38,12 +38,17 @@ describe('provider registry', () => {
     }
   });
 
-  it('ends the chain with a fallback that needs no network', () => {
-    // This is what guarantees the app always renders a result (PRD FR-5, E10).
-    const last = PROVIDER_CHAIN[PROVIDER_CHAIN.length - 1];
-    expect(last).toBeDefined();
-    expect(RATE_PROVIDERS[last!].kind).toBe('fallback');
-    expect(RATE_PROVIDERS[last!].endpoint).toBeUndefined();
+  it('has a non-empty chain', () => {
+    expect(PROVIDER_CHAIN.length).toBeGreaterThan(0);
+  });
+
+  it('ships no provider that invents rates', () => {
+    // ADR-013: offline continuity comes from replaying rates the user really
+    // received, never from bundled numbers that would look equally real.
+    for (const provider of Object.values(RATE_PROVIDERS)) {
+      expect(provider.kind, provider.id).toBe('live');
+      expect(provider.endpoint, provider.id).toBeTruthy();
+    }
   });
 
   it('requires no API keys, so the app deploys with zero secrets', () => {
