@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -207,5 +207,53 @@ describe('Select — pointer', () => {
 
     await user.click(trigger);
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+});
+
+describe('Select — touch scrolling (iOS Safari regression)', () => {
+  /**
+   * The bug this guards against: options used to commit on `pointerdown` with
+   * `preventDefault()`, which made the list impossible to scroll on a phone —
+   * a finger landing on a row selected it instantly, and preventDefault
+   * suppressed the browser's own scrolling.
+   *
+   * Playwright's `.click()` and Testing Library's `user.click()` both fire the
+   * full pointerdown → pointerup → click sequence, so every existing test
+   * passed while real dragging was broken. These assert the distinction.
+   */
+  it('does not select on pointerdown alone — that is the start of a scroll', async () => {
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    const option = screen.getByRole('option', { name: /THB/ });
+    fireEvent.pointerDown(option, { pointerType: 'touch' });
+    fireEvent.pointerUp(option, { pointerType: 'touch' });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('selects on click, which the browser only fires for a real tap', async () => {
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    fireEvent.click(screen.getByRole('option', { name: /THB/ }));
+    expect(onChange).toHaveBeenCalledWith('THB');
+  });
+
+  it('does not move the active option on touch pointerenter', async () => {
+    // Otherwise the highlight would follow the finger while scrolling.
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    const search = screen.getByRole('combobox');
+    const before = search.getAttribute('aria-activedescendant');
+    fireEvent.pointerEnter(screen.getByRole('option', { name: /USD/ }), { pointerType: 'touch' });
+
+    expect(search.getAttribute('aria-activedescendant')).toBe(before);
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
