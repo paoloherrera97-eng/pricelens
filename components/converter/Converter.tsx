@@ -282,14 +282,6 @@ export function Converter() {
         )}
       </div>
 
-      {FEATURES.favourites && (
-        <FavouriteList
-          favourites={favourites}
-          current={currentPair}
-          onSelect={handleSelectFavourite}
-        />
-      )}
-
       <ConversionResult
         original={originalFormatted}
         converted={conversion?.converted ?? null}
@@ -297,6 +289,19 @@ export function Converter() {
         isLoading={false}
         isEmpty={amountText.trim() === ''}
       />
+
+      {/* Debajo del resultado, no encima. Un favorito no es una entrada de
+          *esta* conversión: es el atajo para empezar la siguiente. Encima
+          separaba el selector de moneda de su propia respuesta —la adyacencia
+          más importante de la pantalla— y empujaba el resultado fuera del
+          pliegue en cuanto había un favorito guardado. */}
+      {FEATURES.favourites && (
+        <FavouriteList
+          favourites={favourites}
+          current={currentPair}
+          onSelect={handleSelectFavourite}
+        />
+      )}
 
       <ShareControls url={shareUrl} title={t('shareTitle', { from, to })} />
 
