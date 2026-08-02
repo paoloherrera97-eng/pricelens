@@ -195,7 +195,7 @@ data as if it were live. Requirement FR-5 exists to protect Value #4 in the Proj
 | **Responsive**      | Fully functional from 320px width upward. Mobile-first; desktop is the adaptation, not the baseline.                                                                                                                                          |
 | **Browser support** | Last 2 versions of Safari (iOS + macOS), Chrome, Firefox, Edge. iOS Safari is the primary target — it is what travelers carry.                                                                                                                |
 | **Reliability**     | The app renders and remains usable with the rate provider entirely unreachable.                                                                                                                                                               |
-| **Privacy**         | No tracking, no cookies, no PII, no third-party client-side scripts in V1.                                                                                                                                                                    |
+| **Privacy**         | No cookies, no PII, no cross-site tracking, no advertising scripts. **Vercel Web Analytics is enabled** for aggregate page counts — cookieless, first-party, no identifiers. See §6.2.                                                        |
 | **i18n readiness**  | Number and currency formatting is locale-aware from day one. UI copy ships in Spanish and lives entirely in a message catalogue — no user-facing string is hardcoded in a component. Adding a locale requires no component changes (ADR-009). |
 | **Installability**  | Valid manifest, maskable icons, and a registered service worker. The app renders and converts with the network unavailable, after a first successful load (ADR-007).                                                                          |
 
@@ -227,6 +227,35 @@ The reduction path, in order of return, for after launch:
    win, and a contained refactor.
 2. Re-measure before doing anything else — an assumed win is how this number got
    written down wrong the first time.
+
+---
+
+### 6.2 Analytics and the privacy claim
+
+**Vercel Web Analytics is enabled** (`@vercel/analytics`, mounted in the root layout).
+
+This is a real change to what §6 promised. The original wording was "no tracking, no cookies, no
+PII, **no third-party client-side scripts**" — and analytics is a client-side script that counts page
+views. Recording the narrower, accurate claim beats leaving a privacy promise that the code no longer
+keeps.
+
+What is and is not true now:
+
+| Still true                             | Changed                                 |
+| -------------------------------------- | --------------------------------------- |
+| No cookies                             | A script now loads on every page view   |
+| No PII collected                       | Aggregate page-view counts are recorded |
+| No cross-site tracking, no ad networks |                                         |
+| No user identifiers                    |                                         |
+
+Mitigating details, which are why this is a small change rather than a reversal of intent: the script
+is served **first-party** from `/_vercel/insights/` (not a third-party domain), Vercel Web Analytics
+is cookieless by design, and it collects no persistent identifier. No consent banner is required for
+it under GDPR on that basis — but that is a judgement to confirm with counsel before launching in the
+EU, not something to take from this document.
+
+The service worker does not cache it: `sw.js` only handles `/_next/static/` and `/icons/`, so
+analytics is never served from cache and never runs offline.
 
 ---
 
