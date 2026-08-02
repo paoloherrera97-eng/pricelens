@@ -9,6 +9,43 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — iOS launch screens (Phase 2, feature 2 of 8)
+
+The last piece of the PWA item. Installability, offline support, the manifest and the icon set all
+shipped in V1 (ADR-007); what remained was that an installed app opened on a blank white screen on
+iOS — and on a dark-themed phone, a white flash before a dark app.
+
+Android and desktop Chrome build a launch screen themselves from the manifest (`background_color`
+plus the icon). iOS does not. The only way to control it is to ship one image per device
+resolution, matched by a media query stating the device's exact CSS width, height and pixel ratio; a
+near miss matches nothing and you are back to white.
+
+- **36 generated launch screens** — 18 portrait device sizes (every iPhone still in circulation,
+  plus current iPads) × light and dark. 624KB in the repository, but a device downloads exactly one
+  of them, and only when the app is installed to the home screen. They are deliberately outside the
+  service worker's caching rules for the same reason: nothing the page renders ever requests them.
+- **They render what Android generates** — the app background with the icon tile centred — so the
+  two platforms look the same on launch. That was worth more than a distinct treatment on one.
+- **Dark handling without a cliff.** The light image carries no colour-scheme condition, so it
+  always matches and acts as the fallback; the dark one is declared afterwards and only matches in
+  dark mode, so it wins there. On an engine that ignores `prefers-color-scheme` in this position,
+  the light image still applies rather than nothing at all.
+- **`scripts/generate-splash.mjs`** writes both the images and `config/splash.ts`, so the device
+  matrix has one source of truth — the same generated-config pattern as countries and currencies.
+  Pure Node, no image dependency; the PNG encoder and the mark itself moved to `scripts/lib/` and
+  are now shared with the icon generator, whose output is unchanged **byte for byte**.
+
+**Also fixed while here: the home-screen icon was never declared.** `apple-touch-icon.png` existed
+in `public/icons/` but no `<link>` pointed at it, and iOS only looks for that filename at the site
+root — so an installed app took a screenshot of the page as its icon. The metadata now declares the
+icon set explicitly.
+
+Six tests cover what nothing else can: these files are fetched by iOS and by nothing we render, so a
+broken entry produces no error, no warning and no failing request — just a white screen on a phone.
+They assert every declared file exists, that each filename matches the device pixels its own media
+query claims, that light is always declared before dark, and that every entry is portrait-only to
+match the manifest.
+
 ### Fixed — the picker list actually scrolls on touch (second attempt)
 
 The first attempt moved selection from `pointerdown` to `click`. That was necessary and it was not

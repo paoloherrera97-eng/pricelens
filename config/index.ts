@@ -16,4 +16,6 @@ export { DEFAULT_LOCALE, LOCALES, LOCALE_FORMATTING, isLocale } from './i18n';
 export type { Locale } from './i18n';
 export { PROVIDER_CHAIN, RATE_PROVIDERS } from './providers';
 export { SITE } from './site';
+export { SPLASH_SCREENS } from './splash';
+export type { SplashScreen } from './splash';
 export type { ProviderConfig, ProviderId } from './providers';
