@@ -483,3 +483,159 @@ describe('Converter — favourites', () => {
     expect(await resultText()).toBe(before);
   });
 });
+
+describe('Converter — share', () => {
+  /**
+   * `navigator.share` and `navigator.clipboard` are getter-only on the
+   * prototype, so they are defined on the instance and removed afterwards —
+   * leaving one behind would silently change which branch the next test takes.
+   */
+  const stubbed: string[] = [];
+  function stubNavigator(props: Record<string, unknown>) {
+    for (const [key, value] of Object.entries(props)) {
+      Object.defineProperty(navigator, key, { value, configurable: true });
+      stubbed.push(key);
+    }
+  }
+
+  afterEach(() => {
+    for (const key of stubbed.splice(0)) {
+      delete (navigator as unknown as Record<string, unknown>)[key];
+    }
+  });
+
+  function shareButton() {
+    return screen.getByRole('button', { name: /Compartir|Copiar enlace/ });
+  }
+
+  async function ready() {
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(/1 [A-Z]{3} =/)).toBeInTheDocument());
+  }
+
+  it('restores country, currency and amount from a shared link', async () => {
+    window.history.replaceState(null, '', '/?country=TH&to=JPY&amount=1890');
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
+    expect(screen.getByLabelText('Importe')).toHaveValue('1890');
+    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+  });
+
+  it('does not let detection overrule a currency the link named', async () => {
+    // A shared price is a statement about which conversion to show. Guessing
+    // over it would make links unreliable in exactly the case they exist for.
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('en-GB');
+    window.history.replaceState(null, '', '/?country=TH&to=JPY');
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+  });
+
+  it('ignores the broken half of a mangled link', async () => {
+    window.history.replaceState(null, '', '/?country=TH&to=NOPE');
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
+    expect(screen.getByText(/1 THB =/)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
+  });
+
+  it('writes the conversion into the address bar', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    await user.type(screen.getByLabelText('Importe'), '1890');
+
+    await waitFor(() => {
+      const params = new URLSearchParams(window.location.search);
+      expect(params.get('amount')).toBe('1890');
+      expect(params.get('country')).toBe('US');
+      expect(params.get('to')).toBe('EUR');
+    });
+  });
+
+  it('replaces rather than pushes, so back does not walk through every keystroke', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    const pushState = vi.spyOn(window.history, 'pushState');
+    render(<Converter />);
+    await ready();
+
+    await user.type(screen.getByLabelText('Importe'), '1890');
+    await waitFor(() => expect(window.location.search).toContain('amount=1890'));
+
+    expect(pushState).not.toHaveBeenCalled();
+  });
+
+  it('hands the native share sheet the link, where the browser has one', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    stubNavigator({ share });
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    await user.click(shareButton());
+
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    expect(share.mock.calls[0]?.[0]?.url).toContain('country=US');
+  });
+
+  it('copies to the clipboard when there is no share sheet', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    mockRates(SNAPSHOT);
+    // After `setup`, which installs a clipboard stub of its own.
+    const user = userEvent.setup();
+    stubNavigator({ clipboard: { writeText } });
+    render(<Converter />);
+    await ready();
+
+    await user.click(shareButton());
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    expect(writeText.mock.calls[0]?.[0]).toContain('to=EUR');
+    expect(await screen.findByText('Enlace copiado')).toBeInTheDocument();
+  });
+
+  it('stays quiet when the user dismisses the share sheet', async () => {
+    // Dismissing is a decision, not a failure — falling back to a clipboard
+    // write would hand them a link they just declined to send.
+    const share = vi.fn().mockRejectedValue(new DOMException('cancelled', 'AbortError'));
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    stubNavigator({ share, clipboard: { writeText } });
+    render(<Converter />);
+    await ready();
+
+    await user.click(shareButton());
+
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(writeText).not.toHaveBeenCalled();
+    expect(screen.queryByText('Enlace copiado')).not.toBeInTheDocument();
+  });
+
+  it('leaves the conversion untouched when the link is shared', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    mockRates(SNAPSHOT);
+    // After `setup`, which installs a clipboard stub of its own.
+    const user = userEvent.setup();
+    stubNavigator({ clipboard: { writeText } });
+    render(<Converter />);
+    await ready();
+
+    await user.type(screen.getByLabelText('Importe'), '100');
+    const before = await resultText();
+    await user.click(shareButton());
+
+    expect(await resultText()).toBe(before);
+  });
+});

@@ -46,6 +46,7 @@
     "eslint-config-next": "16.2.12",
     "intl-messageformat": "^11.2.13",
     "jsdom": "^28.0.1",
+    "jsqr": "^1.4.0",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4.3.3",

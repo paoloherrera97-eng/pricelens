@@ -833,3 +833,55 @@ two routes to one answer. Storing the country and comparing by pair gets both pr
 - **The conversion path is untouched.** Favourites set the same two pieces of state the pickers set
   and own none of their own; nothing in `lib/currency` or the rates layer is aware they exist.
 - Behind `FEATURES.favourites`.
+
+---
+
+### ADR-017 — The conversion lives in the URL; the QR encoder is written, not installed
+
+**Decision.** Carry `country`, `to` and `amount` as query parameters, synchronised with
+`history.replaceState`. Share through the Web Share API where it exists, the clipboard where it does
+not, and a QR code on devices with no touch input. Encode the QR with code in this repository rather
+than a dependency.
+
+**Rationale, in three parts.**
+
+**Why `replaceState` and not the router.** A router navigation re-renders the tree; the address bar
+is not application state and nothing on screen depends on it. `replaceState` is a native,
+synchronous write React never sees, debounced so a fast typist produces one update rather than ten.
+And _replace_ rather than _push_, because pushing would make the back button walk backwards through
+every amount the user typed — a history nobody wants.
+
+**Why the amount travels as typed.** Normalising it would mean choosing a format, and the recipient
+would see a number the sender never wrote. Passing the raw text through means a shared link shows
+someone their own price. It is run through the same sanitiser the input uses, in both directions, so
+a link can never introduce text the field would have refused — and a hand-written `?amount=1890.5`
+still works.
+
+**Why a link outranks detection.** Opening a shared price is an explicit statement about which
+conversion to show. ADR-015's home-currency guess is deliberately skipped when the link names a
+currency: guessing over the sender's intent would make shared links unreliable in exactly the case
+they exist for.
+
+**Why the QR encoder is ours.** What the app needs from QR is "turn a short URL into a matrix of
+booleans" — a bounded, fully specified algorithm (ISO/IEC 18004), where a library would ship its own
+take on modes, levels and versions we will never use. The same reasoning as the PNG encoder in
+`scripts/lib` and the service worker.
+
+That is only defensible because it is **verifiable**, and this is the load-bearing part: a QR that
+encodes to garbage looks exactly like one that works. The tests decode the output with an
+independent decoder (`jsqr`, a devDependency that never ships) at every payload length across the
+supported range, and the browser check scans the _rendered SVG_ back out of the DOM. Nothing less
+would justify hand-rolling it.
+
+**Consequences.**
+
+- Byte mode, level M, versions 1–10 — 213 bytes, several times the longest URL this app produces.
+  Longer text returns null and the QR is simply not offered, which is not an error condition.
+- The QR renders **black on white in both themes**. Inverting for dark mode would look tidier and
+  scan worse; the white plate doubles as the quiet zone the specification requires.
+- Fallbacks are chosen by **capability, not by user agent or width**: `navigator.share` for the
+  sheet, and "no coarse pointer at all" for the QR — a phone in landscape is not a desktop.
+- Dismissing the share sheet is a decision, not a failure. It does not fall through to a clipboard
+  write, which would hand the user a link they just declined to send.
+- The address bar now changes as the user types, which means **tests must reset it**: jsdom shares
+  one `window` per file, so one test's URL would otherwise become the next test's shared link.

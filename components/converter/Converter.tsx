@@ -17,12 +17,15 @@ import {
 } from '@/config';
 import { useDetectedHomeCurrency } from '@/hooks/useDetectedHomeCurrency';
 import { useFavourites } from '@/hooks/useFavourites';
+import { useSharedLink } from '@/hooks/useSharedLink';
+import { useShareUrl } from '@/hooks/useShareUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRates } from '@/hooks/useRates';
 import { convert, getRate } from '@/lib/currency/convert';
 import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency/format';
 import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
+import type { PartialShareState } from '@/lib/share/url';
 import { parseAmount, sanitizeAmountInput } from '@/lib/currency/parse';
 
 import { ConversionResult } from './ConversionResult';
@@ -32,9 +35,13 @@ import { CurrencyPicker } from './CurrencyPicker';
 import { FavouriteList } from './FavouriteList';
 import { FavouriteToggle } from './FavouriteToggle';
 import { RateFreshness } from './RateFreshness';
+import { ShareControls } from './ShareControls';
 import { SwapButton } from './SwapButton';
 
 const LOCALE = LOCALE_FORMATTING[DEFAULT_LOCALE];
+
+/** A stable no-op, so skipping detection does not itself churn the effect. */
+const NO_DETECTION = () => {};
 
 /** The country shown on a cold start, derived from the configured default. */
 const DEFAULT_COUNTRY = countryForCurrency(APP_CONFIG.defaultForeignCurrency)?.code ?? 'US';
@@ -161,11 +168,34 @@ export function Converter() {
     [setTo],
   );
 
+  // A link the user opened is a statement about which conversion to show, so it
+  // is applied before anything guesses on their behalf.
+  const applyShared = useCallback(
+    (shared: PartialShareState) => {
+      if (shared.country) setCountryCode(shared.country);
+      if (shared.to) setTo(shared.to);
+      if (shared.amount !== undefined) setAmountText(shared.amount);
+    },
+    [setTo],
+  );
+
+  const { hadHomeCurrency } = useSharedLink(applyShared);
+
   // A first-time visitor gets their own currency guessed from the device rather
   // than the configured default. Routed through the handler above rather than
   // `setTo`, so a guess that collides with the destination country resolves the
   // same way a manual pick would instead of leaving a 1:1 dead end.
-  useDetectedHomeCurrency(handleHomeChange);
+  //
+  // Skipped when the link named a currency: guessing over a shared price would
+  // make shared links unreliable in exactly the case they exist for.
+  useDetectedHomeCurrency(hadHomeCurrency ? NO_DETECTION : handleHomeChange);
+
+  const shareUrl = useShareUrl(
+    useMemo(
+      () => ({ country: countryCode, to, amount: amountText }),
+      [countryCode, to, amountText],
+    ),
+  );
 
   if (rates.status === 'loading') {
     return <ConverterSkeleton label={tRates('loading')} />;
@@ -267,6 +297,8 @@ export function Converter() {
         isLoading={false}
         isEmpty={amountText.trim() === ''}
       />
+
+      <ShareControls url={shareUrl} title={t('shareTitle', { from, to })} />
 
       {freshness && (
         <RateFreshness age={freshness.age} isStale={freshness.stale} isOffline={!isOnline} />
