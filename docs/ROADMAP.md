@@ -40,6 +40,41 @@ under 3 seconds — and trust the number.
 
 ---
 
+## Post-launch backlog (Phase 2)
+
+V1 is live. This is the agreed order of work after launch, **one feature per pull request**, each
+with lint, typecheck, tests and build green before merge.
+
+Two items were already delivered inside V1, so they are narrowed rather than rebuilt — the rule for
+this phase is that nothing already working gets modified.
+
+| #   | Feature                | Status                   | Scope                                                                                                                             |
+| --- | ---------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | SEO                    | To build                 | Metadata, Open Graph, Twitter Cards, `robots.txt`, `sitemap.xml`, canonical URLs                                                  |
+| 2   | PWA                    | **Mostly shipped in V1** | Installable, offline, manifest and icons are live (ADR-007). Only **splash screens** remain                                       |
+| 3   | Conversion history     | To build                 | localStorage, timestamps, clear. Note: V1 deliberately excluded history — this reverses that scope decision and needs its own ADR |
+| 4   | Favourites             | To build                 | Saved pairs, quick access                                                                                                         |
+| 5   | Share                  | To build                 | Web Share API, copy link, QR code. Needs URL state first                                                                          |
+| 6   | Country auto-detection | To build                 | Locale and timezone heuristics, intelligent defaults                                                                              |
+| 7   | Error recovery         | **Shipped in V1**        | Retry, offline notice, and graceful fallback are live (ADR-013). Re-audit rather than rebuild                                     |
+| 8   | Lighthouse 100 × 4     | To build                 | Performance, Accessibility, Best Practices, SEO                                                                                   |
+
+### Two of these deserve a flag before they are started
+
+**#3 Conversion history reverses a V1 scope decision.** `PROJECT_BIBLE.md` lists history under
+"decisions, not omissions", and `PRODUCT_REQUIREMENTS.md` §4.3 draws a hard line: `localStorage` holds
+one preference key, explicitly _not_ "a history or a log". Building it is entirely reasonable — but it
+changes what the product promises about the data it keeps, so it needs an ADR and an update to the
+privacy section rather than a quiet extension of storage.
+
+**#8 Lighthouse 100 across the board is not free.** The Performance score is the one at risk: the
+initial client JS is 175KB gzipped against a documented 100KB target (§6.1), which is largely React
+plus the Next runtime plus next-intl. Reaching 100 will most likely require moving next-intl off the
+client. That is a real refactor of working code, which sits in tension with "do not modify anything
+that already works" — worth deciding deliberately when the item comes up.
+
+---
+
 ## V2 — Comfort
 
 **Theme:** Make the second and hundredth use faster than the first.
