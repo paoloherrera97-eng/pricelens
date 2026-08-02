@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -49,6 +50,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <NextIntlClientProvider>
           {children}
           <ServiceWorkerRegistrar />
+          {/* Vercel Web Analytics — aggregate page views, cookieless, served
+              first-party from /_vercel/insights. Renders nothing. */}
+          <Analytics />
         </NextIntlClientProvider>
       </body>
     </html>

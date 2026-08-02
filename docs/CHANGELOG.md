@@ -9,6 +9,19 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added
+
+- **Vercel Web Analytics** (`@vercel/analytics@2.0.1`), mounted in the root layout via the
+  `@vercel/analytics/next` entry point. Aggregate page views only.
+
+### Changed
+
+- **The privacy requirement in `PRODUCT_REQUIREMENTS.md` §6 has been narrowed to stay true.** It
+  previously promised "no tracking, no cookies, no PII, **no third-party client-side scripts**".
+  Analytics is a client-side script that counts page views, so the claim no longer held as written.
+  What remains true — no cookies, no PII, no cross-site tracking, no ad networks — is now stated
+  precisely, and §6.2 records what changed and why the script is first-party and cookieless.
+
 ### Added — Phase 6: Deployment readiness
 
 - **`docs/DEPLOYMENT.md`** — pre-flight, deploy, custom-domain, rollback, and post-launch monitoring.
