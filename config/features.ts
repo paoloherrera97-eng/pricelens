@@ -23,9 +23,11 @@ export const FEATURES = {
    * restores the configured default for everyone.
    */
   detectHomeCurrency: true,
+  /** Save and recall currency pairs (ADR-016). Off hides the star and the row. */
+  favourites: true,
 
   // --- Deliberately off. Each has a roadmap entry. --------------------
-  /** V2 — recent/favourite currencies. */
+  /** V2 — automatically surfaced recents, distinct from saved favourites. */
   recentCurrencies: false,
   /** V2 — dark mode. Tokens are already CSS variables, so this is a palette. */
   darkMode: false,

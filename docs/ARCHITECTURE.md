@@ -790,3 +790,46 @@ English speaker on that basis would be worse than the honest default.
 - Detection failing, throwing, or naming a currency with no rate all leave the configured default in
   place. The feature can only improve on the default or do nothing.
 - Behind `FEATURES.detectHomeCurrency`; turning it off restores the previous behaviour exactly.
+
+---
+
+### ADR-016 — Favourites extend stored data; history still does not
+
+**Decision.** Persist a second `localStorage` key holding user-saved currency pairs. Identity is the
+currency _pair_; each entry stores the country alongside the home currency.
+
+**Rationale.** ADR-005 drew a deliberate line and required that any extension of stored data come
+with an ADR of its own. This is that ADR, and the line it moves is narrower than it first looks.
+
+What ADR-005 was protecting against was a **log**: data that accumulates by itself, records what the
+user did and when, and grows without anyone asking. Favourites are the opposite kind of thing. They
+are a **preference** — declarative, curated, written only by an explicit tap, bounded, and carrying
+no amounts and no timestamps. Nothing in the stored value says the user ever converted anything.
+"Remember these two currencies" is the same category of statement as "my home currency is EUR",
+which ADR-005 already permits.
+
+So the boundary is unchanged in the way that matters: **storage holds preferences the user chose,
+and nothing else.** Conversion history remains outside it, and remains a separate decision, because
+it is a log by definition.
+
+**Why the pair is the identity, but the country is what gets stored.** Selecting a favourite has to
+restore what the traveler actually saw, and this app asks for a country rather than a currency
+(ADR-014) — restoring "EUR → ARS" leaves the picker unable to say whether that was Spain or France.
+But Spain → ARS and France → ARS convert identically, so treating them as two favourites would offer
+two routes to one answer. Storing the country and comparing by pair gets both properties.
+
+**Consequences.**
+
+- **Bounded at 8.** A shortcut you have to search through is not a shortcut, and a cap means the
+  stored value can never grow large enough to be the reason a write fails. Adding past the cap drops
+  the least recently saved.
+- **Stored data is untrusted input.** It outlives deploys, so it can have been written by an older
+  build, hand-edited, or corrupted. Parsing drops entries that no longer resolve to a real country
+  and currency rather than rejecting the whole list, and collapses duplicates a previous version may
+  have written.
+- **No new UI surface for removal.** The star toggles the pair on screen, and selecting a favourite
+  makes it the pair on screen — so removal is the control that already means removal. A delete
+  target inside each chip would be either too small to hit or too large to fit on a phone.
+- **The conversion path is untouched.** Favourites set the same two pieces of state the pickers set
+  and own none of their own; nothing in `lib/currency` or the rates layer is aware they exist.
+- Behind `FEATURES.favourites`.

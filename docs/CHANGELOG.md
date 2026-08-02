@@ -9,6 +9,48 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — favourite pairs (Phase 2, feature 4 of 8)
+
+A star beside the home-currency selector saves the pair on screen; saved pairs appear as a row of
+chips, one tap from being restored.
+
+**One control does both directions.** "Save this" and "unsave this" are the same thought, so the
+star toggles: filled when the pair on screen is already saved, outlined when it is not. Tapping a
+chip makes that pair current — which fills the star — so removing any favourite is "tap it, unstar
+it", using the control that already means exactly that. There is deliberately no delete target
+inside the chips: a second button in each would be either too small to hit or too large to fit on
+the screen size that matters most.
+
+- **Identity is the currency pair; the country is what gets stored.** Selecting a favourite has to
+  restore what the traveler saw, and this app asks for a country rather than a currency (ADR-014) —
+  "EUR → ARS" cannot say whether that was Spain or France. But Spain → ARS and France → ARS convert
+  identically, so **saving one after the other is a no-op** rather than two chips reaching one
+  answer.
+- **Capped at 8**, newest first. A shortcut you have to search through is not a shortcut, and the
+  cap means the stored value can never be the reason a write fails.
+- **Stored data is treated as untrusted.** It outlives deploys, so parsing drops entries naming a
+  country or currency this build no longer carries — and collapses duplicates an older version might
+  have written — instead of rejecting the whole list. A corrupt value renders as no favourites, not
+  as a broken screen.
+- **Nothing appears until something is saved.** An empty-state prompt would be teaching a feature at
+  the moment the user is trying to read a price.
+- The chip row scrolls horizontally rather than wrapping, so its height never changes and the result
+  below it never moves.
+
+**The conversion path is untouched.** Favourites set the same two pieces of state the pickers set
+and own none of their own; nothing in `lib/currency` or the rates layer is aware they exist. There
+is a test asserting the displayed result is byte-identical across saving a favourite.
+
+Recorded as **ADR-016**, because ADR-005 required one for any extension of stored data. The
+distinction it draws: favourites are a _preference_ — declarative, curated, written only by an
+explicit tap, with no amounts and no timestamps — while history is a _log_. Storage still holds only
+preferences the user chose, so history remains a separate decision.
+
+**Verified** in Chromium at iPhone 13, Pixel 7 and desktop, with real CDP touch taps on the two
+mobile profiles: save, duplicate-prevention, restore-both-selectors, remove, persistence across
+reload, no horizontal page overflow, and every control at least 44px tall. axe reports 0 violations
+in both themes with favourites present. 28 new tests.
+
 ### Added — home-currency detection (Phase 2, feature 6 of 8)
 
 A first-time visitor's home currency is now guessed from their device instead of defaulting to

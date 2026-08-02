@@ -39,9 +39,14 @@ export const APP_CONFIG = {
 
   /**
    * localStorage keys. Namespaced so they cannot collide with anything else
-   * on the origin. Only the home currency is persisted — see ADR-005.
+   * on the origin.
+   *
+   * Both entries hold *preferences the user chose*, and nothing else: no
+   * amounts, no timestamps, no record of activity. That boundary is the whole
+   * of ADR-005 and ADR-016, and adding a key requires an ADR of its own.
    */
   storageKeys: {
     homeCurrency: 'pricelens.home-currency',
+    favourites: 'pricelens.favourites',
   },
 } as const;

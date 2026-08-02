@@ -53,7 +53,7 @@ this phase is that nothing already working gets modified.
 | 1   | SEO                    | **Shipped**       | Metadata, Open Graph, Twitter Cards, `robots.txt`, `sitemap.xml`, canonical URLs                                                  |
 | 2   | PWA                    | **Shipped**       | Installable, offline, manifest and icons shipped in V1 (ADR-007); iOS launch screens and the icon `<link>` tags followed          |
 | 3   | Conversion history     | To build          | localStorage, timestamps, clear. Note: V1 deliberately excluded history — this reverses that scope decision and needs its own ADR |
-| 4   | Favourites             | To build          | Saved pairs, quick access                                                                                                         |
+| 4   | Favourites             | **Shipped**       | Saved pairs, one-tap recall, capped at 8 (ADR-016)                                                                                |
 | 5   | Share                  | To build          | Web Share API, copy link, QR code. Needs URL state first                                                                          |
 | 6   | Country auto-detection | **Shipped**       | Locale region, then timezone. No permission prompt, no geolocation (ADR-015)                                                      |
 | 7   | Error recovery         | **Shipped in V1** | Retry, offline notice, and graceful fallback are live (ADR-013). Re-audit rather than rebuild                                     |
