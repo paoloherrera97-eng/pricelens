@@ -47,5 +47,13 @@
     "add": "Guardar este par como favorito",
     "remove": "Quitar este par de favoritos",
     "select": "{country}, de {from} a {to}"
+  },
+  "share": {
+    "share": "Compartir esta conversión",
+    "copy": "Copiar enlace de esta conversión",
+    "copied": "Enlace copiado",
+    "qr": "Mostrar código QR",
+    "qrLabel": "Código QR con el enlace a esta conversión",
+    "shareTitle": "PriceLens — {from} a {to}"
   }
 }

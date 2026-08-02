@@ -29,4 +29,9 @@ Object.defineProperty(navigator, 'language', {
 
 afterEach(() => {
   cleanup();
+  // The app writes the conversion into the address bar, and jsdom shares one
+  // `window` across every test in a file — so without this, one test's URL
+  // becomes the next test's shared link and silently changes its starting
+  // state.
+  window.history.replaceState(null, '', '/');
 });

@@ -9,6 +9,56 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — share (Phase 2, feature 5 of 8)
+
+A conversion is now a link. The address bar carries `country`, `to` and `amount`; a share control
+hands that link to the platform's own share sheet, the clipboard, or a QR code, whichever the device
+actually supports.
+
+**URL state**
+
+- Synchronised with `history.replaceState` — a native, synchronous write React never sees, debounced
+  so a fast typist produces one update rather than ten. **Replace, not push**: pushing would make the
+  back button walk backwards through every amount the user typed.
+- **The amount travels as typed.** Normalising it would mean choosing a format, and the recipient
+  would see a number the sender never wrote. It runs through the same sanitiser the input uses in
+  both directions, so a link can never introduce text the field would have refused — and a
+  hand-written `?amount=1890.5` still works.
+- A link is untrusted input: each parameter is validated independently, and a broken one is dropped
+  rather than failing the whole link. A URL truncated by a chat client still restores what survived.
+- **A link outranks detection.** Opening a shared price states which conversion to show, so the
+  home-currency guess from ADR-015 is skipped when the link names a currency.
+
+**Sharing**, chosen by capability rather than by user agent or screen width:
+
+- **Web Share** where the browser has it — the native sheet is where the user's own apps live.
+- **Clipboard** everywhere else, with a visible confirmation.
+- **A QR code** on devices with no touch input at all — the honest test for "this is a desktop and
+  the phone is the thing you want the link on". A phone in landscape is not a desktop.
+- Dismissing the share sheet is a decision, not a failure: it does **not** fall through to a
+  clipboard write, which would hand the user a link they just declined to send.
+
+**The QR encoder is written, not installed** (ADR-017) — byte mode, level M, versions 1–10, ~450
+lines, no runtime dependency. That is only defensible because it is verifiable: a QR that encodes to
+garbage looks exactly like one that works. The tests **decode the output with an independent
+decoder** (`jsqr`, a devDependency that never ships) at every payload length across the supported
+range, including exhaustively from 1 to 62 bytes; the browser check scans the **rendered SVG** back
+out of the DOM and compares it to the URL. Writing it also caught a real bug — the two copies of the
+format information were transposed, which no structural assertion would have noticed.
+
+It renders black on white in both themes. Inverting for dark mode would look tidier and scan worse;
+the white plate doubles as the quiet zone the specification requires.
+
+**Tests now reset the address bar between cases.** The app writes to it, and jsdom shares one
+`window` per file — so one test's URL was becoming the next test's shared link and silently changing
+its starting state. Three detection tests failed in the suite while passing alone, which is how it
+surfaced.
+
+**Verified** end to end against the production build: URL state written without adding history
+entries, a shared link restoring all three fields, Web Share receiving the URL on a touch device with
+no QR control offered, and on desktop the clipboard fallback plus a QR that **scans back to the
+correct URL**. axe: 0 violations on mobile in both themes and on desktop with the QR open.
+
 ### Added — favourite pairs (Phase 2, feature 4 of 8)
 
 A star beside the home-currency selector saves the pair on screen; saved pairs appear as a row of
