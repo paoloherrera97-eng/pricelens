@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import type { CSSProperties } from 'react';
 
 import { Skeleton } from '@/components/ui';
 import { cn } from '@/lib/utils/cn';
@@ -47,15 +48,33 @@ export function ConversionResult({
       {/* Polite, so the result is announced without interrupting typing. The
           region is always present: an aria-live container mounted at the same
           moment as its content is frequently not announced at all. */}
-      <div aria-live="polite" aria-atomic="true" className="mt-0.5 min-h-6 md:mt-1 md:min-h-8">
+      {/* `fit-container` makes this element the query container that sizes the
+          value below; `px-1` insets that container from the card's own padding,
+          which is both the comfortable gutter and the safety margin the sizing
+          estimate spends if a font runs wider than measured. */}
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className={cn(
+          'fit-container mt-0.5 min-h-6 px-1 md:mt-1 md:min-h-8',
+          // The reserved height stops the card resizing between states; now
+          // that the value's height varies with its length, the value has to be
+          // centred inside that reserve or a short number floats at the top.
+          'flex flex-col items-center justify-center',
+        )}
+      >
         {isLoading ? (
           <Skeleton className="mx-auto h-6 w-24" />
         ) : converted ? (
           <>
             <p
               key={converted}
+              // The character count is the second input to the sizing formula
+              // (app/globals.css). It has to come from here because only the
+              // component knows the string.
+              style={{ '--len': converted.length } as CSSProperties}
               className={cn(
-                'tabular text-display-sm sm:text-display animate-rise text-fg',
+                'tabular text-fit sm:text-fit-lg animate-rise text-fg',
                 // The empty state keeps the number in place but recedes, so the
                 // layout never jumps when the first digit is typed. `fg-muted`
                 // rather than `fg-subtle`: this is real text and must clear

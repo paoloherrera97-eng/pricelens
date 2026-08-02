@@ -151,13 +151,35 @@ build-time network access; where it is unavailable, ship the stack above unchang
 
 | Token               | Size / Line height | Weight | Use                     |
 | ------------------- | ------------------ | ------ | ----------------------- |
-| `--text-display`    | `3.5rem / 1.05`    | 700    | **The result**          |
-| `--text-display-sm` | `2.5rem / 1.1`     | 700    | The result at ≤ 375px   |
+| `--text-display`    | `4rem / 1`         | 700    | Result ceiling, ≥ 640px |
+| `--text-display-sm` | `3rem / 1.02`      | 700    | Result ceiling, mobile  |
 | `text-2xl`          | `1.5rem / 1.3`     | 600    | Page title              |
 | `text-lg`           | `1.125rem / 1.5`   | 500    | Amount input, selection |
 | `text-base`         | `1rem / 1.5`       | 400    | Body                    |
 | `text-sm`           | `0.875rem / 1.45`  | 400    | Labels, secondary line  |
 | `text-xs`           | `0.75rem / 1.4`    | 500    | Timestamps              |
+
+**The result is the one type size that is not fixed.** The two display tokens are its _ceiling_,
+not its size. A fixed 3rem is correct for `49,12 €` and wrong for `48.154.088,37 ARS`, which needs
+490px inside a 208px card — so the result is sized from the two things that decide whether it fits:
+
+```
+font-size: clamp(1rem, calc(100cqw / (var(--len) * 0.64)), var(--fit-max));
+```
+
+`100cqw` comes from the container (`.fit-container` on the live region), `--len` from the component
+(the character count of the formatted string), and `--fit-max` from the display token in force at
+that breakpoint. `0.64` is the measured per-character advance ceiling for a bold tabular string with
+this stack, and the live region's own 8px inset is the margin a wider face spends before it can
+reach the card edge. Consequences worth knowing before changing it:
+
+- The result **never wraps, never clips and never overflows**, at any string length or viewport.
+- It is **not** a fixed hierarchy: a short result renders at the full 3rem, an extreme one at ~23px.
+  Both still dominate the 1.125rem input above them, which is what the hierarchy has to preserve.
+- Tabular figures are what make length a usable proxy for width. Turning them off breaks the sizing,
+  not just the jitter.
+- New custom `--text-*` tokens must be registered in `lib/utils/cn.ts` or tailwind-merge classifies
+  them as colours and drops them.
 
 **Rules**
 
