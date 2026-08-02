@@ -34,7 +34,7 @@ export function FavouriteToggle({ isSaved, onToggle, className }: FavouriteToggl
       className={className}
     >
       <svg
-        className={isSaved ? 'text-warning-600 size-2.5' : 'size-2.5'}
+        className={isSaved ? 'text-accent size-2.5' : 'size-2.5'}
         viewBox="0 0 24 24"
         // Filled when saved, outlined when not: the difference is visible at a
         // glance and does not rely on colour alone (WCAG 1.4.1).

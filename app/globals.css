@@ -175,8 +175,12 @@
      animation, which is the point. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 120ms;
-  --duration-base: 200ms;
+  /* The namespace matters: Tailwind builds `duration-*` utilities from
+     `--transition-duration-*`, not from `--duration-*`. Under the old name the
+     variables existed, the classes did not, and every transition in the app
+     silently used Tailwind's 150ms default instead of these. */
+  --transition-duration-fast: 120ms;
+  --transition-duration-base: 200ms;
 }
 
 @layer base {
@@ -254,7 +258,7 @@
   }
 
   .animate-sheet {
-    animation: pl-sheet-up var(--duration-base) var(--ease-out) both;
+    animation: pl-sheet-up var(--transition-duration-base) var(--ease-out) both;
   }
 
   @keyframes pl-fade {
@@ -267,7 +271,7 @@
   }
 
   .animate-fade {
-    animation: pl-fade var(--duration-fast) var(--ease-out) both;
+    animation: pl-fade var(--transition-duration-fast) var(--ease-out) both;
   }
 }
 

@@ -15,7 +15,10 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const VARIANTS: Record<IconButtonVariant, string> = {
-  solid: 'bg-primary-600 text-white shadow-md hover:bg-primary-700',
+  // `shadow-sm`, not `shadow-md`: `md` is the card's own elevation, and a
+  // 44px control lifted as far as the surface holding it flattens the
+  // hierarchy instead of expressing it.
+  solid: 'bg-primary-600 text-white shadow-sm hover:bg-primary-700',
   subtle:
     'bg-surface text-fg-muted shadow-sm ring-1 ring-outline-soft hover:bg-sunken hover:text-fg',
   ghost: 'bg-transparent text-fg-muted hover:bg-sunken hover:text-fg',
