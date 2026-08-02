@@ -58,8 +58,13 @@ export function Button({
       {...props}
     >
       {/* The label keeps its space while loading, so the button cannot resize
-          under the user's finger mid-tap. */}
-      <span className={cn(isLoading && 'invisible')}>{children}</span>
+          under the user's finger mid-tap.
+
+          `opacity-0`, NOT `invisible`: `visibility: hidden` removes the element
+          from the accessibility tree, so a loading button would lose its name
+          entirely. Caught by an axe audit — a jsdom unit test cannot see this,
+          because Tailwind's CSS is never applied there. */}
+      <span className={cn(isLoading && 'opacity-0')}>{children}</span>
       {isLoading && (
         <span className="absolute inset-0 flex items-center justify-center">
           <Spinner />

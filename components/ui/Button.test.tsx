@@ -51,6 +51,17 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Convertir' })).toBeInTheDocument();
   });
 
+  it('hides the loading label with opacity, never with visibility', () => {
+    // Regression guard. `invisible` (visibility: hidden) removes the element
+    // from the accessibility tree, which silently costs the button its name.
+    // jsdom applies no Tailwind CSS, so this asserts the class directly — the
+    // rendered behaviour is covered by the axe audit.
+    render(<Button isLoading>Convertir</Button>);
+    const label = screen.getByText('Convertir');
+    expect(label).toHaveClass('opacity-0');
+    expect(label).not.toHaveClass('invisible');
+  });
+
   it('does not fire when disabled', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();

@@ -49,7 +49,7 @@ export function DesignSystemGallery() {
   const [amount, setAmount] = useState('1890');
 
   return (
-    <div className="mx-auto max-w-lg px-2 py-4 md:px-4">
+    <main className="mx-auto max-w-lg px-2 py-4 md:px-4">
       <header className="mb-5">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
           Sistema de diseño
@@ -180,7 +180,7 @@ export function DesignSystemGallery() {
           ))}
         </Card>
       </Section>
-    </div>
+    </main>
   );
 }
 
