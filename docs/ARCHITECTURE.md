@@ -2,26 +2,27 @@
 
 **Status:** Approved for build · **Applies to:** V1 MVP
 
-This document defines *how* PriceLens is built. It assumes the *what* from `PRODUCT_REQUIREMENTS.md`
-and the *why* from `PROJECT_BIBLE.md`.
+This document defines _how_ PriceLens is built. It assumes the _what_ from `PRODUCT_REQUIREMENTS.md`
+and the _why_ from `PROJECT_BIBLE.md`.
 
 ---
 
 ## 1. Stack
 
-| Concern | Choice | Version | Note |
-| --- | --- | --- | --- |
-| Framework | Next.js (App Router) | `16.2.x` | React Server Components, Route Handlers |
-| Runtime | React | `19.2.x` | |
-| Language | TypeScript | **`^6.0.3`** | **Not 7.x** — see ADR-004 |
-| Styling | Tailwind CSS | `4.3.x` | CSS-first config; no `tailwind.config.js` |
-| Linting | ESLint + `eslint-config-next` + `typescript-eslint` | `10.x` / `16.2.x` / `8.65.x` | Type-aware rules |
-| Formatting | Prettier | `3.9.x` | |
-| Testing | Vitest + Testing Library | `4.1.x` | Runs offline against fixtures |
-| Package manager | pnpm | `10.x` | |
-| Hosting | Vercel | — | Zero required environment variables |
+| Concern         | Choice                                              | Version                            | Note                                      |
+| --------------- | --------------------------------------------------- | ---------------------------------- | ----------------------------------------- |
+| Framework       | Next.js (App Router)                                | `16.2.12`                          | React Server Components, Route Handlers   |
+| Runtime         | React                                               | `19.2.x`                           |                                           |
+| Language        | TypeScript                                          | **`^6.0.3`**                       | **Not 7.x** — see ADR-004                 |
+| Styling         | Tailwind CSS                                        | `4.3.x`                            | CSS-first config; no `tailwind.config.js` |
+| i18n            | next-intl                                           | `4.13.x`                           | ICU messages — see ADR-009                |
+| Linting         | ESLint + `eslint-config-next` + `typescript-eslint` | **`9.39.x`** / `16.2.x` / `8.65.x` | **Not 10.x** — see ADR-004                |
+| Formatting      | Prettier                                            | `3.9.x`                            |                                           |
+| Testing         | Vitest + Testing Library                            | `4.1.x`                            | Runs offline against fixtures             |
+| Package manager | pnpm                                                | `10.x`                             |                                           |
+| Hosting         | Vercel                                              | —                                  | Zero required environment variables       |
 
-Exact versions are pinned in Phase 2 and recorded in `CHANGELOG.md`.
+Exact versions are pinned in `package.json` and recorded in `CHANGELOG.md`.
 
 ---
 
@@ -61,13 +62,13 @@ pairs that don't involve the base currency at all.
 
 ### Why this and not a request per conversion
 
-| | One table + local math | Request per conversion |
-| --- | --- | --- |
-| Keystroke latency | ~0ms (arithmetic) | 100–800ms + debounce delay |
-| Requests per session | 1 | 10–40 |
-| Behavior on flaky Wi-Fi | Fully working | Broken exactly when needed |
-| Provider rate-limit exposure | Negligible | Real |
-| Debounce complexity | None needed | Required, and user-visible |
+|                              | One table + local math | Request per conversion     |
+| ---------------------------- | ---------------------- | -------------------------- |
+| Keystroke latency            | ~0ms (arithmetic)      | 100–800ms + debounce delay |
+| Requests per session         | 1                      | 10–40                      |
+| Behavior on flaky Wi-Fi      | Fully working          | Broken exactly when needed |
+| Provider rate-limit exposure | Negligible             | Real                       |
+| Debounce complexity          | None needed            | Required, and user-visible |
 
 The second column is easier to write. The first column is the product. Recorded as **ADR-001**.
 
@@ -131,6 +132,7 @@ Boundaries are what make this codebase testable without a browser and changeable
 ├──────────────────────────────────────────────┤
 │ lib/          Pure domain logic              │  knows nothing (by design)
 └──────────────────────────────────────────────┘
+   config/      Data and settings — a leaf, importable by any layer
 ```
 
 **Enforced rules:**
@@ -141,7 +143,12 @@ Boundaries are what make this codebase testable without a browser and changeable
 - `components/` never calls `fetch` and never imports from `services/`. Data arrives as props or via
   a hook.
 - `services/` never imports React.
+- `config/` imports nothing from the app and may be imported by anything. It is data, not behaviour.
 - Dependencies point downward only. A violation is a review blocker.
+
+**These rules are enforced by ESLint**, not by review discipline alone: `eslint.config.mjs` applies
+`no-restricted-imports` per directory, so a boundary violation fails the build. A rule that lives
+only in a document is a rule that erodes.
 
 ---
 
@@ -170,12 +177,22 @@ components/
     SwapButton.tsx
     RateFreshness.tsx
 
+    pwa/
+      ServiceWorkerRegistrar.tsx  Registers /sw.js after load
+
+config/                      Centralised configuration (ADR-008)
+  app.ts                     App settings, cache windows, storage keys
+  currencies.ts              GENERATED currency metadata — do not hand-edit
+  features.ts                Feature flags, including the deliberately-off ones
+  i18n.ts                    Locales and formatting tags
+  providers.ts               Rate-provider registry and resolution order
+  index.ts                   Barrel
+
 lib/
   currency/
     convert.ts               Pure conversion math
     format.ts                Intl-based display formatting
     parse.ts                 User input → number (separator-tolerant)
-    currencies.ts            Static metadata: code, name, symbol, digits, country
   utils/
     cn.ts                    Class-name merge helper
 
@@ -191,16 +208,112 @@ hooks/
   useLocalStorage.ts         SSR-safe persisted state
   useConversion.ts           Derives the result from inputs + table
 
+i18n/
+  request.ts                 next-intl request configuration
+messages/
+  es.json                    Spanish catalogue (the only V1 locale)
+
 types/
   index.ts                   Shared domain types
 
-public/                      Static assets
+scripts/
+  generate-currencies.mjs    Regenerates config/currencies.ts from ICU
+  generate-icons.mjs         Regenerates the PWA icon set
+
+app/manifest.ts              PWA manifest, generated from config
+public/sw.js                 Service worker (ADR-007)
+public/icons/                GENERATED app icons
+tests/                       Test setup and cross-cutting tests
+.github/workflows/ci.yml     Format, lint, typecheck, test, build
 styles/                      Reserved: tokens if they outgrow globals.css
 docs/                        This documentation set
 ```
 
 Each directory has exactly one responsibility. A file that doesn't clearly belong to one of them is
 a signal that a boundary is missing, not that a folder is missing.
+
+**Generated files** (`config/currencies.ts`, `public/icons/*`) are committed so the build needs no
+generation step, but they are never hand-edited: change the generator and re-run it. Both generators
+are deterministic and reproduce their committed output byte-for-byte.
+
+---
+
+## 6a. Configuration (ADR-008)
+
+Everything tunable lives in `config/`, so changing behaviour is an edit in one place rather than a
+search across the codebase:
+
+| File            | Holds                                                                    |
+| --------------- | ------------------------------------------------------------------------ |
+| `app.ts`        | Base currency, defaults, cache/staleness windows, timeouts, storage keys |
+| `currencies.ts` | 156 currencies with name, symbol, minor-unit digits, and region          |
+| `features.ts`   | Feature flags — including OCR, AI, and history, all explicitly `false`   |
+| `i18n.ts`       | Locale list, default locale, `Intl` formatting tags                      |
+| `providers.ts`  | Rate-provider registry and the order they are tried in                   |
+
+`config/` is a leaf: it imports nothing from the app, which is why any layer may import it without
+creating a cycle. Its invariants are unit-tested — that the provider chain ends in a fallback, that
+defaults name real currencies, that no provider needs an API key, and that `digits` agrees with
+`Intl` for all 156 currencies.
+
+---
+
+## 6b. Progressive Web App (ADR-007)
+
+PriceLens is installable and offline-capable from V1, because the connection a traveler has is
+usually the problem.
+
+- **`app/manifest.ts`** generates the manifest from `config/` and the message catalogue, so the
+  installed app's name can never drift from the UI's.
+- **`public/sw.js`** is a hand-written service worker using runtime caching only — no build-time
+  precache manifest and therefore no coupling to the bundler.
+- **`ServiceWorkerRegistrar`** registers it after `load`, and never in development (a worker holding
+  development assets after a rebuild looks exactly like a broken app).
+
+Three strategies, one per kind of request:
+
+| Request          | Strategy               | Why                                            |
+| ---------------- | ---------------------- | ---------------------------------------------- |
+| Navigations      | Network-first → cache  | Fresh when online, shell when not              |
+| `/api/rates`     | Network-first → cache  | Keeps the last good rate table for offline use |
+| `/_next/static/` | Stale-while-revalidate | Hashed and immutable; instant on repeat visits |
+
+The service worker's caching of `/api/rates` complements the fixture provider: the fixture guarantees
+_a_ result, the cache preserves the _user's most recent real_ rates.
+
+---
+
+## 6c. Internationalisation (ADR-009)
+
+V1 ships Spanish only, but nothing assumes a single locale.
+
+- All UI copy lives in `messages/es.json` — no user-facing string is hardcoded in a component.
+- `config/i18n.ts` holds the locale list and formatting tags; `LOCALES` having one entry is a fact
+  about today, not an assumption baked into call sites.
+- Number and currency formatting goes through `Intl` with an explicit locale, never a hardcoded
+  format.
+- Adding a locale is: a JSON file, an entry in `LOCALES`, and locale negotiation in
+  `i18n/request.ts`. No component changes.
+
+A test compiles every message as ICU and asserts that all catalogues define exactly the same keys, so
+a partial translation fails CI rather than showing a raw key to a user.
+
+---
+
+## 6d. Readiness for OCR, AI, and native apps
+
+These are not built (`FEATURES.ocr`, `FEATURES.ai` are `false`), but the structure does not obstruct
+them:
+
+- **OCR** is an input method. It produces an amount and a currency — exactly what the converter
+  already takes. It plugs in beside the manual input without touching conversion or display.
+- **AI/context** consumes a completed conversion and adds interpretation. It sits above the existing
+  flow rather than inside it.
+- **Native apps** are why `lib/` is framework-agnostic. Pure conversion, parsing, and formatting have
+  no React or Next imports — enforced by ESLint — so a React Native client can consume them
+  unchanged. `services/` is plain `fetch`, which is portable too.
+
+The readiness is structural, not speculative: no abstraction exists solely to anticipate these.
 
 ---
 
@@ -219,9 +332,9 @@ interface RateProvider {
 interface RateSnapshot {
   base: CurrencyCode;
   rates: Readonly<Record<CurrencyCode, number>>;
-  fetchedAt: string;   // ISO 8601
-  source: string;      // provider id, surfaced for transparency
-  degraded: boolean;   // true when this is fallback data
+  fetchedAt: string; // ISO 8601
+  source: string; // provider id, surfaced for transparency
+  degraded: boolean; // true when this is fallback data
 }
 ```
 
@@ -251,7 +364,7 @@ excluded from the selectors rather than producing a broken conversion (PRD E12).
 The route handler uses Next.js Data Cache:
 
 ```ts
-fetch(providerUrl, { next: { revalidate: 3600 } })
+fetch(providerUrl, { next: { revalidate: 3600 } });
 ```
 
 One upstream request per hour per deployment, regardless of user count. This is why no database is
@@ -293,12 +406,12 @@ sentence, never a stack trace or an error code.
 
 ## 10. Testing Strategy
 
-| Layer | Tool | What is covered |
-| --- | --- | --- |
-| `lib/` | Vitest | Conversion math, parsing, formatting, rounding — including every PRD edge case E3–E7. Exhaustive, because it is cheap and it is the money. |
-| `services/` | Vitest | Payload validation, malformed responses, fallback chain ordering |
-| `hooks/` | Vitest + Testing Library | Loading, success, degraded, and offline states |
-| `components/` | Testing Library | The primary conversion flow, swap behavior, a11y roles and labels |
+| Layer         | Tool                     | What is covered                                                                                                                            |
+| ------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `lib/`        | Vitest                   | Conversion math, parsing, formatting, rounding — including every PRD edge case E3–E7. Exhaustive, because it is cheap and it is the money. |
+| `services/`   | Vitest                   | Payload validation, malformed responses, fallback chain ordering                                                                           |
+| `hooks/`      | Vitest + Testing Library | Loading, success, degraded, and offline states                                                                                             |
+| `components/` | Testing Library          | The primary conversion flow, swap behavior, a11y roles and labels                                                                          |
 
 Tests never touch the network. Provider responses are fixtures, which makes the suite deterministic
 and fast — and, usefully, is also the only way it can run in a sandboxed CI environment with
@@ -341,7 +454,7 @@ display precision. Offline capability comes free.
 **Alternatives.** (a) Frankfurter / ECB. (b) A keyed commercial provider.
 
 **Rationale.** Frankfurter is reputable and ECB-sourced, but carries only ~31 currencies and omits
-VND, AED, EGP, and most Asian and Middle Eastern destinations — for a *travel* product, that is a
+VND, AED, EGP, and most Asian and Middle Eastern destinations — for a _travel_ product, that is a
 disqualifying gap, since the currencies it lacks are exactly the ones a traveler is least able to
 estimate mentally. A keyed provider offers intraday refresh we do not need at hourly granularity, in
 exchange for a signup, a secret, and a deployment prerequisite.
@@ -360,7 +473,7 @@ and disclosed in the UI. The provider interface means switching later is a one-f
 **Decision.** A hand-written `useRates` hook rather than SWR or React Query.
 
 **Rationale.** These libraries solve cache invalidation, deduplication, and background refetching
-across *many* endpoints. We have one request, once per session, already cached server-side. The
+across _many_ endpoints. We have one request, once per session, already cached server-side. The
 library would replace roughly twenty lines with a permanent dependency, bundle weight against a
 100KB budget, and an upgrade obligation.
 
@@ -369,19 +482,111 @@ real-time refresh, revisiting this is a contained change confined to one hook.
 
 ---
 
-### ADR-004 — Pin TypeScript to `^6.0.3`, not `latest`
+### ADR-004 — Pin the toolchain to what the ecosystem supports, not to `latest`
 
-**Decision.** Pin `typescript@^6.0.3` and do not upgrade to 7.x until tooling catches up.
+**Decision.** Pin `typescript@^6.0.3` (not 7.x) and `eslint@^9.39.1` (not 10.x).
 
-**Rationale.** At the time of writing, npm `latest` for TypeScript is `7.0.2`, but
-`typescript-eslint@8.65.0` declares a peer range of `>=4.8.4 <6.1.0`. Installing "the latest" would
-silently break type-aware linting — one of our main quality gates — on the first day of the project.
-`6.0.3` is the newest version inside the supported range.
+**Rationale.** "Use the latest version" is a good default that fails badly at the edge of a release
+cycle. Two concrete cases, both verified rather than assumed:
 
-**Consequences.** We are one major version behind `latest` by design. This ADR exists so that a
-future contributor bumping the version understands it is a deliberate constraint, not neglect. The
-upgrade unblocks when `typescript-eslint` widens its peer range; re-verify with
-`npm view typescript-eslint peerDependencies` before bumping.
+- npm `latest` for TypeScript is `7.0.2`, but `typescript-eslint@8.65.0` declares a peer range of
+  `>=4.8.4 <6.1.0`. Installing it would silently break type-aware linting — a main quality gate — on
+  day one. `6.0.3` is the newest version inside the supported range.
+- ESLint `10.8.0` installs cleanly and then **fails at runtime**: `eslint-plugin-react@7.37.5`, a
+  transitive dependency of `eslint-config-next`, calls a rule-context API that ESLint 10 removed
+  (`TypeError: contextOrFilename.getFilename is not a function`). `9.39.x` lints clean.
+
+The second case is the instructive one: the peer ranges _permitted_ ESLint 10, and the incompatibility
+only appeared when the linter actually ran. Dependency metadata is a claim, not a guarantee.
+
+**Consequences.** We are deliberately one major behind on two tools. This ADR exists so a future
+contributor bumping them understands it is a constraint, not neglect. Before either upgrade, run the
+tool — not just the install. TypeScript unblocks when `typescript-eslint` widens its peer range;
+ESLint unblocks when `eslint-plugin-react` supports 10.
+
+---
+
+### ADR-007 — A hand-written service worker, not a PWA framework
+
+**Decision.** Ship a ~120-line runtime-caching service worker in `public/sw.js` rather than adopting
+`@serwist/next` or `next-pwa`.
+
+**Alternatives.** (a) `@serwist/next` — maintained, generates a build-time precache manifest.
+(b) `next-pwa` — effectively unmaintained.
+
+**Rationale.** The genuine difficulty in a service worker is precaching hashed build assets, whose
+names are unknown at author time. **Runtime caching sidesteps that entirely**: assets are cached as
+they are requested, so filenames never need to be known in advance. That removes the main reason to
+take the dependency.
+
+Against taking it: Serwist's peer range predates Next 16 and it hooks the bundler, while Next 16
+defaults to Turbopack — a compatibility risk on the critical path of the build, on a brand-new major.
+A worker with zero build integration cannot break the build.
+
+**Consequences.** We own ~120 lines of well-understood cache code. The trade-off to be honest about:
+without a precache manifest, the first visit does not pre-populate the cache, so full offline support
+begins after the first successful load rather than immediately on install. For a single-screen app
+this means "works offline after you've opened it once" — adequate, and verified in a real browser
+with the network disabled. If richer offline behaviour is needed (V2 offline rate packs), revisit
+Serwist then, when Next 16 support is settled.
+
+---
+
+### ADR-008 — Centralised configuration in `config/`
+
+**Decision.** All currencies, providers, feature flags, locales, and app settings live in `config/`,
+which imports nothing from the rest of the app.
+
+**Rationale.** Configuration scattered as literals across a codebase is the reason "change the
+default currency" turns into a grep. Collecting it makes behaviour changes a single edit, and makes
+the settings **testable as data** — the provider chain always ending in a fallback is an invariant a
+unit test can hold, rather than a property nobody notices breaking.
+
+Keeping `config/` free of app imports is what lets every layer use it without creating a cycle,
+including pure `lib/` code.
+
+**Consequences.** One more directory, and a rule that literals belong in config. `currencies.ts` is
+generated rather than hand-written, so a stale ICU assumption is a re-run rather than an audit.
+
+---
+
+### ADR-009 — next-intl for i18n, with Spanish as the only V1 locale
+
+**Decision.** Use `next-intl` with all copy in `messages/es.json`.
+
+**Alternatives.** (a) Hardcode Spanish now, extract later. (b) A hand-rolled dictionary and `t()`.
+
+**Rationale.** (a) is how products end up with a six-week i18n project: extracting strings after the
+fact means touching every component. The cost of routing copy through a catalogue now is nearly zero;
+the cost of retrofitting it is not.
+
+(b) is tempting for ~30 strings, but the moment a message needs plurals — `hace 1 minuto` vs
+`hace 5 minutos`, which the rate-freshness UI needs — it means implementing ICU plural rules per
+locale. That is meaningfully hard to do correctly, which is exactly our bar for taking a dependency.
+next-intl also officially supports Next 16 and works in both Server and Client Components.
+
+**Consequences.** One dependency. V1 has no locale routing and no middleware — the locale resolves to
+the default — so the setup stays small. Adding a locale is a JSON file plus negotiation in
+`i18n/request.ts`, with no call-site changes.
+
+---
+
+### ADR-010 — Structural readiness for OCR, AI, and native, with nothing built
+
+**Decision.** Keep `lib/` framework-agnostic and enforce it with lint rules, but add no abstraction
+whose only purpose is a future feature.
+
+**Rationale.** "Ready for the future" usually means speculative interfaces that turn out to fit the
+future badly, and cost maintenance in the meantime. The version that works is keeping the domain core
+free of framework dependencies — which we want anyway, for testability.
+
+That single property is what makes the future features tractable: OCR is an input method producing an
+amount and a currency the converter already accepts; AI context consumes a finished conversion; a
+native client can import the same pure `lib/` modules. Feature flags in `config/features.ts` name
+these seams without implementing them.
+
+**Consequences.** No speculative code. The readiness claim is checkable: if `lib/` ever imports React,
+lint fails.
 
 ---
 

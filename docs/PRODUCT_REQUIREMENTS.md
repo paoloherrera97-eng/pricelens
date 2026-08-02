@@ -1,8 +1,8 @@
 # PriceLens — Product Requirements (V1 MVP)
 
-**Status:** Approved for build · **Version:** 1.0 · **Owner:** Product
+**Status:** Approved for build · **Version:** 1.1 · **Owner:** Product
 
-This document defines *what* V1 must do and how we will know it is done. It does not define *how* —
+This document defines _what_ V1 must do and how we will know it is done. It does not define _how_ —
 that is `ARCHITECTURE.md`.
 
 ---
@@ -16,12 +16,12 @@ reasonable, or a tourist price. Their options today are all bad:
   coffee or a hotel night?).
 - **A search engine** — requires typing a full query, tolerating ads, and a working connection.
 - **A generic converter app** — buried under charts, rate alerts, portfolios, and interstitial ads;
-  optimized for people who care about currencies rather than people who care about *prices*.
+  optimized for people who care about currencies rather than people who care about _prices_.
 
 All three break the moment the connection is weak, which on travel is most of the time.
 
-**The gap:** there is no tool designed for the specific moment of *holding a price you don't
-understand.*
+**The gap:** there is no tool designed for the specific moment of _holding a price you don't
+understand._
 
 ---
 
@@ -61,18 +61,20 @@ anyone who wants historical data. Serving them would compromise the primary user
 
 ### 4.1 In scope for V1
 
-| # | Requirement | Notes |
-| --- | --- | --- |
-| S1 | Manual amount input | Numeric, decimal-aware, mobile numeric keypad |
-| S2 | Foreign (source) currency selector | Searchable, 160+ currencies |
-| S3 | Home (target) currency selector | Same component, persisted |
-| S4 | Live exchange rates | Refreshed hourly server-side |
-| S5 | Conversion result | The visual centerpiece |
-| S6 | Swap direction | One tap, no reload |
-| S7 | Rate freshness indicator | Timestamp + degraded-state messaging |
-| S8 | Responsive, mobile-first UI | 320px → desktop |
-| S9 | Fast first load | See §6 |
-| S10 | Full keyboard + screen-reader support | WCAG 2.2 AA |
+| #   | Requirement                            | Notes                                         |
+| --- | -------------------------------------- | --------------------------------------------- |
+| S1  | Manual amount input                    | Numeric, decimal-aware, mobile numeric keypad |
+| S2  | Foreign (source) currency selector     | Searchable, 160+ currencies                   |
+| S3  | Home (target) currency selector        | Same component, persisted                     |
+| S4  | Live exchange rates                    | Refreshed hourly server-side                  |
+| S5  | Conversion result                      | The visual centerpiece                        |
+| S6  | Swap direction                         | One tap, no reload                            |
+| S7  | Rate freshness indicator               | Timestamp + degraded-state messaging          |
+| S8  | Responsive, mobile-first UI            | 320px → desktop                               |
+| S9  | Fast first load                        | See §6                                        |
+| S10 | Full keyboard + screen-reader support  | WCAG 2.2 AA                                   |
+| S11 | Installable, offline-capable PWA       | Manifest + service worker, from V1            |
+| S12 | Spanish UI, internationalisation-ready | All copy in a message catalogue               |
 
 ### 4.2 Explicitly out of scope for V1
 
@@ -86,22 +88,39 @@ in `ROADMAP.md`.
 
 **Home currency is persisted to `localStorage`** — a single string such as `"EUR"`.
 
-| It is | It is not |
-| --- | --- |
-| One preference key | A database |
-| Device-local | An account |
-| Overwritten on change | A history or a log |
-| Zero PII | Anything requiring consent or a cookie banner |
+| It is                 | It is not                                     |
+| --------------------- | --------------------------------------------- |
+| One preference key    | A database                                    |
+| Device-local          | An account                                    |
+| Overwritten on change | A history or a log                            |
+| Zero PII              | Anything requiring consent or a cookie banner |
 
 Rationale: a returning traveler re-selecting their home currency on every visit pays a direct tax
 against the 3-second promise. The foreign currency is deliberately **not** persisted — it changes
 per country, and a stale value would be actively misleading. Recorded as ADR-005.
+
+The service worker's caches (S11) are the same kind of exception: a cache of the app shell and the
+last rate table, holding no user data and no history.
+
+### 4.4 Scope changes since v1.0 of this document
+
+| Change                               | Effect                                                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| **PWA moved from V2 into V1** (S11)  | Installability and offline support are now MVP requirements, not comfort features |
+| **Spanish is the shipping UI** (S12) | Copy is Spanish; the architecture stays locale-agnostic (ADR-009)                 |
+
+The PWA move is worth stating plainly, because v1.0 of this document argued for deferring it. That
+argument was that installability is comfort rather than comprehension. Offline capability is not
+comfort for this product — a traveler on failed hotel Wi-Fi is the _primary_ scenario, not an edge
+case, and ADR-001 already gives us most of the way there by keeping conversion client-side. Making it
+explicit costs a manifest and a service worker.
 
 ---
 
 ## 5. Functional Requirements
 
 ### FR-1 — Amount input
+
 - Accepts digits and a single decimal separator.
 - Accepts both `.` and `,` as decimal separators (a European traveler types `12,50`).
 - Rejects letters and multiple separators without an error message — invalid characters simply never
@@ -111,6 +130,7 @@ per country, and a stale value would be actively misleading. Recorded as ADR-005
 - No maximum, but values beyond safe display precision are formatted in compact notation.
 
 ### FR-2 — Currency selection
+
 - Both selectors draw from the same currency dataset and the same component.
 - Searchable by **code** (`JPY`), **name** (`Japanese Yen`), and **country/common name** (`Japan`) —
   travelers know the country, not always the currency code.
@@ -119,6 +139,7 @@ per country, and a stale value would be actively misleading. Recorded as ADR-005
   invalid same-currency state.
 
 ### FR-3 — Conversion
+
 - Recomputes on every change to amount, source, or target — with no network request (ADR-001).
 - Perceived latency target: **< 16ms** (one frame). This is arithmetic; it should never be visible.
 - Rounds to the target currency's real minor-unit digits (ADR-006).
@@ -126,23 +147,25 @@ per country, and a stale value would be actively misleading. Recorded as ADR-005
   showing the working.
 
 ### FR-4 — Swap
+
 - One control, one tap, no layout shift, no refetch.
 - Swaps the currencies and preserves the amount.
 
 ### FR-5 — Rate freshness and degradation
 
-| State | Behavior |
-| --- | --- |
-| **Fresh** | Show the result and a quiet `Updated <relative time>` line |
-| **Loading** | Show the layout with a skeleton in the result slot — never a blank screen or a spinner-only page |
-| **Stale** (cached, older than expected) | Show the result with a visible but non-alarming staleness note |
-| **Provider failure** | Fall back to bundled snapshot rates, clearly labeled as approximate and dated |
-| **Offline** | Same as provider failure, plus an offline indicator |
+| State                                   | Behavior                                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Fresh**                               | Show the result and a quiet `Updated <relative time>` line                                       |
+| **Loading**                             | Show the layout with a skeleton in the result slot — never a blank screen or a spinner-only page |
+| **Stale** (cached, older than expected) | Show the result with a visible but non-alarming staleness note                                   |
+| **Provider failure**                    | Fall back to bundled snapshot rates, clearly labeled as approximate and dated                    |
+| **Offline**                             | Same as provider failure, plus an offline indicator                                              |
 
 The app must never (a) show a number without indicating how current it is, or (b) present fallback
 data as if it were live. Requirement FR-5 exists to protect Value #4 in the Project Bible.
 
 ### FR-6 — Persistence
+
 - Home currency written to `localStorage` on change, read on mount.
 - A missing, corrupt, or unparseable value falls back to the default without throwing.
 - Absence of `localStorage` (private mode, disabled storage) degrades silently to session-only.
@@ -151,17 +174,18 @@ data as if it were live. Requirement FR-5 exists to protect Value #4 in the Proj
 
 ## 6. Non-Functional Requirements
 
-| Category | Requirement |
-| --- | --- |
-| **Performance** | LCP < 1.5s on a simulated Fast 3G / mid-tier mobile device. TTI < 2.0s. Conversion recompute < 16ms. |
-| **Bundle** | Initial client JS ≤ 100KB gzipped. Every dependency must justify its weight. |
-| **Accessibility** | WCAG 2.2 AA. Fully keyboard operable. All controls labeled. Result announced via a polite live region. Contrast ≥ 4.5:1 for text, ≥ 3:1 for UI boundaries. |
-| **Touch** | Minimum 44×44px interactive targets. |
-| **Responsive** | Fully functional from 320px width upward. Mobile-first; desktop is the adaptation, not the baseline. |
-| **Browser support** | Last 2 versions of Safari (iOS + macOS), Chrome, Firefox, Edge. iOS Safari is the primary target — it is what travelers carry. |
-| **Reliability** | The app renders and remains usable with the rate provider entirely unreachable. |
-| **Privacy** | No tracking, no cookies, no PII, no third-party client-side scripts in V1. |
-| **i18n readiness** | Number and currency formatting is locale-aware from day one. UI copy is English in V1 but is not hardcoded in a way that blocks translation. |
+| Category            | Requirement                                                                                                                                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Performance**     | LCP < 1.5s on a simulated Fast 3G / mid-tier mobile device. TTI < 2.0s. Conversion recompute < 16ms.                                                                                                                                          |
+| **Bundle**          | Initial client JS ≤ 100KB gzipped. Every dependency must justify its weight.                                                                                                                                                                  |
+| **Accessibility**   | WCAG 2.2 AA. Fully keyboard operable. All controls labeled. Result announced via a polite live region. Contrast ≥ 4.5:1 for text, ≥ 3:1 for UI boundaries.                                                                                    |
+| **Touch**           | Minimum 44×44px interactive targets.                                                                                                                                                                                                          |
+| **Responsive**      | Fully functional from 320px width upward. Mobile-first; desktop is the adaptation, not the baseline.                                                                                                                                          |
+| **Browser support** | Last 2 versions of Safari (iOS + macOS), Chrome, Firefox, Edge. iOS Safari is the primary target — it is what travelers carry.                                                                                                                |
+| **Reliability**     | The app renders and remains usable with the rate provider entirely unreachable.                                                                                                                                                               |
+| **Privacy**         | No tracking, no cookies, no PII, no third-party client-side scripts in V1.                                                                                                                                                                    |
+| **i18n readiness**  | Number and currency formatting is locale-aware from day one. UI copy ships in Spanish and lives entirely in a message catalogue — no user-facing string is hardcoded in a component. Adding a locale requires no component changes (ADR-009). |
+| **Installability**  | Valid manifest, maskable icons, and a registered service worker. The app renders and converts with the network unavailable, after a first successful load (ADR-007).                                                                          |
 
 ---
 
@@ -169,22 +193,22 @@ data as if it were live. Requirement FR-5 exists to protect Value #4 in the Proj
 
 Each must have a designed, implemented, and tested behavior.
 
-| # | Case | Required behavior |
-| --- | --- | --- |
-| E1 | Empty amount | Neutral zero result. Not an error. |
-| E2 | Amount is `0` | Show zero in the target currency. Valid. |
-| E3 | Decimal separator ambiguity (`12,50`) | Parsed as 12.5 |
-| E4 | Zero-decimal currency (JPY, KRW, VND) | Rounded to 0 decimals |
-| E5 | Three-decimal currency (KWD, BHD, OMR) | Rounded to 3 decimals |
-| E6 | Very large amount (₫250,000,000) | Formatted readably; no overflow, no layout break |
-| E7 | Very small result (< 0.01) | Show meaningful precision rather than `0.00` — `$0.0031` is useful, `$0.00` is a lie |
-| E8 | Same currency selected in both fields | Auto-swap; never a 1:1 dead end |
-| E9 | Rate provider returns malformed data | Reject the payload at the boundary, fall back, log server-side |
-| E10 | Rate provider unreachable / times out | Fallback rates + labeled degraded state |
-| E11 | User goes offline mid-session | Conversion continues working from the in-memory table |
-| E12 | Currency present in the app but missing from the provider payload | Excluded from selectors rather than producing a broken conversion |
-| E13 | `localStorage` unavailable or throws | Session-only operation, no crash |
-| E14 | Extremely long currency name in the selector | Truncates with ellipsis; layout holds |
+| #   | Case                                                              | Required behavior                                                                    |
+| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| E1  | Empty amount                                                      | Neutral zero result. Not an error.                                                   |
+| E2  | Amount is `0`                                                     | Show zero in the target currency. Valid.                                             |
+| E3  | Decimal separator ambiguity (`12,50`)                             | Parsed as 12.5                                                                       |
+| E4  | Zero-decimal currency (JPY, KRW, VND)                             | Rounded to 0 decimals                                                                |
+| E5  | Three-decimal currency (KWD, BHD, OMR)                            | Rounded to 3 decimals                                                                |
+| E6  | Very large amount (₫250,000,000)                                  | Formatted readably; no overflow, no layout break                                     |
+| E7  | Very small result (< 0.01)                                        | Show meaningful precision rather than `0.00` — `$0.0031` is useful, `$0.00` is a lie |
+| E8  | Same currency selected in both fields                             | Auto-swap; never a 1:1 dead end                                                      |
+| E9  | Rate provider returns malformed data                              | Reject the payload at the boundary, fall back, log server-side                       |
+| E10 | Rate provider unreachable / times out                             | Fallback rates + labeled degraded state                                              |
+| E11 | User goes offline mid-session                                     | Conversion continues working from the in-memory table                                |
+| E12 | Currency present in the app but missing from the provider payload | Excluded from selectors rather than producing a broken conversion                    |
+| E13 | `localStorage` unavailable or throws                              | Session-only operation, no crash                                                     |
+| E14 | Extremely long currency name in the selector                      | Truncates with ellipsis; layout holds                                                |
 
 ---
 

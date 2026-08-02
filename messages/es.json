@@ -1,0 +1,36 @@
+{
+  "app": {
+    "name": "PriceLens",
+    "tagline": "Entiende al instante cuánto vale un precio extranjero en tu moneda.",
+    "description": "Convierte precios de viaje a tu moneda en segundos. Funciona sin conexión."
+  },
+  "converter": {
+    "amountLabel": "Importe",
+    "amountPlaceholder": "0",
+    "fromLabel": "Moneda local",
+    "toLabel": "Tu moneda",
+    "swap": "Intercambiar monedas",
+    "resultLabel": "Equivale a",
+    "rateLine": "1 {from} = {rate} {to}"
+  },
+  "currencyPicker": {
+    "search": "Buscar moneda o país",
+    "noResults": "No se encontró ninguna moneda",
+    "close": "Cerrar"
+  },
+  "rates": {
+    "updated": "Actualizado {relative}",
+    "justNow": "hace un momento",
+    "minutesAgo": "hace {count, plural, one {# minuto} other {# minutos}}",
+    "hoursAgo": "hace {count, plural, one {# hora} other {# horas}}",
+    "daysAgo": "hace {count, plural, one {# día} other {# días}}",
+    "stale": "Estas tasas no son recientes.",
+    "degraded": "Tasas aproximadas del {date}. Sin conexión con el proveedor.",
+    "offline": "Sin conexión",
+    "loading": "Cargando tasas"
+  },
+  "errors": {
+    "generic": "Algo no ha funcionado. Vuelve a intentarlo.",
+    "ratesUnavailable": "No hemos podido actualizar las tasas."
+  }
+}

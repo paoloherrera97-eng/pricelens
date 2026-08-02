@@ -13,7 +13,7 @@
 ## Vision
 
 A traveler anywhere in the world sees a price tag they don't understand, opens PriceLens, and knows
-what it means to *them* — before they've finished reading the tag.
+what it means to _them_ — before they've finished reading the tag.
 
 Long term, PriceLens becomes the layer between a traveler and every foreign price they encounter:
 menus, taxis, market stalls, hotel bills. The conversion is the entry point, not the destination.
@@ -43,12 +43,12 @@ understands the price" is a regression, regardless of what it adds elsewhere.
 
 The distinction is not semantic — it decides what we build:
 
-| A currency converter would… | PriceLens instead… |
-| --- | --- |
-| Offer every currency pair equally | Optimizes for the pair a traveler is actually standing in |
-| Show a rate | Shows a **price the user understands** |
-| Add charts, historical data, rate alerts | Removes anything that isn't the answer |
-| Serve finance users and travelers alike | Serves the traveler holding a price tag |
+| A currency converter would…              | PriceLens instead…                                        |
+| ---------------------------------------- | --------------------------------------------------------- |
+| Offer every currency pair equally        | Optimizes for the pair a traveler is actually standing in |
+| Show a rate                              | Shows a **price the user understands**                    |
+| Add charts, historical data, rate alerts | Removes anything that isn't the answer                    |
+| Serve finance users and travelers alike  | Serves the traveler holding a price tag                   |
 
 We are competing with the traveler's own mental arithmetic, not with financial tools.
 
@@ -117,10 +117,10 @@ Full token definitions live in `DESIGN_SYSTEM.md`.
 - **Boundaries are deliberate.** UI does not fetch. Services do not format. Pure logic does not know
   React exists. This is what makes the code testable without a browser.
 - **Dependencies are liabilities.** Every package added is a package maintained, audited, and
-  upgraded for years. The bar for adding one is: *this is meaningfully hard to do correctly
-  ourselves.* A single HTTP request does not clear that bar.
+  upgraded for years. The bar for adding one is: _this is meaningfully hard to do correctly
+  ourselves._ A single HTTP request does not clear that bar.
 - **Decisions are documented, not remembered.** Anything non-obvious becomes an ADR. Code explains
-  *how*; ADRs explain *why*, which is the part that gets lost.
+  _how_; ADRs explain _why_, which is the part that gets lost.
 - **No fake implementations.** No placeholder architecture, no mocked-out "coming soon" internals.
   If it ships, it works.
 
@@ -159,7 +159,8 @@ These are enforced in review. They are not suggestions.
 ### V1 MVP includes exactly
 
 Manual amount input · currency selector · home currency selector · live exchange rates · a beautiful
-conversion result · responsive, mobile-first interface · fast loading · clean UI.
+conversion result · responsive, mobile-first interface · fast loading · clean UI · an installable,
+offline-capable PWA · a Spanish UI built on an internationalisation-ready foundation.
 
 ### V1 explicitly excludes
 
@@ -180,13 +181,13 @@ recorded in ADR-005.
 
 Detail and rationale live in `ROADMAP.md`.
 
-| Version | Theme |
-| --- | --- |
-| **V1** | The 3-second conversion. One screen, done exceptionally well. |
-| **V2** | Comfort — recent currencies, dark mode, offline rate packs. |
-| **V3** | Capture — camera and OCR. Point at a price tag instead of typing it. |
-| **V4** | Context — "is this expensive *here*?" Turning a number into a judgment. |
-| **V5** | Continuity — accounts and sync, only once there is something worth syncing. |
+| Version | Theme                                                                       |
+| ------- | --------------------------------------------------------------------------- |
+| **V1**  | The 3-second conversion. One screen, done exceptionally well.               |
+| **V2**  | Comfort — recent currencies, dark mode, offline rate packs.                 |
+| **V3**  | Capture — camera and OCR. Point at a price tag instead of typing it.        |
+| **V4**  | Context — "is this expensive _here_?" Turning a number into a judgment.     |
+| **V5**  | Continuity — accounts and sync, only once there is something worth syncing. |
 
 The ordering reflects a principle: **we earn the right to add complexity by first proving the simple
 thing works.**

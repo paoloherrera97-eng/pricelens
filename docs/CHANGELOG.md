@@ -9,6 +9,65 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — Phase 2: Project Foundation
+
+Working Next.js application scaffold. No converter UI yet — that is Phase 4.
+
+- **Next.js 16.2.12** (App Router, Turbopack) + React 19.2, TypeScript 6.0.3, Tailwind CSS 4.3
+- **Tailwind `@theme` token block** implementing `DESIGN_SYSTEM.md` in `app/globals.css`. In Tailwind
+  4 this block _is_ the framework configuration, which is why it belongs to setup rather than to
+  component work.
+- **Progressive Web App**: manifest generated from config, a hand-written runtime-caching service
+  worker, and a generated icon set (192/512/maskable/apple-touch)
+- **Centralised configuration** in `config/` — app settings, 156 currencies, feature flags, locales,
+  and the provider registry, with unit-tested invariants
+- **Provider abstraction** (`services/rates/types.ts`): the `RateProvider` contract and
+  `RateSnapshot` shape. Implementations land in Phase 4
+- **Internationalisation** via next-intl, Spanish catalogue, no hardcoded UI strings
+- **Tooling**: ESLint with type-aware rules _and_ per-directory import rules that enforce the
+  architecture boundaries, Prettier, Vitest + Testing Library
+- **CI** (`.github/workflows/ci.yml`): format, lint, typecheck, test, build as separate named gates
+- **Generators** in `scripts/` for the currency table and icons, both deterministic
+
+### Changed
+
+- **PWA moved from V2 into V1.** Offline capability is not a comfort feature for a travel product —
+  a failed connection is the primary scenario. Recorded as ADR-007.
+- **UI language is Spanish**, on a locale-agnostic foundation (ADR-009). Supersedes the earlier note
+  that V1 copy would be English.
+- **ADR-004 broadened** from "pin TypeScript" to "pin the toolchain to what the ecosystem supports."
+
+### Fixed
+
+- **Corrected the ESLint version recorded in Phase 1.** `ARCHITECTURE.md` listed ESLint `10.x` on the
+  strength of the registry's `latest` tag. In practice ESLint 10.8.0 installs cleanly and then throws
+  at lint time — `eslint-plugin-react@7.37.5`, a transitive dependency of `eslint-config-next`, calls
+  a rule-context API that ESLint 10 removed. Pinned to `9.39.x`, which lints clean. The Phase 1 claim
+  was based on registry metadata rather than on running the tool; ADR-004 now says to run it.
+
+### Decisions recorded
+
+- **ADR-007** — Hand-written runtime-caching service worker instead of Serwist or next-pwa. Runtime
+  caching removes the hard part (precaching hashed assets), and a worker with no build integration
+  cannot break a Turbopack build.
+- **ADR-008** — Centralised configuration in `config/`, kept free of app imports so any layer can use
+  it, and testable as data.
+- **ADR-009** — next-intl over a hand-rolled dictionary: ICU plural rules for rate freshness are
+  exactly the kind of thing not worth reimplementing.
+- **ADR-010** — Structural readiness for OCR, AI, and native apps, with no speculative abstractions.
+  The claim is checkable: if `lib/` imports React, lint fails.
+
+### Verified
+
+- `pnpm format:check && lint && typecheck && test && build` all pass; 24 tests
+- Real-browser check at iPhone 13 viewport: service worker reaches `active`, and the app still
+  renders **with the network disabled**
+- No horizontal overflow at 320px; `<html lang="es">`; manifest and `sw.js` served with correct
+  headers
+- Both generators reproduce their committed output byte-for-byte
+
+---
+
 ### Added — Phase 1: Documentation & Architecture
 
 Foundation documentation set. No application code in this phase.
@@ -45,7 +104,8 @@ Foundation documentation set. No application code in this phase.
 ### Notes
 
 - Verified toolchain versions at time of writing: `next@16.2.12`, `react@19.2.8`,
-  `tailwindcss@4.3.3`, `eslint@10.8.0`, `prettier@3.9.6`, `vitest@4.1.10`.
+  `tailwindcss@4.3.3`, `eslint@10.8.0`, `prettier@3.9.6`, `vitest@4.1.10`. (The ESLint version was
+  later corrected to `9.39.x` in Phase 2 — see Fixed, above.)
 - Tailwind 4 is CSS-first — design tokens live in an `@theme` block in `app/globals.css`, and there
   is no `tailwind.config.js`.
 - `next/font/google` self-hosts Inter at build time and requires build-time network access. Where

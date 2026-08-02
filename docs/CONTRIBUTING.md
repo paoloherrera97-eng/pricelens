@@ -38,17 +38,36 @@ without network by design.
 
 ### Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Development server |
-| `pnpm build` | Production build |
-| `pnpm start` | Serve the production build |
-| `pnpm lint` | ESLint, including type-aware rules |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm test` | Vitest, single run |
-| `pnpm test:watch` | Vitest, watch mode |
-| `pnpm format` | Prettier write |
-| `pnpm format:check` | Prettier check (CI) |
+| Command             | Purpose                                       |
+| ------------------- | --------------------------------------------- |
+| `pnpm dev`          | Development server                            |
+| `pnpm build`        | Production build                              |
+| `pnpm start`        | Serve the production build                    |
+| `pnpm lint`         | ESLint, including type-aware + boundary rules |
+| `pnpm typecheck`    | `tsc --noEmit`                                |
+| `pnpm test`         | Vitest, single run                            |
+| `pnpm test:watch`   | Vitest, watch mode                            |
+| `pnpm format`       | Prettier write                                |
+| `pnpm format:check` | Prettier check (CI)                           |
+| `pnpm verify`       | All gates, in the order CI runs them          |
+
+**The service worker only registers in production builds.** `pnpm dev` deliberately skips it — a
+worker caching development assets across a rebuild produces bugs that look like application faults.
+To exercise PWA behaviour, run `pnpm build && pnpm start`.
+
+### Generated files
+
+Two files are generated and committed. Never hand-edit them; change the generator and re-run:
+
+```bash
+node scripts/generate-currencies.mjs   # → config/currencies.ts (ICU/CLDR data)
+node scripts/generate-icons.mjs        # → public/icons/*.png
+pnpm format                            # normalise the generated TypeScript
+```
+
+Both are deterministic and reproduce their committed output byte-for-byte, so an unexpected diff
+after regeneration means the underlying ICU data changed — which is information worth reading, not
+noise to commit past.
 
 ---
 
@@ -83,7 +102,7 @@ docs(architecture): record ADR-006 on currency-aware rounding
 Types: `feat` · `fix` · `docs` · `style` · `refactor` · `test` · `chore`
 
 **Write the subject so it completes the sentence "this commit will…"** in the imperative mood. The
-body explains *why*, not *what* — the diff already shows what.
+body explains _why_, not _what_ — the diff already shows what.
 
 ---
 
@@ -93,6 +112,7 @@ These are enforced in review, not aspirational. They restate the engineering rul
 `PROJECT_BIBLE.md` in operational terms.
 
 ### TypeScript
+
 - Strict mode. **No `any`** — use `unknown` and narrow it.
 - Prefer `type` for unions and object shapes; `interface` for contracts meant to be implemented
   (e.g. `RateProvider`).
@@ -101,22 +121,42 @@ These are enforced in review, not aspirational. They restate the engineering rul
 
 ### Architecture boundaries
 
-Dependencies point downward only. These import rules are review blockers:
+Dependencies point downward only. **These are enforced by ESLint**, so a violation fails `pnpm lint`
+rather than waiting for a reviewer to notice:
 
 - `lib/` imports **nothing** from `app/`, `components/`, `hooks/`, or `services/`. Everything in
   `lib/` is a pure function of its arguments — no fetch, no DOM, no React, no module-scope clock or
-  randomness. This is what makes the domain logic testable in milliseconds.
+  randomness. This is what makes the domain logic testable in milliseconds, and what would let a
+  future native client reuse it unchanged (ADR-010).
 - `components/` never calls `fetch` and never imports from `services/`. Data arrives via props or a
   hook.
 - `services/` never imports React.
+- `config/` imports nothing from the app, which is why anything may import it.
+
+### Configuration
+
+No magic literals. Currencies, providers, feature flags, locales, cache windows, and storage keys
+belong in `config/` (ADR-008). If you find yourself typing a constant into a component, it belongs
+one directory over.
+
+### Copy and i18n
+
+**No user-facing string is hardcoded.** All copy lives in `messages/es.json` and is reached through
+next-intl (ADR-009). Adding a string means adding a key; a missing key in any locale fails the test
+suite rather than reaching a user.
+
+Format numbers and currencies through `Intl` with an explicit locale — never with string
+concatenation or a hardcoded symbol position, both of which are wrong in some locale.
 
 ### Components
+
 - One component per file, named the same as the file.
 - Presentation components take props and render. Data fetching and state live in hooks.
 - Props interfaces are explicit — no `React.FC`, no implicit `any` props.
 - If a component exceeds ~150 lines, it is doing more than one job.
 
 ### Styling
+
 - Tailwind utilities only, from tokens defined in `DESIGN_SYSTEM.md`.
 - **No hardcoded values.** No `text-[13px]`, no inline hex, no one-off shadows. If a value is
   missing, add it to the `@theme` block in `app/globals.css` and document it in `DESIGN_SYSTEM.md`
@@ -124,11 +164,13 @@ Dependencies point downward only. These import rules are review blockers:
 - Mobile-first: unprefixed utilities are the mobile design; `sm:` / `md:` are adaptations.
 
 ### Money
+
 - Amounts never travel between layers as a naked `number` — they carry their currency code.
 - Rounding respects the currency's real minor-unit digits (ADR-006). Never hardcode `toFixed(2)`.
 - Rounding happens once, at display time. Never mid-calculation.
 
 ### Naming
+
 - Booleans read as assertions: `isLoading`, `hasError`, `isDegraded`.
 - Handlers are `handleX` in the component, `onX` in the props interface.
 - No abbreviations except the genuinely universal (`id`, `url`, `api`).
@@ -181,10 +223,11 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 All four must pass. A red `main` is an incident, and the cheapest place to prevent it is here.
 
 **PR description should cover:**
+
 - What changed and why
 - Which requirement or ADR it relates to
 - Screenshots or a recording for UI changes — mobile viewport first
-- Anything you decided *not* to do, and why
+- Anything you decided _not_ to do, and why
 
 **Keep PRs small.** A 200-line PR gets a real review; a 2,000-line PR gets an approval.
 
