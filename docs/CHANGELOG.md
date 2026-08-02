@@ -9,6 +9,40 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — Phase 6: Deployment readiness
+
+- **`docs/DEPLOYMENT.md`** — pre-flight, deploy, custom-domain, rollback, and post-launch monitoring.
+- **`scripts/verify-deployment.mjs`** — a 27-check smoke test that runs against a live URL in a real
+  browser: HTTPS and HSTS, manifest and icons, service worker registration and cache headers,
+  `/api/rates` returning a real table, offline navigation, responsive layout at four widths, touch
+  targets, and accessible names. Exits non-zero, so it works as a CI gate too.
+
+### Fixed
+
+- **The loading button lost its accessible name.** `Button` hid its label with `invisible`, and
+  `visibility: hidden` removes an element from the accessibility tree. Found by an axe audit of the
+  running app; the Phase 3 unit test passed because jsdom applies no Tailwind CSS. Now `opacity-0`,
+  with a regression guard on the class.
+- The design-system gallery had no `main` landmark.
+
+### Changed
+
+- **The bundle budget in `PRODUCT_REQUIREMENTS.md` §6 is now recorded as unmet, with the measurement.**
+  The ≤100KB figure was written in Phase 1 without measuring; the real number is 175KB gzipped
+  (150KB brotli), most of it React + the Next runtime + next-intl. §6.1 records the number and the
+  reduction path rather than leaving a target that reads as if it were met.
+
+### Verified
+
+- Clean production build: **zero warnings, zero errors**
+- **axe: 0 violations** across the converter, the open country picker, the error state, and the
+  gallery, at WCAG 2.2 AA plus best-practice rules
+- Service worker active, offline navigation working, manifest installable
+- No overflow, no sub-44px target, no unnamed button at 320 / 390 / 768 / 1280px
+- 148 tests, lint, typecheck, and format all clean
+
+---
+
 ### Added — Phase 5: The Complete User Experience
 
 The journey a traveler actually takes: open, pick the country, enter or paste a price, read the

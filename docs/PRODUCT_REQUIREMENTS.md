@@ -189,7 +189,7 @@ data as if it were live. Requirement FR-5 exists to protect Value #4 in the Proj
 | Category            | Requirement                                                                                                                                                                                                                                   |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Performance**     | LCP < 1.5s on a simulated Fast 3G / mid-tier mobile device. TTI < 2.0s. Conversion recompute < 16ms.                                                                                                                                          |
-| **Bundle**          | Initial client JS ≤ 100KB gzipped. Every dependency must justify its weight.                                                                                                                                                                  |
+| **Bundle**          | Target: initial client JS ≤ 100KB gzipped. **Currently 175KB — not met.** See below. Every dependency must still justify its weight.                                                                                                          |
 | **Accessibility**   | WCAG 2.2 AA. Fully keyboard operable. All controls labeled. Result announced via a polite live region. Contrast ≥ 4.5:1 for text, ≥ 3:1 for UI boundaries.                                                                                    |
 | **Touch**           | Minimum 44×44px interactive targets.                                                                                                                                                                                                          |
 | **Responsive**      | Fully functional from 320px width upward. Mobile-first; desktop is the adaptation, not the baseline.                                                                                                                                          |
@@ -198,6 +198,35 @@ data as if it were live. Requirement FR-5 exists to protect Value #4 in the Proj
 | **Privacy**         | No tracking, no cookies, no PII, no third-party client-side scripts in V1.                                                                                                                                                                    |
 | **i18n readiness**  | Number and currency formatting is locale-aware from day one. UI copy ships in Spanish and lives entirely in a message catalogue — no user-facing string is hardcoded in a component. Adding a locale requires no component changes (ADR-009). |
 | **Installability**  | Valid manifest, maskable icons, and a registered service worker. The app renders and converts with the network unavailable, after a first successful load (ADR-007).                                                                          |
+
+---
+
+### 6.1 Bundle budget — measured, and currently missed
+
+| Measured on the production build | Value                                                       |
+| -------------------------------- | ----------------------------------------------------------- |
+| Initial client JS, gzipped       | **175.4 KB** (150.3 KB brotli, which is what Vercel serves) |
+| CSS, gzipped                     | 4.7 KB                                                      |
+| Target from §6                   | ≤ 100 KB gzipped                                            |
+
+**The 100KB figure was set in Phase 1 without measuring anything, and it is not
+reachable with this stack.** React 19, the Next App Router runtime, and next-intl
+account for the great majority of those bytes before a line of PriceLens code is
+counted. Recording the real number matters more than keeping a round one.
+
+Why this is not a launch blocker: Vercel serves brotli (150 KB), the payload is
+immutable and hashed so it is fetched once, and the service worker serves it from
+cache on every subsequent visit. The 3-second promise is about the _conversion_
+loop, which is local arithmetic and touches none of this.
+
+The reduction path, in order of return, for after launch:
+
+1. **Move `next-intl` off the client.** The converter is a Client Component that
+   calls `useTranslations`; passing resolved strings down as props from the
+   Server Component would drop the client i18n runtime entirely. Largest single
+   win, and a contained refactor.
+2. Re-measure before doing anything else — an assumed win is how this number got
+   written down wrong the first time.
 
 ---
 
