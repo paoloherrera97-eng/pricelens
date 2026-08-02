@@ -9,6 +9,26 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Fixed — detalles de acabado (auditoría 🟢)
+
+- **El estado vacío ya no anuncia una conversión que no ha ocurrido.** El «0,00 €» visible es un
+  marcador que mantiene abierto el alto de la tarjeta, pero la región viva también lo leía: un lector
+  de pantalla oía «0,00 ฿ equivale a 0,00 €» sin que nadie hubiera pedido nada. El hueco se sigue
+  reservando; solo calla hasta que hay importe.
+- **`text-xs` recupera el interlineado documentado.** El sistema especifica 1,4 y Tailwind trae 1,33,
+  así que los avisos de dos líneas iban 0,8px apretados por línea. Medido: 12px / 16,8px.
+
+### Revisado y descartado
+
+Dos puntos que la auditoría marcó y que, al analizarlos, **no** son defectos:
+
+- **Los 110 espaciados de 4px.** Parecían cuartos de paso en un sistema de 8 puntos, pero 4px es el
+  medio paso que tanto el propio sistema (`--spacing: 0.5rem`, donde `0.5` = 4px) como Material
+  Design 3 admiten para relaciones estrechas —etiqueta con su campo—. Cambiarlos habría sido
+  uniformidad por uniformidad.
+- **El chip de favorito activo sin `hover`.** Los inactivos sí lo tienen. Darle uno al que ya está
+  seleccionado sugeriría que pulsarlo hace algo, y no hace nada: su ausencia es la señal correcta.
+
 ### Fixed — consistencia del sistema (auditoría 🟠)
 
 Cuatro incoherencias entre lo que el sistema de diseño documenta y lo que la app renderiza. Todas
