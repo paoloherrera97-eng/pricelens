@@ -1,0 +1,334 @@
+// Generates config/countries.ts.
+//
+// The ISO 3166 → ISO 4217 mapping below is CURATED, not derived: no JavaScript
+// API exposes which currency a country uses. Unlike exchange rates, this is
+// stable, checkable reference data — a reviewer can verify any row.
+//
+// Everything else is derived: Spanish country names come from ICU, and flags are
+// computed from the country code's regional-indicator code points.
+//
+// Entries marked NOTE are recent changes worth re-verifying before launch.
+
+import { writeFileSync } from 'node:fs';
+
+/** ISO 3166-1 alpha-2 → ISO 4217. */
+const COUNTRY_CURRENCY = {
+  AD: 'EUR',
+  AE: 'AED',
+  AF: 'AFN',
+  AG: 'XCD',
+  AL: 'ALL',
+  AM: 'AMD',
+  AO: 'AOA',
+  AR: 'ARS',
+  AT: 'EUR',
+  AU: 'AUD',
+  AW: 'AWG',
+  AZ: 'AZN',
+  BA: 'BAM',
+  BB: 'BBD',
+  BD: 'BDT',
+  BE: 'EUR',
+  BF: 'XOF',
+  BG: 'EUR', // NOTE: BG adopted the euro 2026-01-01
+  BH: 'BHD',
+  BI: 'BIF',
+  BJ: 'XOF',
+  BM: 'BMD',
+  BN: 'BND',
+  BO: 'BOB',
+  BR: 'BRL',
+  BS: 'BSD',
+  BT: 'BTN',
+  BW: 'BWP',
+  BY: 'BYN',
+  BZ: 'BZD',
+  CA: 'CAD',
+  CD: 'CDF',
+  CF: 'XAF',
+  CG: 'XAF',
+  CH: 'CHF',
+  CI: 'XOF',
+  CL: 'CLP',
+  CM: 'XAF',
+  CN: 'CNY',
+  CO: 'COP',
+  CR: 'CRC',
+  CU: 'CUP',
+  CV: 'CVE',
+  CY: 'EUR',
+  CZ: 'CZK',
+  DE: 'EUR',
+  DJ: 'DJF',
+  DK: 'DKK',
+  DM: 'XCD',
+  DO: 'DOP',
+  DZ: 'DZD',
+  EC: 'USD',
+  EE: 'EUR',
+  EG: 'EGP',
+  ER: 'ERN',
+  ES: 'EUR',
+  ET: 'ETB',
+  FI: 'EUR',
+  FJ: 'FJD',
+  FK: 'FKP',
+  FR: 'EUR',
+  GA: 'XAF',
+  GB: 'GBP',
+  GD: 'XCD',
+  GE: 'GEL',
+  GH: 'GHS',
+  GI: 'GIP',
+  GM: 'GMD',
+  GN: 'GNF',
+  GQ: 'XAF',
+  GR: 'EUR',
+  GT: 'GTQ',
+  GW: 'XOF',
+  GY: 'GYD',
+  HK: 'HKD',
+  HN: 'HNL',
+  HR: 'EUR', // NOTE: HR adopted the euro 2023-01-01
+  HT: 'HTG',
+  HU: 'HUF',
+  ID: 'IDR',
+  IE: 'EUR',
+  IL: 'ILS',
+  IN: 'INR',
+  IQ: 'IQD',
+  IR: 'IRR',
+  IS: 'ISK',
+  IT: 'EUR',
+  JM: 'JMD',
+  JO: 'JOD',
+  JP: 'JPY',
+  KE: 'KES',
+  KG: 'KGS',
+  KH: 'KHR',
+  KM: 'KMF',
+  KP: 'KPW',
+  KR: 'KRW',
+  KW: 'KWD',
+  KY: 'KYD',
+  KZ: 'KZT',
+  LA: 'LAK',
+  LB: 'LBP',
+  LC: 'XCD',
+  LI: 'CHF',
+  LK: 'LKR',
+  LR: 'LRD',
+  LS: 'LSL',
+  LT: 'EUR',
+  LU: 'EUR',
+  LV: 'EUR',
+  LY: 'LYD',
+  MA: 'MAD',
+  MC: 'EUR',
+  MD: 'MDL',
+  ME: 'EUR',
+  MG: 'MGA',
+  MK: 'MKD',
+  MM: 'MMK',
+  MN: 'MNT',
+  MO: 'MOP',
+  MR: 'MRU',
+  MT: 'EUR',
+  MU: 'MUR',
+  MV: 'MVR',
+  MW: 'MWK',
+  MX: 'MXN',
+  MY: 'MYR',
+  MZ: 'MZN',
+  NA: 'NAD',
+  NE: 'XOF',
+  NG: 'NGN',
+  NI: 'NIO',
+  NL: 'EUR',
+  NO: 'NOK',
+  NP: 'NPR',
+  NZ: 'NZD',
+  OM: 'OMR',
+  PA: 'PAB',
+  PE: 'PEN',
+  PF: 'XPF',
+  PG: 'PGK',
+  PH: 'PHP',
+  PK: 'PKR',
+  PL: 'PLN',
+  PT: 'EUR',
+  PY: 'PYG',
+  QA: 'QAR',
+  RO: 'RON',
+  RS: 'RSD',
+  RU: 'RUB',
+  RW: 'RWF',
+  SA: 'SAR',
+  SB: 'SBD',
+  SC: 'SCR',
+  SD: 'SDG',
+  SE: 'SEK',
+  SG: 'SGD',
+  SH: 'SHP',
+  SI: 'EUR',
+  SK: 'EUR',
+  SL: 'SLE', // NOTE: SL redenominated to SLE in 2022
+  SM: 'EUR',
+  SN: 'XOF',
+  SO: 'SOS',
+  SR: 'SRD',
+  SS: 'SSP',
+  ST: 'STN',
+  SV: 'USD',
+  SY: 'SYP',
+  SZ: 'SZL',
+  TD: 'XAF',
+  TG: 'XOF',
+  TH: 'THB',
+  TJ: 'TJS',
+  TL: 'USD',
+  TM: 'TMT',
+  TN: 'TND',
+  TO: 'TOP',
+  TR: 'TRY',
+  TT: 'TTD',
+  TW: 'TWD',
+  TZ: 'TZS',
+  UA: 'UAH',
+  UG: 'UGX',
+  US: 'USD',
+  UY: 'UYU',
+  UZ: 'UZS',
+  VA: 'EUR',
+  VE: 'VES',
+  VN: 'VND',
+  VU: 'VUV',
+  WS: 'WST',
+  YE: 'YER',
+  ZA: 'ZAR',
+  ZM: 'ZMW',
+  ZW: 'ZWG', // NOTE: ZW introduced ZWG in 2024
+};
+
+/**
+ * When several countries share a currency, this is the one shown after a swap
+ * or when we need a single representative. Chosen by traveler recognisability,
+ * not by population.
+ */
+const PRIMARY_FOR_CURRENCY = {
+  EUR: 'ES',
+  USD: 'US',
+  XOF: 'SN',
+  XAF: 'CM',
+  XCD: 'AG',
+  CHF: 'CH',
+  XPF: 'PF',
+};
+
+const names = new Intl.DisplayNames(['es'], { type: 'region' });
+
+/** Regional-indicator code points spell the flag from the country code. */
+const flagOf = (code) =>
+  String.fromCodePoint(...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+
+const rows = Object.entries(COUNTRY_CURRENCY)
+  .map(([code, currency]) => {
+    const name = names.of(code);
+    if (!name || name === code) throw new Error(`No Spanish name for region ${code}`);
+    return { code, name, currency, flag: flagOf(code) };
+  })
+  .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+// Every referenced currency must exist in config/currencies.ts, or a country
+// would point at a currency the app cannot convert.
+const currenciesSrc = new URL('../config/currencies.ts', import.meta.url);
+const known = new Set(
+  [
+    ...(await import('node:fs'))
+      .readFileSync(currenciesSrc, 'utf8')
+      .matchAll(/code: '([A-Z]{3})'/g),
+  ].map((m) => m[1]),
+);
+const unknown = rows.filter((r) => !known.has(r.currency));
+if (unknown.length) {
+  console.error('Countries referencing unknown currencies:', unknown);
+  process.exit(1);
+}
+for (const country of Object.values(PRIMARY_FOR_CURRENCY)) {
+  if (!COUNTRY_CURRENCY[country]) throw new Error(`Primary country ${country} is not in the map`);
+}
+
+const HEADER = `/**
+ * Countries and the currency each one uses.
+ *
+ * GENERATED by scripts/generate-countries.mjs. Do not edit by hand.
+ *
+ * Travelers think in countries, not currency codes — you know you are going to
+ * Japan, not that you need JPY (ADR-014). This table is what lets the app ask
+ * the question the user can actually answer.
+ *
+ * The country → currency mapping is curated (no API provides it); Spanish names
+ * come from ICU and flags are computed from the country code. Unlike exchange
+ * rates, this is stable reference data a reviewer can verify row by row.
+ */
+
+import type { CurrencyCode } from './currencies';
+
+export interface Country {
+  /** ISO 3166-1 alpha-2. */
+  readonly code: string;
+  /** Display name in Spanish (CLDR). */
+  readonly name: string;
+  /** The currency a traveler will actually pay with there. */
+  readonly currency: CurrencyCode;
+  /** Emoji flag, derived from the country code. */
+  readonly flag: string;
+}
+
+export const COUNTRIES: readonly Country[] = [
+`;
+
+const FOOTER = `];
+
+/**
+ * The country shown to represent a currency — needed after a swap, when the UI
+ * has a currency and must display a country for it.
+ *
+ * Several countries share a currency (twenty use the euro), so the choice is
+ * explicit for those and falls back to the first match otherwise.
+ */
+const PRIMARY_BY_CURRENCY: Readonly<Record<string, string>> = ${JSON.stringify(
+  PRIMARY_FOR_CURRENCY,
+  null,
+  2,
+)};
+
+const BY_CODE: ReadonlyMap<string, Country> = new Map(COUNTRIES.map((c) => [c.code, c]));
+
+export function getCountry(code: string): Country | undefined {
+  return BY_CODE.get(code);
+}
+
+/** The representative country for a currency, or undefined if none uses it. */
+export function countryForCurrency(currency: CurrencyCode): Country | undefined {
+  const preferred = PRIMARY_BY_CURRENCY[currency];
+  if (preferred) {
+    const country = BY_CODE.get(preferred);
+    if (country) return country;
+  }
+  return COUNTRIES.find((c) => c.currency === currency);
+}
+`;
+
+const body = rows
+  .map(
+    (r) =>
+      `  { code: '${r.code}', name: '${r.name.replace(/'/g, "\\'")}', currency: '${r.currency}', flag: '${r.flag}' },`,
+  )
+  .join('\n');
+
+writeFileSync(new URL('../config/countries.ts', import.meta.url), HEADER + body + '\n' + FOOTER);
+
+console.log(`Wrote ${rows.length} countries to config/countries.ts`);
+console.log(`Distinct currencies referenced: ${new Set(rows.map((r) => r.currency)).size}`);
+console.log('Run `pnpm format` afterwards to normalise the output.');

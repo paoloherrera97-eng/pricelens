@@ -1,0 +1,44 @@
+{
+  "app": {
+    "name": "PriceLens",
+    "tagline": "Entiende al instante cuánto vale un precio extranjero en tu moneda.",
+    "description": "Convierte precios de viaje a tu moneda en segundos. Funciona sin conexión."
+  },
+  "converter": {
+    "amountLabel": "Importe",
+    "amountPlaceholder": "0",
+    "fromLabel": "Moneda local",
+    "toLabel": "Tu moneda",
+    "swap": "Intercambiar monedas",
+    "resultLabel": "Equivale a",
+    "rateLine": "1 {from} = {rate} {to}",
+    "announcement": "{amount} equivale a {converted}",
+    "unavailablePair": "No tenemos la tasa de esta moneda ahora mismo.",
+    "countryLabel": "¿A qué país viajas?"
+  },
+  "currencyPicker": {
+    "search": "Buscar moneda o país",
+    "noResults": "No se encontró ninguna moneda"
+  },
+  "rates": {
+    "updated": "Actualizado {relative}",
+    "justNow": "hace un momento",
+    "minutesAgo": "hace {count, plural, one {# minuto} other {# minutos}}",
+    "hoursAgo": "hace {count, plural, one {# hora} other {# horas}}",
+    "daysAgo": "hace {count, plural, one {# día} other {# días}}",
+    "stale": "Estas tasas no son recientes.",
+    "offline": "Sin conexión",
+    "loading": "Cargando tasas",
+    "offlineBanner": "Sin conexión · usando las últimas tasas guardadas"
+  },
+  "errors": {
+    "ratesUnavailableTitle": "No hemos podido obtener las tasas",
+    "ratesUnavailableBody": "Vuelve a intentarlo en un momento.",
+    "offlineBody": "Conéctate a internet para obtener las tasas más recientes.",
+    "retry": "Reintentar"
+  },
+  "countryPicker": {
+    "search": "Buscar país o moneda",
+    "noResults": "No se encontró ningún país"
+  }
+}

@@ -1,0 +1,279 @@
+# PriceLens — Product Requirements (V1 MVP)
+
+**Status:** Approved for build · **Version:** 1.1 · **Owner:** Product
+
+This document defines _what_ V1 must do and how we will know it is done. It does not define _how_ —
+that is `ARCHITECTURE.md`.
+
+---
+
+## 1. Problem
+
+A traveler standing in a shop in Bangkok sees `฿1,890`. They have no idea whether that is cheap,
+reasonable, or a tourist price. Their options today are all bad:
+
+- **Mental arithmetic** — slow, error-prone, and impossible with unfamiliar exponents (is ₫250,000 a
+  coffee or a hotel night?).
+- **A search engine** — requires typing a full query, tolerating ads, and a working connection.
+- **A generic converter app** — buried under charts, rate alerts, portfolios, and interstitial ads;
+  optimized for people who care about currencies rather than people who care about _prices_.
+
+All three break the moment the connection is weak, which on travel is most of the time.
+
+**The gap:** there is no tool designed for the specific moment of _holding a price you don't
+understand._
+
+---
+
+## 2. Target User
+
+**Primary: the active traveler.**
+
+- On a phone, one-handed, often outdoors in bright light.
+- On unreliable Wi-Fi or expensive roaming data.
+- In a hurry, sometimes mildly stressed, occasionally being watched by a shopkeeper.
+- Not a finance person. Does not know or care what the mid-market rate is.
+- Needs an answer, not information.
+
+**Explicit non-users for V1:** traders, accountants, expense-reporting business travelers, and
+anyone who wants historical data. Serving them would compromise the primary user.
+
+---
+
+## 3. Primary User Story
+
+> **As a traveler**, I want to type a foreign price and immediately see what it costs in my own
+> currency, **so that** I can decide whether to buy it without doing math or losing my place in the
+> conversation.
+
+### Supporting stories
+
+- As a traveler, I want the app to already know my home currency, so I don't re-select it every time.
+- As a traveler, I want to switch the direction of the conversion in one tap, because sometimes I
+  need to think in the local currency instead.
+- As a traveler, I want to know whether the rate I'm seeing is current, so I know how much to trust
+  it.
+- As a traveler whose connection drops mid-trip, I want to keep converting with the rates I already
+  have, rather than hitting an error screen. (If I have never loaded the app at all, I would rather
+  be told the rates are unavailable than be shown a number nobody fetched — see ADR-013.)
+
+---
+
+## 4. Scope
+
+### 4.1 In scope for V1
+
+| #   | Requirement                            | Notes                                          |
+| --- | -------------------------------------- | ---------------------------------------------- |
+| S1  | Manual amount input                    | Numeric, decimal-aware, mobile numeric keypad  |
+| S2  | Country selector (drives the currency) | Searchable, 195 countries with flags (ADR-014) |
+| S3  | Home (target) currency selector        | Same component, persisted                      |
+| S4  | Live exchange rates                    | Refreshed hourly server-side                   |
+| S5  | Conversion result                      | The visual centerpiece                         |
+| S6  | Swap direction                         | One tap, no reload                             |
+| S7  | Rate freshness indicator               | Timestamp + degraded-state messaging           |
+| S8  | Responsive, mobile-first UI            | 320px → desktop                                |
+| S9  | Fast first load                        | See §6                                         |
+| S10 | Full keyboard + screen-reader support  | WCAG 2.2 AA                                    |
+| S11 | Installable, offline-capable PWA       | Manifest + service worker, from V1             |
+| S12 | Spanish UI, internationalisation-ready | All copy in a message catalogue                |
+
+### 4.2 Explicitly out of scope for V1
+
+Authentication · database · user accounts · payments · notifications · ads · OCR · camera · history ·
+dark mode · AI.
+
+These are **decisions, not omissions** (see `PROJECT_BIBLE.md` → Scope Discipline). Each is scheduled
+in `ROADMAP.md`.
+
+### 4.3 The one documented exception
+
+**Home currency is persisted to `localStorage`** — a single string such as `"EUR"`.
+
+| It is                 | It is not                                     |
+| --------------------- | --------------------------------------------- |
+| One preference key    | A database                                    |
+| Device-local          | An account                                    |
+| Overwritten on change | A history or a log                            |
+| Zero PII              | Anything requiring consent or a cookie banner |
+
+Rationale: a returning traveler re-selecting their home currency on every visit pays a direct tax
+against the 3-second promise. The foreign currency is deliberately **not** persisted — it changes
+per country, and a stale value would be actively misleading. Recorded as ADR-005.
+
+The service worker's caches (S11) are the same kind of exception: a cache of the app shell and the
+last rate table, holding no user data and no history.
+
+### 4.4 Scope changes since v1.0 of this document
+
+| Change                               | Effect                                                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| **PWA moved from V2 into V1** (S11)  | Installability and offline support are now MVP requirements, not comfort features |
+| **Spanish is the shipping UI** (S12) | Copy is Spanish; the architecture stays locale-agnostic (ADR-009)                 |
+| **Country-first selection** (S2)     | The foreign side is chosen by country; the currency is derived (ADR-014)          |
+| **No bundled fallback rates**        | Offline falls back to real cached rates, never to invented ones (ADR-013)         |
+
+The PWA move is worth stating plainly, because v1.0 of this document argued for deferring it. That
+argument was that installability is comfort rather than comprehension. Offline capability is not
+comfort for this product — a traveler on failed hotel Wi-Fi is the _primary_ scenario, not an edge
+case, and ADR-001 already gives us most of the way there by keeping conversion client-side. Making it
+explicit costs a manifest and a service worker.
+
+---
+
+## 5. Functional Requirements
+
+### FR-1 — Amount input
+
+- Accepts digits and a single decimal separator.
+- Accepts both `.` and `,` as decimal separators (a European traveler types `12,50`).
+- A lone separator followed by exactly three digits is read as **grouping**, not a decimal: the app
+  ships in Spanish, where `1.890` means one thousand eight hundred ninety. This is what makes a
+  pasted price parse the way the user meant it.
+- Pasting is not special-cased — the same sanitising that ignores stray characters is what lets
+  `฿1.890` be pasted straight in.
+- Rejects letters and multiple separators without an error message — invalid characters simply never
+  appear. Punishing a user with an error for a keystroke we could ignore is a design failure.
+- Empty input is a valid state showing a neutral zero result, not an error.
+- Triggers `inputmode="decimal"` so phones show a numeric keypad.
+- No maximum, but values beyond safe display precision are formatted in compact notation.
+
+### FR-2 — Country and currency selection
+
+- The **foreign side is chosen by country**, and the currency is derived (ADR-014). Travelers know
+  they are going to Japan; asking them for "JPY" makes them do the translation the app should do.
+- The **home side is a currency picker** — you know your own currency, and it is remembered.
+- Both are the same searchable `Select` primitive, so behaviour and accessibility are identical.
+- The country picker shows a flag, the country name, and its currency code; it matches on country
+  name, country code, currency code, and currency name, and ignores accents.
+- Choosing a country whose currency is already the home currency swaps rather than producing an
+  invalid 1:1 state; the same applies in reverse.
+- After a swap, the country selector moves to a representative country for the new foreign currency.
+
+### FR-3 — Conversion
+
+- Recomputes on every change to amount, source, or target — with no network request (ADR-001).
+- Perceived latency target: **< 16ms** (one frame). This is arithmetic; it should never be visible.
+- Rounds to the target currency's real minor-unit digits (ADR-006).
+- Displays the effective rate used (`1 THB = 0.026 EUR`) as a secondary line, because trust requires
+  showing the working.
+
+### FR-4 — Swap
+
+- One control, one tap, no layout shift, no refetch.
+- Swaps the currencies and preserves the amount.
+
+### FR-5 — Rate freshness and degradation
+
+| State                                   | Behavior                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Fresh**                               | Show the result and a quiet `Updated <relative time>` line                                                    |
+| **Loading**                             | Show the layout with a skeleton in the result slot — never a blank screen or a spinner-only page              |
+| **Stale** (cached, older than expected) | Show the result with a visible but non-alarming staleness note                                                |
+| **Provider failure**                    | Show the last real table the service worker holds; if there is none, an explicit unavailable state with retry |
+| **Offline**                             | Same as provider failure, plus an offline indicator                                                           |
+
+The app must never (a) show a number without indicating how current it is, (b) present cached
+data as if it were live. Requirement FR-5 exists to protect Value #4 in the Project Bible.
+
+### FR-6 — Persistence
+
+- Home currency written to `localStorage` on change, read on mount.
+- A missing, corrupt, or unparseable value falls back to the default without throwing.
+- Absence of `localStorage` (private mode, disabled storage) degrades silently to session-only.
+
+---
+
+## 6. Non-Functional Requirements
+
+| Category            | Requirement                                                                                                                                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Performance**     | LCP < 1.5s on a simulated Fast 3G / mid-tier mobile device. TTI < 2.0s. Conversion recompute < 16ms.                                                                                                                                          |
+| **Bundle**          | Target: initial client JS ≤ 100KB gzipped. **Currently 175KB — not met.** See below. Every dependency must still justify its weight.                                                                                                          |
+| **Accessibility**   | WCAG 2.2 AA. Fully keyboard operable. All controls labeled. Result announced via a polite live region. Contrast ≥ 4.5:1 for text, ≥ 3:1 for UI boundaries.                                                                                    |
+| **Touch**           | Minimum 44×44px interactive targets.                                                                                                                                                                                                          |
+| **Responsive**      | Fully functional from 320px width upward. Mobile-first; desktop is the adaptation, not the baseline.                                                                                                                                          |
+| **Browser support** | Last 2 versions of Safari (iOS + macOS), Chrome, Firefox, Edge. iOS Safari is the primary target — it is what travelers carry.                                                                                                                |
+| **Reliability**     | The app renders and remains usable with the rate provider entirely unreachable.                                                                                                                                                               |
+| **Privacy**         | No tracking, no cookies, no PII, no third-party client-side scripts in V1.                                                                                                                                                                    |
+| **i18n readiness**  | Number and currency formatting is locale-aware from day one. UI copy ships in Spanish and lives entirely in a message catalogue — no user-facing string is hardcoded in a component. Adding a locale requires no component changes (ADR-009). |
+| **Installability**  | Valid manifest, maskable icons, and a registered service worker. The app renders and converts with the network unavailable, after a first successful load (ADR-007).                                                                          |
+
+---
+
+### 6.1 Bundle budget — measured, and currently missed
+
+| Measured on the production build | Value                                                       |
+| -------------------------------- | ----------------------------------------------------------- |
+| Initial client JS, gzipped       | **175.4 KB** (150.3 KB brotli, which is what Vercel serves) |
+| CSS, gzipped                     | 4.7 KB                                                      |
+| Target from §6                   | ≤ 100 KB gzipped                                            |
+
+**The 100KB figure was set in Phase 1 without measuring anything, and it is not
+reachable with this stack.** React 19, the Next App Router runtime, and next-intl
+account for the great majority of those bytes before a line of PriceLens code is
+counted. Recording the real number matters more than keeping a round one.
+
+Why this is not a launch blocker: Vercel serves brotli (150 KB), the payload is
+immutable and hashed so it is fetched once, and the service worker serves it from
+cache on every subsequent visit. The 3-second promise is about the _conversion_
+loop, which is local arithmetic and touches none of this.
+
+The reduction path, in order of return, for after launch:
+
+1. **Move `next-intl` off the client.** The converter is a Client Component that
+   calls `useTranslations`; passing resolved strings down as props from the
+   Server Component would drop the client i18n runtime entirely. Largest single
+   win, and a contained refactor.
+2. Re-measure before doing anything else — an assumed win is how this number got
+   written down wrong the first time.
+
+---
+
+## 7. Edge Cases
+
+Each must have a designed, implemented, and tested behavior.
+
+| #   | Case                                                              | Required behavior                                                                     |
+| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| E1  | Empty amount                                                      | Neutral zero result. Not an error.                                                    |
+| E2  | Amount is `0`                                                     | Show zero in the target currency. Valid.                                              |
+| E3  | Decimal separator ambiguity (`12,50`)                             | Parsed as 12.5                                                                        |
+| E4  | Zero-decimal currency (JPY, KRW, VND)                             | Rounded to 0 decimals                                                                 |
+| E5  | Three-decimal currency (KWD, BHD, OMR)                            | Rounded to 3 decimals                                                                 |
+| E6  | Very large amount (₫250,000,000)                                  | Formatted readably; no overflow, no layout break                                      |
+| E7  | Very small result (< 0.01)                                        | Show meaningful precision rather than `0.00` — `$0.0031` is useful, `$0.00` is a lie  |
+| E8  | Same currency selected in both fields                             | Auto-swap; never a 1:1 dead end                                                       |
+| E9  | Rate provider returns malformed data                              | Reject the payload at the boundary, fall back, log server-side                        |
+| E10 | Rate provider unreachable / times out                             | Cached rates if available, otherwise an honest unavailable state with retry (ADR-013) |
+| E11 | User goes offline mid-session                                     | Conversion continues working from the in-memory table                                 |
+| E12 | Currency present in the app but missing from the provider payload | Excluded from selectors rather than producing a broken conversion                     |
+| E13 | `localStorage` unavailable or throws                              | Session-only operation, no crash                                                      |
+| E14 | Extremely long currency name in the selector                      | Truncates with ellipsis; layout holds                                                 |
+
+---
+
+## 8. Success Criteria
+
+V1 is done when all are true:
+
+1. A cold-start user completes their first conversion in **under 3 seconds**, measured from
+   navigation start to a correct visible result.
+2. Every requirement in §5 is implemented and every edge case in §7 has a passing test.
+3. Lighthouse mobile: **Performance ≥ 95, Accessibility = 100, Best Practices ≥ 95**.
+4. The app is fully functional with the rate provider blocked at the network level.
+5. `pnpm lint && pnpm typecheck && pnpm test && pnpm build` all pass clean.
+6. Conversion math has unit-test coverage including every edge case in E3–E7.
+
+---
+
+## 9. Explicit Non-Goals
+
+State so that they are never accidentally optimized for:
+
+- We do not aim for trader-grade rate accuracy. Mid-market rates refreshed hourly are correct for
+  deciding whether to buy a scarf; they are not correct for executing a trade, and we do not pretend
+  otherwise.
+- We do not aim to show what the user's bank will actually charge — that requires card, bank, and
+  fee data we deliberately do not collect in V1.
+- We do not aim for feature parity with any existing converter. Parity is the failure mode.
