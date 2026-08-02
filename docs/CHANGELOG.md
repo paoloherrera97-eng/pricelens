@@ -9,6 +9,38 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Changed — el resultado vuelve a estar sobre el pliegue (auditoría 🔴)
+
+Medido en la build de producción antes de tocar nada: **con un solo favorito guardado, el resultado
+caía fuera de la pantalla en Safari iOS siempre que la barra de direcciones estaba expandida**, que
+es su estado al abrir la app.
+
+| Viewport                             | Antes    | Ahora    |
+| ------------------------------------ | -------- | -------- |
+| iPhone SE2 barra expandida (375×553) | −107px ✗ | +51px ✓  |
+| iPhone 12 mini (390×629)             | −31px ✗  | +127px ✓ |
+| iPhone 13 barra expandida (390×600)  | −60px ✗  | +98px ✓  |
+| iPhone 13 colapsada (390×664)        | +4px     | +162px ✓ |
+
+Tres cambios, ninguno de ellos recorte arbitrario de píxeles:
+
+- **Los favoritos pasan debajo del resultado.** Un favorito no es una entrada de _esta_ conversión:
+  es el atajo para empezar la siguiente. Encima, separaba el selector de moneda de su propia
+  respuesta —la adyacencia más importante de la pantalla— y empujaba el resultado 84px hacia abajo.
+  Ahora la posición del resultado **no depende del número de favoritos**: 372–502px con 0, 1, 2 u 8.
+- **El tagline se oculta en teléfonos** (`sm:` en adelante lo mantiene). Cuesta 51px de los ~553 que
+  deja Safari con la barra expandida, y ahí el resultado vale más que una frase explicativa. Sigue
+  siendo la meta description, así que el SEO no depende de que se pinte.
+- **El relleno vertical de la página baja de 16px a 8px en móvil.** Era redundante: la tarjeta ya
+  aporta sus propios 24px, así que sumaban 40px entre el borde de la pantalla y la primera etiqueta.
+
+**Lo que sigue sin caber:** el iPhone SE de 1.ª generación (320×460 con la barra expandida) queda
+40px corto. Es un dispositivo de 2016 y no hay forma de resolverlo sin quitar contenido que sí
+importa; ahí el usuario desplaza.
+
+Verificado además: sin desbordamiento horizontal en ningún viewport de 320 a 1440, y axe sin
+violaciones en claro y oscuro.
+
 ### Added — share (Phase 2, feature 5 of 8)
 
 A conversion is now a link. The address bar carries `country`, `to` and `amount`; a share control
