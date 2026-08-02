@@ -383,3 +383,103 @@ describe('Converter — home currency detection', () => {
     expect(screen.getByText(/= 1 USD|1 EUR =/)).toBeInTheDocument();
   });
 });
+
+describe('Converter — favourites', () => {
+  const FAVOURITES_KEY = APP_CONFIG.storageKeys.favourites;
+
+  async function ready() {
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+  }
+
+  function star() {
+    return screen.getByRole('button', { name: /favorito/i });
+  }
+
+  it('saves the pair on screen and marks the star as pressed', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    expect(star()).toHaveAttribute('aria-pressed', 'false');
+    await user.click(star());
+
+    expect(star()).toHaveAttribute('aria-pressed', 'true');
+    expect(JSON.parse(window.localStorage.getItem(FAVOURITES_KEY)!)).toEqual([
+      { country: 'US', to: 'EUR' },
+    ]);
+  });
+
+  it('takes the pair back on a second tap', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    await user.click(star());
+    await user.click(star());
+
+    expect(star()).toHaveAttribute('aria-pressed', 'false');
+    expect(JSON.parse(window.localStorage.getItem(FAVOURITES_KEY)!)).toEqual([]);
+  });
+
+  it('shows nothing at all until something is saved', async () => {
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    // An empty-state prompt would be teaching a feature at the moment the user
+    // is trying to read a price.
+    expect(screen.queryByText('Favoritos')).not.toBeInTheDocument();
+  });
+
+  it('restores both selectors when a saved pair is chosen', async () => {
+    window.localStorage.setItem(FAVOURITES_KEY, JSON.stringify([{ country: 'TH', to: 'JPY' }]));
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    await user.click(screen.getByRole('button', { name: /Tailandia, de THB a JPY/ }));
+
+    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
+  });
+
+  it('does not save the same pair twice', async () => {
+    window.localStorage.setItem(FAVOURITES_KEY, JSON.stringify([{ country: 'US', to: 'EUR' }]));
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    // Already saved, so the star is pressed and tapping it removes rather than
+    // duplicating. The list can never grow by re-saving what is on screen.
+    expect(star()).toHaveAttribute('aria-pressed', 'true');
+    await user.click(star());
+    expect(JSON.parse(window.localStorage.getItem(FAVOURITES_KEY)!)).toHaveLength(0);
+  });
+
+  it('survives a corrupt stored value instead of failing to render', async () => {
+    window.localStorage.setItem(FAVOURITES_KEY, '{not json');
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+
+    await ready();
+    expect(screen.queryByText('Favoritos')).not.toBeInTheDocument();
+  });
+
+  it('leaves the conversion untouched when a favourite is saved', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await ready();
+
+    await user.type(screen.getByLabelText('Importe'), '100');
+    const before = await resultText();
+    await user.click(star());
+
+    expect(await resultText()).toBe(before);
+  });
+});

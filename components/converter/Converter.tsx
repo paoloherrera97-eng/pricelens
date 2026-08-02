@@ -7,6 +7,7 @@ import { Button, Card, IconButton, Input } from '@/components/ui';
 import {
   APP_CONFIG,
   DEFAULT_LOCALE,
+  FEATURES,
   LOCALE_FORMATTING,
   countryForCurrency,
   getCountry,
@@ -15,17 +16,21 @@ import {
   type CurrencyCode,
 } from '@/config';
 import { useDetectedHomeCurrency } from '@/hooks/useDetectedHomeCurrency';
+import { useFavourites } from '@/hooks/useFavourites';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRates } from '@/hooks/useRates';
 import { convert, getRate } from '@/lib/currency/convert';
 import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency/format';
+import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
 import { parseAmount, sanitizeAmountInput } from '@/lib/currency/parse';
 
 import { ConversionResult } from './ConversionResult';
 import { ConverterSkeleton } from './ConverterSkeleton';
 import { CountryPicker } from './CountryPicker';
 import { CurrencyPicker } from './CurrencyPicker';
+import { FavouriteList } from './FavouriteList';
+import { FavouriteToggle } from './FavouriteToggle';
 import { RateFreshness } from './RateFreshness';
 import { SwapButton } from './SwapButton';
 
@@ -134,6 +139,28 @@ export function Converter() {
     [from, to, countryCode, setTo],
   );
 
+  // Favourites are a shortcut over the two selectors, not a third input: they
+  // set the same state the pickers do and own none of their own.
+  const { favourites, toggle } = useFavourites();
+  const currentPair = useMemo<Favourite>(() => ({ country: countryCode, to }), [countryCode, to]);
+  const isCurrentSaved = useMemo(
+    () => isFavourite(favourites, currentPair),
+    [favourites, currentPair],
+  );
+
+  const handleToggleFavourite = useCallback(() => toggle(currentPair), [toggle, currentPair]);
+
+  const handleSelectFavourite = useCallback(
+    (favourite: Favourite) => {
+      // Both at once, and deliberately not through the picker handlers: those
+      // exist to resolve a collision when *one* side changes, and here both
+      // sides are known good — the pair was saved as a working pair.
+      setCountryCode(favourite.country);
+      setTo(favourite.to);
+    },
+    [setTo],
+  );
+
   // A first-time visitor gets their own currency guessed from the device rather
   // than the configured default. Routed through the handler above rather than
   // `setTo`, so a guess that collides with the destination country resolves the
@@ -210,7 +237,28 @@ export function Converter() {
         <SwapButton onSwap={handleSwap} />
       </div>
 
-      <CurrencyPicker label={t('toLabel')} value={to} onChange={handleHomeChange} />
+      {/* The star sits on the home-currency row because that row is where the
+          pair is completed — by the time it is reachable, both halves of the
+          favourite exist. */}
+      <div className="flex items-end gap-0.5">
+        <CurrencyPicker
+          className="min-w-0 flex-1"
+          label={t('toLabel')}
+          value={to}
+          onChange={handleHomeChange}
+        />
+        {FEATURES.favourites && (
+          <FavouriteToggle isSaved={isCurrentSaved} onToggle={handleToggleFavourite} />
+        )}
+      </div>
+
+      {FEATURES.favourites && (
+        <FavouriteList
+          favourites={favourites}
+          current={currentPair}
+          onSelect={handleSelectFavourite}
+        />
+      )}
 
       <ConversionResult
         original={originalFormatted}

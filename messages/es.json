@@ -41,5 +41,11 @@
   "countryPicker": {
     "search": "Buscar país o moneda",
     "noResults": "No se encontró ningún país"
+  },
+  "favourites": {
+    "title": "Favoritos",
+    "add": "Guardar este par como favorito",
+    "remove": "Quitar este par de favoritos",
+    "select": "{country}, de {from} a {to}"
   }
 }
