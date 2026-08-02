@@ -55,7 +55,7 @@ this phase is that nothing already working gets modified.
 | 3   | Conversion history     | To build          | localStorage, timestamps, clear. Note: V1 deliberately excluded history — this reverses that scope decision and needs its own ADR |
 | 4   | Favourites             | To build          | Saved pairs, quick access                                                                                                         |
 | 5   | Share                  | To build          | Web Share API, copy link, QR code. Needs URL state first                                                                          |
-| 6   | Country auto-detection | To build          | Locale and timezone heuristics, intelligent defaults                                                                              |
+| 6   | Country auto-detection | **Shipped**       | Locale region, then timezone. No permission prompt, no geolocation (ADR-015)                                                      |
 | 7   | Error recovery         | **Shipped in V1** | Retry, offline notice, and graceful fallback are live (ADR-013). Re-audit rather than rebuild                                     |
 | 8   | Lighthouse 100 × 4     | To build          | Performance, Accessibility, Best Practices, SEO                                                                                   |
 

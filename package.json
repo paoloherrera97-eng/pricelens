@@ -20,6 +20,7 @@
     "format:check": "prettier --check .",
     "generate:icons": "node scripts/generate-icons.mjs",
     "generate:splash": "node scripts/generate-splash.mjs",
+    "generate:timezones": "node scripts/generate-timezones.mjs",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {

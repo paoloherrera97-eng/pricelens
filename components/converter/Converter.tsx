@@ -14,6 +14,7 @@ import {
   isCurrencyCode,
   type CurrencyCode,
 } from '@/config';
+import { useDetectedHomeCurrency } from '@/hooks/useDetectedHomeCurrency';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRates } from '@/hooks/useRates';
@@ -132,6 +133,12 @@ export function Converter() {
     },
     [from, to, countryCode, setTo],
   );
+
+  // A first-time visitor gets their own currency guessed from the device rather
+  // than the configured default. Routed through the handler above rather than
+  // `setTo`, so a guess that collides with the destination country resolves the
+  // same way a manual pick would instead of leaving a 1:1 dead end.
+  useDetectedHomeCurrency(handleHomeChange);
 
   if (rates.status === 'loading') {
     return <ConverterSkeleton label={tRates('loading')} />;

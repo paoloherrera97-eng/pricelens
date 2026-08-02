@@ -321,3 +321,65 @@ describe('Converter — accessibility', () => {
     expect(screen.getByRole('button', { name: /Tu moneda/ })).toBeInTheDocument();
   });
 });
+
+describe('Converter — home currency detection', () => {
+  /**
+   * jsdom reports `en-US` and whatever timezone the runner is in, so these
+   * stub `navigator.language` rather than relying on the environment — a test
+   * that passes only on a machine set to Argentina is not a test.
+   */
+  function withLocale(locale: string) {
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue(locale);
+  }
+
+  it('adopts the currency of the device region on a first visit', async () => {
+    mockRates({ ...SNAPSHOT, rates: { ...SNAPSHOT.rates, GBP: 0.79 } });
+    withLocale('en-GB');
+    render(<Converter />);
+
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(/1 USD = /)).toHaveTextContent('GBP'));
+    expect(window.localStorage.getItem(APP_CONFIG.storageKeys.homeCurrency)).toBe('GBP');
+  });
+
+  it('leaves a returning visitor’s stored choice alone', async () => {
+    // The failure mode that makes this kind of feature hated: re-detecting on
+    // every visit and overriding what the user deliberately picked.
+    window.localStorage.setItem(APP_CONFIG.storageKeys.homeCurrency, 'JPY');
+    mockRates(SNAPSHOT);
+    withLocale('en-GB');
+    render(<Converter />);
+
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+
+    expect(screen.getByText(/1 USD =/)).toHaveTextContent('JPY');
+    expect(window.localStorage.getItem(APP_CONFIG.storageKeys.homeCurrency)).toBe('JPY');
+  });
+
+  it('keeps the configured default when the region names no currency we carry', async () => {
+    mockRates(SNAPSHOT);
+    withLocale('en');
+    render(<Converter />);
+
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    expect(screen.getByText(/1 USD =/)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
+  });
+
+  it('moves the destination when the detected currency is the one being converted from', async () => {
+    // Detecting USD for a US visitor would otherwise leave USD → USD, a 1:1
+    // dead end (PRD E8). Routing through the picker's own handler avoids it.
+    mockRates(SNAPSHOT);
+    withLocale('en-US');
+    render(<Converter />);
+
+    await screen.findByLabelText('Importe');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /país viajas/ })).not.toHaveTextContent(
+        'Estados Unidos',
+      ),
+    );
+    expect(screen.getByText(/= 1 USD|1 EUR =/)).toBeInTheDocument();
+  });
+});
