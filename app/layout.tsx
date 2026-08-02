@@ -4,20 +4,59 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { ServiceWorkerRegistrar } from '@/components/pwa/ServiceWorkerRegistrar';
-import { APP_CONFIG } from '@/config';
+import { APP_CONFIG, SITE } from '@/config';
 
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('app');
 
+  const title = `${APP_CONFIG.name} — ${t('tagline')}`;
+  const description = t('description');
+
   return {
+    // Resolves every relative URL below (canonical, OG image) against the
+    // production origin — see config/site.ts for how that origin is derived.
+    metadataBase: new URL(SITE.url),
     title: {
-      default: `${APP_CONFIG.name} — ${t('tagline')}`,
+      default: title,
       template: `%s · ${APP_CONFIG.name}`,
     },
-    description: t('description'),
+    description,
     applicationName: APP_CONFIG.name,
+    // A single-screen app has exactly one canonical URL. Stating it stops
+    // preview deployments and any query-string variant from competing with
+    // production in search results.
+    alternates: { canonical: '/' },
+    openGraph: {
+      type: 'website',
+      siteName: APP_CONFIG.name,
+      locale: SITE.ogLocale,
+      url: '/',
+      title,
+      description,
+      images: [
+        {
+          url: SITE.ogImage,
+          width: SITE.ogImageWidth,
+          height: SITE.ogImageHeight,
+          alt: `${APP_CONFIG.name} — ฿1.890 → 49,12 €`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [SITE.ogImage],
+    },
+    keywords: [
+      'conversor de divisas',
+      'cambio de moneda',
+      'precios en el extranjero',
+      'viajes',
+      'tipo de cambio',
+    ],
     // Lets iOS treat the installed app as standalone.
     appleWebApp: {
       capable: true,

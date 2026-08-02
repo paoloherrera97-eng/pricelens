@@ -2,6 +2,9 @@
 
 **Target:** Vercel · **Required environment variables: none.**
 
+One _optional_ variable exists: `NEXT_PUBLIC_SITE_URL`, needed only after a custom domain is
+connected (§4).
+
 That last point is the payoff of ADR-002: the rate provider is keyless, so a fresh clone deploys and
 runs with nothing to configure. If a future change adds a required secret, that is an architectural
 decision needing an ADR, not a config task.
@@ -97,7 +100,16 @@ change and no redeploy.
 
 4. **Wait for propagation** (minutes to a few hours) and confirm the certificate is issued in the
    Domains panel.
-5. **Re-run the verification script against the new hostname.** The manifest's `start_url` and
+5. **Set `NEXT_PUBLIC_SITE_URL` to the new origin** in Vercel → Settings → Environment Variables
+   (e.g. `https://pricelens.app`), then redeploy. Canonical URLs, `sitemap.xml`, `robots.txt` and the
+   Open Graph image URL all derive from it (`config/site.ts`). Until it is set they resolve from
+   `VERCEL_PROJECT_PRODUCTION_URL`, which stays the `*.vercel.app` hostname — so search engines would
+   keep treating that as canonical.
+
+   It must be a **build-time** variable: these routes are statically prerendered, so a value added
+   without a redeploy has no effect.
+
+6. **Re-run the verification script against the new hostname.** The manifest's `start_url` and
    `scope` are relative (`/`), so they follow the domain automatically — but confirm rather than
    assume.
 

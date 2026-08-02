@@ -9,6 +9,27 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — SEO (Phase 2, feature 1 of 8)
+
+- **Metadata**: canonical URL, keywords, and a title template, all resolved against a real origin
+- **Open Graph + Twitter Cards** with a `summary_large_image` card
+- **`public/og.png`** — a 1200×630 link-preview card, rendered once with Chromium by
+  `scripts/generate-og-image.mjs` and committed as a static asset. Deliberately not generated per
+  request with `next/og`: a social card changes about as often as the logo, so paying a serverless
+  render for every crawler hit buys nothing.
+- **`app/robots.ts`** — disallows `/design-system` (internal) and `/api/` (JSON with no standalone
+  meaning, and crawling it would load the rate provider through our proxy)
+- **`app/sitemap.ts`** — one honest entry, because the product is one screen
+- **`config/site.ts`** — resolves the public origin from `NEXT_PUBLIC_SITE_URL`, then Vercel's
+  `VERCEL_PROJECT_PRODUCTION_URL`, then localhost. Preview deployments therefore never advertise
+  themselves as canonical, and deployment still needs zero configuration.
+
+### Verified
+
+- `lint`, `typecheck`, **148 tests**, `format:check`, `build` — all clean; no existing behaviour touched
+- `robots.txt`, `sitemap.xml`, canonical, OG and Twitter tags all checked in the built output, with
+  and without a build-time origin set
+
 ### Added — Production polish
 
 - **Dark mode**, system-detected via `prefers-color-scheme`. No toggle and no stored preference: the
