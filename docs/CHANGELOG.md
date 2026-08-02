@@ -9,6 +9,61 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — Phase 3: Design System
+
+Six reusable primitives in `components/ui/`, plus the tokens they are built from. No conversion
+screen — that is Phase 4.
+
+- **`Button`** — 3 variants × 2 sizes, loading state that preserves both the accessible name and the
+  button's width
+- **`IconButton`** — 44px circle with a type-level required `label`
+- **`Input`** — associated label, `hint` via `aria-describedby`, leading/trailing slots
+- **`Select`** — searchable combobox with full keyboard support, `aria-activedescendant`,
+  accent-insensitive search, and a bottom-sheet presentation on phones
+- **`Card`**, **`Skeleton`**
+- **`/design-system`** — internal gallery rendering every primitive in every state (`noindex`)
+- **32 new component tests** (56 total), covering keyboard navigation, ARIA wiring, and focus return
+
+### Changed
+
+- **Spacing is now an 8-point grid**, enforced by setting Tailwind's `--spacing` to `0.5rem` rather
+  than by convention. Supersedes the 4px base scale specified in Phase 1. Note the numeric utilities
+  are 8px units — `p-4` is 32px.
+- **Five colour tokens corrected** after a measured contrast audit (see Fixed).
+- Field boundaries are drawn with a `ring` rather than a `border`, because a border consumes 2px of
+  the row's content box and drops the target below 44px.
+
+### Fixed
+
+Three defects found by verification rather than by review:
+
+- **Contrast: 5 of 17 token pairs failed WCAG AA.** `success-600` (3.77:1) and `warning-600`
+  (3.19:1) were unusable as text; secondary text on the field fill was 4.34:1; the placeholder was
+  2.34:1; and the field boundary was 1.23:1 — meaning nothing on screen identified a text field as a
+  control, against WCAG 1.4.11. All five corrected; all 17 pairs now measured and passing.
+- **The amount field rendered 40px tall** inside its 44px row, missing the touch-target floor. The
+  input now stretches to fill the row.
+- **Horizontal overflow at 320px** on the gallery, caused by writing `w-40` with stock-Tailwind
+  reflexes under the new 8px base (320px, not 160px). Fixed — and a useful demonstration that the
+  grid constraint actually binds.
+
+### Decisions recorded
+
+- **ADR-011** — `clsx` + `tailwind-merge` for class composition. Not cosmetic: Tailwind's fixed
+  stylesheet order makes caller overrides unpredictable without conflict resolution.
+- **ADR-012** — Capture readiness through existing slots rather than scaffolding. The seam is
+  exercised and tested today; no OCR code exists.
+
+### Verified
+
+- `format:check`, `lint`, `typecheck`, **56 tests**, `build` all pass
+- Automated in-browser checks at iPhone 13: no interactive element under 44px, no button without an
+  accessible name, no console errors, no horizontal overflow at 320px
+- `Select` confirmed to render as a bottom sheet anchored to the viewport bottom on phones and as an
+  anchored dropdown at ≥640px; accent-insensitive search and keyboard selection confirmed end to end
+
+---
+
 ### Added — Phase 2: Project Foundation
 
 Working Next.js application scaffold. No converter UI yet — that is Phase 4.

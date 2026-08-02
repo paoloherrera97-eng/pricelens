@@ -164,11 +164,13 @@ app/
 
 components/
   ui/                        Design-system primitives, no domain knowledge
-    Button.tsx
-    Input.tsx
-    Select.tsx               Searchable listbox
+    Button.tsx               3 variants × 2 sizes, loading state
+    IconButton.tsx           44px circle; `label` required by the type system
+    Input.tsx                Label + leading/trailing slots (the capture seam)
+    Select.tsx               Searchable combobox; bottom sheet on phones
     Card.tsx
     Skeleton.tsx
+    index.ts                 Barrel
   converter/                 Feature composition, domain-aware
     Converter.tsx            Orchestrates the screen
     AmountInput.tsx
@@ -194,7 +196,9 @@ lib/
     format.ts                Intl-based display formatting
     parse.ts                 User input → number (separator-tolerant)
   utils/
-    cn.ts                    Class-name merge helper
+    cn.ts                    Class-name merge (ADR-011)
+
+app/design-system/           Internal component gallery — noindex, unlinked
 
 services/
   rates/
@@ -587,6 +591,47 @@ these seams without implementing them.
 
 **Consequences.** No speculative code. The readiness claim is checkable: if `lib/` ever imports React,
 lint fails.
+
+---
+
+### ADR-011 — `clsx` + `tailwind-merge` for class composition
+
+**Decision.** Compose class names through a `cn()` helper built on `clsx` and `tailwind-merge`.
+
+**Alternatives.** (a) `classes.filter(Boolean).join(' ')`. (b) A variant library such as `cva`.
+
+**Rationale.** (a) looks sufficient and is quietly broken for a component library. Tailwind emits
+utilities in a fixed stylesheet order, so `class="p-2 p-4"` does not reliably resolve to `p-4` — the
+rule appearing later in the CSS wins, regardless of attribute order. Any component that accepts a
+`className` override therefore has unpredictable overrides. `tailwind-merge` removes the losing
+utility outright, which is a correctness fix, not a convenience.
+
+(b) is declined: variant maps are plain objects here, and a library to look up a string in a record
+is not worth a dependency.
+
+**Consequences.** Two small dependencies (~8KB combined) against a 100KB budget. A unit test asserts
+that a caller-supplied `bg-danger-600` actually displaces the variant's `bg-primary-600`, so the
+behaviour this ADR buys is checked rather than assumed.
+
+---
+
+### ADR-012 — Capture readiness through slots, not scaffolding
+
+**Decision.** Make future OCR/camera capture integrable through existing component seams — `Input`'s
+`trailing` slot, `IconButton`, and the bottom-sheet pattern — and build none of it.
+
+**Rationale.** "Prepare for a feature" usually produces abstractions designed against an imagined
+version of that feature, which then fit the real one badly while costing maintenance in between.
+
+The version that works is noticing what capture actually needs from the UI: a trigger inside the
+amount row, a full-screen surface, a loading state, and an error state. All four are ordinary
+requirements that the design system needs anyway, so meeting them costs nothing extra and commits us
+to nothing.
+
+**Consequences.** No capture code, no permission flow, no unused abstraction — `FEATURES.ocr` stays
+`false`. The seam is exercised today (the gallery renders a camera `IconButton` in the trailing slot)
+and asserted by a test, so "no redesign required" is a claim that fails loudly if it stops being
+true.
 
 ---
 

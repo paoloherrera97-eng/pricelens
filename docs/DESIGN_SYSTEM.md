@@ -1,9 +1,12 @@
 # PriceLens — Design System
 
-**Status:** Approved for build · **Applies to:** V1 MVP
+**Status:** Implemented (Phase 3) · **Applies to:** V1 MVP
 
 The source of truth for every visual decision. Tokens defined here are implemented verbatim in the
 Tailwind 4 `@theme` block in `app/globals.css` — that block and this document must never disagree.
+
+Every contrast ratio below is **measured, not estimated**. Five token pairs failed the first audit and
+were corrected; the failures and fixes are recorded in §2.
 
 ---
 
@@ -17,8 +20,8 @@ Inspiration: **Apple, Linear, Stripe, Wise, Revolut.** What we borrow is discipl
    more space. It usually wins.
 3. **Typography carries the hierarchy.** Size and weight do the work that color and boxes do in
    lesser interfaces.
-4. **Color means something or it isn't there.** Blue is action, green is confirmation, red is
-   failure. There is no decorative color.
+4. **Color means something or it isn't there.** Blue is action, green is confirmation, amber is
+   stale, red is failure. There is no decorative color.
 5. **Designed for a thumb.** One-handed, on a phone, outdoors, possibly in a hurry.
 6. **Accessible by default.** Contrast and focus states are part of the design, not a remediation
    pass afterward.
@@ -27,258 +30,334 @@ Inspiration: **Apple, Linear, Stripe, Wise, Revolut.** What we borrow is discipl
 
 ## 2. Color
 
-Deliberately narrow. Blue, neutrals, and two semantic colors — nothing else.
+Deliberately narrow: blue, neutrals, and three semantic colors.
 
 ### Primary — Blue
 
-| Token                 | Value     | Use                               |
-| --------------------- | --------- | --------------------------------- |
-| `--color-primary-50`  | `#EFF6FF` | Tinted surfaces, subtle highlight |
-| `--color-primary-100` | `#DBEAFE` | Hover on tinted surfaces          |
-| `--color-primary-500` | `#3B82F6` | Accents, focus ring               |
-| `--color-primary-600` | `#2563EB` | **Primary actions, key emphasis** |
-| `--color-primary-700` | `#1D4ED8` | Pressed / active                  |
-
-`primary-600` on white gives 5.17:1 — passes AA for normal text. `primary-500` is used for focus
-rings and large text only, never small body copy on white.
+| Token                 | Value     | Use                                   |
+| --------------------- | --------- | ------------------------------------- |
+| `--color-primary-50`  | `#EFF6FF` | Active option, tinted surfaces        |
+| `--color-primary-100` | `#DBEAFE` | Hover on tinted surfaces              |
+| `--color-primary-500` | `#3B82F6` | Focus ring (3.68:1 on white)          |
+| `--color-primary-600` | `#2563EB` | **Primary actions** (5.17:1 on white) |
+| `--color-primary-700` | `#1D4ED8` | Pressed / active                      |
 
 ### Neutral
 
-| Token                 | Value     | Use                                   |
-| --------------------- | --------- | ------------------------------------- |
-| `--color-white`       | `#FFFFFF` | Page and card background              |
-| `--color-neutral-50`  | `#F8FAFC` | App background behind cards           |
-| `--color-neutral-100` | `#F1F5F9` | Input backgrounds, dividers           |
-| `--color-neutral-200` | `#E2E8F0` | Borders                               |
-| `--color-neutral-400` | `#94A3B8` | Placeholder, disabled text            |
-| `--color-neutral-500` | `#64748B` | Secondary text (4.76:1 on white — AA) |
-| `--color-neutral-700` | `#334155` | Body text                             |
-| `--color-neutral-900` | `#0F172A` | **Headings and the result amount**    |
+| Token                 | Value     | Use                                                     |
+| --------------------- | --------- | ------------------------------------------------------- |
+| `--color-white`       | `#FFFFFF` | Card surface                                            |
+| `--color-neutral-50`  | `#F8FAFC` | App background                                          |
+| `--color-neutral-100` | `#F1F5F9` | Field fill                                              |
+| `--color-neutral-200` | `#E2E8F0` | Decorative dividers **only** — 1.23:1, never a boundary |
+| `--color-neutral-400` | `#94A3B8` | **Disabled text only** — exempt from 1.4.3              |
+| `--color-neutral-500` | `#5B6B7F` | Secondary text, placeholders (5.45:1 / 4.97:1 on fill)  |
+| `--color-neutral-700` | `#334155` | Body text (10.35:1)                                     |
+| `--color-neutral-900` | `#0F172A` | Headings and the result (17.85:1)                       |
+| `--color-outline`     | `#828C9C` | Field and trigger boundary (3.40:1) — see below         |
 
 ### Semantic
 
-| Token                 | Value     | Use                        |
-| --------------------- | --------- | -------------------------- |
-| `--color-success-600` | `#059669` | Fresh rates, confirmation  |
-| `--color-success-50`  | `#ECFDF5` | Success surface            |
-| `--color-danger-600`  | `#DC2626` | Errors, failure states     |
-| `--color-danger-50`   | `#FEF2F2` | Error surface              |
-| `--color-warning-600` | `#D97706` | **Stale / degraded rates** |
-| `--color-warning-50`  | `#FFFBEB` | Degraded-state surface     |
+| Token                 | Value     | Use                                 |
+| --------------------- | --------- | ----------------------------------- |
+| `--color-success-600` | `#047857` | Fresh rates (5.48:1)                |
+| `--color-warning-600` | `#B45309` | **Stale / degraded rates** (5.02:1) |
+| `--color-danger-600`  | `#DC2626` | Errors (4.83:1)                     |
+| `--color-*-50`        | —         | Matching tinted surfaces            |
 
-Warning is the one addition beyond the specified palette, and it earns its place: PRD FR-5 requires
-that stale and fallback rates are visibly distinguished from fresh ones. Using red would imply
-failure when the app is working correctly; using green would misrepresent stale data as current.
-Amber is the honest signal, and honesty about data quality is Value #4 in the Project Bible.
+Amber is the one addition beyond the specified palette, and it earns its place: PRD FR-5 requires
+stale and fallback rates to be visibly distinct from fresh ones. Red would imply failure when the app
+is working correctly; green would misrepresent stale data as current. Amber is the honest signal.
 
-**Dark mode is out of scope for V1** — but every color above is declared as a CSS custom property,
-so V2 adds a palette rather than a refactor.
+### What the contrast audit changed
+
+The first audit measured every pair used in the components. **Five failed**, and the palette was
+corrected rather than the claim softened:
+
+| Pair                         | Was       | Measured | Now       | Now measures |
+| ---------------------------- | --------- | -------- | --------- | ------------ |
+| Secondary text on field fill | `#64748B` | 4.34:1 ✗ | `#5B6B7F` | 4.97:1 ✓     |
+| Success on white             | `#059669` | 3.77:1 ✗ | `#047857` | 5.48:1 ✓     |
+| Warning on white             | `#D97706` | 3.19:1 ✗ | `#B45309` | 5.02:1 ✓     |
+| Placeholder on field fill    | `#94A3B8` | 2.34:1 ✗ | `#5B6B7F` | 4.97:1 ✓     |
+| Field boundary               | `#E2E8F0` | 1.23:1 ✗ | `#828C9C` | 3.40:1 ✓     |
+
+The last one is the interesting case. A neutral-100 fill on a white card measures **1.09:1** — so
+before this change, nothing on screen identified a text field as an interactive control, which WCAG
+1.4.11 requires at 3:1. The minimal aesthetic wanted a fill and no border; the rule wanted a visible
+boundary. **The rule wins**, and a 1px hairline is the smallest honest way to satisfy it.
+
+It is drawn as a `ring` (box-shadow) rather than a `border`, because a border consumes 2px of the
+row's content box and drops the field below the 44px target floor — measured, not assumed.
+
+**Dark mode is out of scope for V1**, but every value above is a CSS custom property, so V2 adds a
+palette rather than a refactor.
 
 ---
 
 ## 3. Typography
 
-**Inter** — a modern, highly legible UI typeface with excellent tabular figures, which matters here
-because we render numbers that must not shift width while typing.
+**Inter** — excellent tabular figures, which matters because we render numbers that must not shift
+width while typing.
 
 ```
 --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system,
              "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 ```
 
-### Loading strategy
-
-**Preferred:** `next/font/google` — self-hosts Inter at build time, so there is no runtime request
-to Google, no layout shift, and no third-party dependency in the critical path (which also keeps our
-privacy promise in PRD §6 intact).
-
-**Documented fallback:** the build machine must reach Google Fonts _at build time_. In restricted
-network environments this step fails. If it does, ship the stack above unchanged — Inter renders for
-users who have it, and the system UI font is a close metrical match for everyone else. The swap is
-one line in `layout.tsx`; the `--font-sans` variable is the seam that makes it one line.
+**Loading strategy.** Preferred: `next/font/google`, which self-hosts Inter at build time — no
+runtime request to Google, no layout shift, no third party in the critical path. That step needs
+build-time network access; where it is unavailable, ship the stack above unchanged. The
+`--font-sans` variable is the seam that keeps the swap to one line in `layout.tsx`.
 
 ### Scale
 
-| Token               | Size / Line height | Weight | Use                             |
-| ------------------- | ------------------ | ------ | ------------------------------- |
-| `--text-display`    | `3.5rem / 1.05`    | 700    | **The conversion result**       |
-| `--text-display-sm` | `2.5rem / 1.1`     | 700    | The result at ≤ 375px           |
-| `--text-2xl`        | `1.5rem / 1.3`     | 600    | Page title                      |
-| `--text-lg`         | `1.125rem / 1.5`   | 500    | Amount input, selected currency |
-| `--text-base`       | `1rem / 1.5`       | 400    | Body                            |
-| `--text-sm`         | `0.875rem / 1.45`  | 400    | Labels, secondary rate line     |
-| `--text-xs`         | `0.75rem / 1.4`    | 500    | Freshness timestamp, captions   |
+| Token               | Size / Line height | Weight | Use                     |
+| ------------------- | ------------------ | ------ | ----------------------- |
+| `--text-display`    | `3.5rem / 1.05`    | 700    | **The result**          |
+| `--text-display-sm` | `2.5rem / 1.1`     | 700    | The result at ≤ 375px   |
+| `text-2xl`          | `1.5rem / 1.3`     | 600    | Page title              |
+| `text-lg`           | `1.125rem / 1.5`   | 500    | Amount input, selection |
+| `text-base`         | `1rem / 1.5`       | 400    | Body                    |
+| `text-sm`           | `0.875rem / 1.45`  | 400    | Labels, secondary line  |
+| `text-xs`           | `0.75rem / 1.4`    | 500    | Timestamps              |
 
 **Rules**
 
-- The result uses **tabular figures** (`font-variant-numeric: tabular-nums`). Without this, digits
-  change width as the user types and the number visibly jitters — a small detail that reads as
-  cheapness.
-- The amount input is minimum `1rem` on mobile. Anything smaller triggers iOS Safari's automatic
-  zoom-on-focus, which yanks the user out of the layout.
-- Body text never goes below `0.75rem`.
+- The result and the amount field use **tabular figures** (`.tabular`). Without it digits change
+  width as the user types and the number visibly jitters — a small detail that reads as cheapness.
+- Inputs never go below `1rem` on mobile: anything smaller triggers iOS Safari's zoom-on-focus, which
+  throws the user out of the layout mid-tap.
 
 ---
 
-## 4. Spacing
+## 4. Spacing — the 8-point grid
 
-A 4px base scale. Generous by default — space is the primary tool (Principle 2).
+**`--spacing: 0.5rem`.** Tailwind's entire numeric scale is a multiple of this token, so setting it
+to 8px makes the grid structural rather than a convention people have to remember. There is no way to
+express a 5px gap without deliberately reaching for a half-step.
 
-| Token        | Value            |
-| ------------ | ---------------- |
-| `--space-1`  | `0.25rem` (4px)  |
-| `--space-2`  | `0.5rem` (8px)   |
-| `--space-3`  | `0.75rem` (12px) |
-| `--space-4`  | `1rem` (16px)    |
-| `--space-6`  | `1.5rem` (24px)  |
-| `--space-8`  | `2rem` (32px)    |
-| `--space-12` | `3rem` (48px)    |
-| `--space-16` | `4rem` (64px)    |
+> **Arriving from another Tailwind project?** The numbers here are 8px units, not the stock 4px ones.
+> `p-4` is **32px**. This is the system's one genuine surprise, and it is deliberate.
 
-Screen gutter: `--space-4` on mobile, `--space-8` from `md` upward. Vertical rhythm between major
-blocks: `--space-8`.
+| Utility | Value | Typical use                    |
+| ------- | ----- | ------------------------------ |
+| `0.5`   | 4px   | Optical alignment **only**     |
+| `1`     | 8px   | Tight grouping, icon gaps      |
+| `2`     | 16px  | Field padding, screen gutter   |
+| `3`     | 24px  | Card padding (mobile)          |
+| `4`     | 32px  | Card padding (desktop), blocks |
+| `5`     | 40px  | Section separation             |
+| `8`     | 64px  | Major vertical rhythm          |
+
+Half-steps exist for aligning an icon against a text baseline, never for layout rhythm.
+
+**Named size tokens** (not rhythm values, so they are named rather than numbered):
+
+| Token                | Value        | Meaning                          |
+| -------------------- | ------------ | -------------------------------- |
+| `--spacing-touch`    | 2.75rem/44px | Minimum comfortable target       |
+| `--spacing-touch-lg` | 3.25rem/52px | Primary action in the thumb zone |
+
+That this genuinely enforces the grid is not theoretical: writing `w-40` out of old habit produced a
+320px element and a horizontal overflow at 320px width, caught by an automated check. The footgun is
+real, which is also the evidence that the constraint binds.
 
 ---
 
-## 5. Radius and Elevation
+## 5. Radius, Elevation, Motion
 
-| Token           | Value            | Use                     |
-| --------------- | ---------------- | ----------------------- |
-| `--radius-md`   | `0.75rem` (12px) | Inputs, selectors       |
-| `--radius-lg`   | `1rem` (16px)    | Buttons                 |
-| `--radius-xl`   | `1.5rem` (24px)  | Cards, the result panel |
-| `--radius-full` | `9999px`         | Swap button, pills      |
+| Token          | Value | Use                 |
+| -------------- | ----- | ------------------- |
+| `--radius-md`  | 12px  | Fields, selectors   |
+| `--radius-lg`  | 16px  | Buttons             |
+| `--radius-xl`  | 24px  | Cards, bottom sheet |
+| `rounded-full` | —     | Icon buttons, pills |
 
-Elevation is restrained — depth comes from space and hierarchy, not shadow stacking.
+| Token         | Value                             | Use              |
+| ------------- | --------------------------------- | ---------------- |
+| `--shadow-sm` | `0 1px 2px rgb(15 23 42 / .04)`   | Resting controls |
+| `--shadow-md` | `0 4px 12px rgb(15 23 42 / .06)`  | Cards            |
+| `--shadow-lg` | `0 12px 32px rgb(15 23 42 / .10)` | Sheet, dropdown  |
 
-| Token         | Value                              | Use               |
-| ------------- | ---------------------------------- | ----------------- |
-| `--shadow-sm` | `0 1px 2px rgb(15 23 42 / 0.04)`   | Resting inputs    |
-| `--shadow-md` | `0 4px 12px rgb(15 23 42 / 0.06)`  | Cards             |
-| `--shadow-lg` | `0 12px 32px rgb(15 23 42 / 0.10)` | Selector dropdown |
+Depth comes from space and hierarchy; shadows never stack to compete for attention.
+
+**Motion is micro-interaction only.**
+
+| Token             | Value                      | Use                          |
+| ----------------- | -------------------------- | ---------------------------- |
+| `--duration-fast` | 120ms                      | Hover, focus, color change   |
+| `--duration-base` | 200ms                      | Panel open, chevron rotation |
+| `--ease-out`      | `cubic-bezier(.16,1,.3,1)` | Default                      |
+
+Motion confirms that a tap registered, then gets out of the way. Nothing is long enough to be
+_noticed_ as an animation — that is the definition of a micro-interaction and the reason there are no
+flourishes here.
+
+**The result never animates its value.** Counting-up digits would delay comprehension in exchange for
+a flourish, directly violating the 3-second promise. All transitions collapse to ~0ms under
+`prefers-reduced-motion: reduce`.
 
 ---
 
 ## 6. Component Inventory
 
-Every component below must implement **every state listed**. A component without its error and
-disabled states is not finished.
+Six primitives in `components/ui/`. None knows anything about currencies or conversion — domain-aware
+composition lives in `components/converter/` (Phase 4).
 
 ### `Button`
 
-- **Variants:** `primary` (filled blue), `secondary` (neutral surface), `ghost` (transparent).
-- **States:** default · hover · active · focus-visible · disabled · loading.
-- **Sizes:** `md` (44px), `lg` (52px). Minimum height is never below 44px.
+```tsx
+<Button variant="primary|secondary|ghost" size="md|lg" isLoading isFullWidth />
+```
 
-### `Input` (amount)
+- Both sizes clear 44px; `lg` (52px) is for the primary action.
+- `isLoading` sets `aria-busy`, disables interaction, and **keeps the label in the accessibility
+  tree** — a name that vanishes mid-request leaves a screen-reader user with nothing to return to.
+  The label also holds its width, so the button cannot resize under a finger mid-tap.
+- Defaults to `type="button"`; defaulting to `submit` is a classic accidental-submit bug.
 
-- Left-aligned currency symbol, large tabular value.
-- `inputmode="decimal"` so phones open the numeric keypad.
-- **States:** default · focus · filled · disabled. Invalid characters are silently ignored rather
-  than producing an error state (PRD FR-1) — the component has no error variant by design.
+### `IconButton`
 
-### `Select` (currency picker)
+```tsx
+<IconButton label="Intercambiar monedas" variant="solid|subtle|ghost" />
+```
 
-- Searchable listbox filtering on code, name, and country.
-- Each row: code (medium weight) · name · symbol, in that reading order.
-- **States:** closed · open · searching · no-results · disabled · focused-option.
-- Built on native semantics with `role="listbox"` / `role="option"`, `aria-activedescendant`, and
-  full keyboard support: ↑ ↓ Home End Enter Esc, plus type-ahead.
+- **`label` is required by the type system.** An icon-only control without one is unusable with a
+  screen reader, and this is too easy to forget to leave to review.
+- 44×44 circle. The icon is `aria-hidden`, so the name is never duplicated.
+
+### `Input`
+
+```tsx
+<Input label="Importe" isLabelHidden leading="฿" trailing={<IconButton…/>}
+       hint="…" isEmphasised />
+```
+
+- Label always present and associated; `isLabelHidden` hides it visually only. A placeholder is never
+  a label — it disappears the moment the user types.
+- `hint` is wired through `aria-describedby`.
+- Focus ring is applied with `focus-within` on the row, so the field reads as one control even when
+  the trailing slot holds a separate button.
+- **`trailing` is the camera seam** (§9).
+
+### `Select`
+
+```tsx
+<Select label="Tu moneda" value={code} options={…} onChange={…}
+        searchLabel="Buscar moneda o país" noResultsLabel="…" />
+```
+
+The most complex primitive. Implements combobox-with-listbox:
+
+- The search field owns `role="combobox"`; the list owns `role="listbox"`; the active option is
+  pointed at with **`aria-activedescendant`**, so focus never leaves the input and typing is never
+  interrupted.
+- Keyboard: `↓` `↑` (wrapping), `Home`, `End`, `Enter`, `Esc`, `Tab`. Escape restores focus to the
+  trigger rather than dumping the user at the top of the document.
+- Opens with the **current selection active**, not the top of a 156-item list.
+- Search matches code, name, and country, and **folds accents** — "Japon" finds "Japón", because a
+  traveler typing one-handed should not have to reach for the accent key.
+- Empty results show a message, never an empty panel.
 
 ### `Card`
 
-- White surface, `--radius-xl`, `--shadow-md`. The structural container for the converter.
+The primary surface. `--radius-xl`, `--shadow-md`, 24px padding rising to 32px from `md`.
 
 ### `Skeleton`
 
-- Neutral shimmer occupying the exact final dimensions of its content. Prevents layout shift while
-  the rate table loads (PRD FR-5).
-
-### `ConversionResult`
-
-- The centerpiece. `--text-display`, `--color-neutral-900`, tabular figures.
-- Secondary line showing the effective rate, at `--text-sm` in `--color-neutral-500`.
-- Wrapped in `aria-live="polite"` so screen-reader users hear the updated result without the region
-  interrupting their typing.
-
-### `RateFreshness`
-
-- Three visual states mapping to PRD FR-5: **fresh** (green dot, relative timestamp), **stale**
-  (amber dot, explicit note), **degraded/offline** (amber dot, "approximate rates from <date>").
-- Never uses red — degraded rates are a working state, not an error.
+Sized by the caller so it occupies the exact dimensions of the content it replaces, preventing the
+layout shift a spinner would cause. `aria-hidden` — the surrounding region announces loading, so a
+screen reader should not also read a row of empty boxes.
 
 ---
 
-## 7. Layout and Responsive
+## 7. Layout, Mobile-First and One-Handed Reach
 
-**Mobile-first.** The mobile layout is the design; desktop is the adaptation.
+**Mobile is the design; desktop is the adaptation.**
 
-| Breakpoint | Width   | Behavior                                                |
-| ---------- | ------- | ------------------------------------------------------- |
-| base       | 320px+  | Single column, full-width controls, `--text-display-sm` |
-| `sm`       | 640px+  | Full display size, wider gutters                        |
-| `md`       | 768px+  | Card max-width `28rem`, vertically centered             |
-| `lg`       | 1024px+ | Unchanged card, more surrounding space                  |
+| Breakpoint | Width  | Behavior                                     |
+| ---------- | ------ | -------------------------------------------- |
+| base       | 320px+ | Single column, full-width controls           |
+| `sm`       | 640px+ | Select becomes a dropdown instead of a sheet |
+| `md`       | 768px+ | Card max-width `28rem`, vertically centered  |
 
-The card never exceeds `28rem`. A conversion widened across a 1440px monitor looks like a form; kept
-narrow, it looks like an answer.
+The card never exceeds `28rem`. A conversion stretched across a 1440px monitor looks like a form;
+kept narrow, it looks like an answer.
 
-**Vertical order (mobile):** title → amount input + source currency → swap → target currency →
-**result** → freshness.
+### The thumb zone
+
+On a phone held one-handed, the comfortable arc is the **bottom two-thirds** of the screen. The top
+corners are the hardest to reach. Two consequences, both implemented:
+
+1. **The `Select` panel opens as a bottom sheet on phones**, anchored to the bottom edge with a
+   scrim — options land under the thumb instead of at the top of the screen. From `sm` up, where
+   there is a pointer, it is an ordinary anchored dropdown.
+2. **Primary actions sit low in the card**, at `touch-lg` (52px). Reference and status content sits
+   above, where reading is easy but reaching is not.
+
+Sheet padding respects `env(safe-area-inset-bottom)` so the home indicator never overlaps a control.
+
+**Vertical order (mobile):** title → amount + source currency → swap → target currency → **result** →
+freshness.
 
 ---
 
 ## 8. Accessibility
 
-Non-negotiable, and part of the definition of done.
+Part of the definition of done, and **verified in a real browser**, not asserted.
 
-- **Contrast:** ≥ 4.5:1 for text, ≥ 3:1 for UI boundaries and focus indicators. Every token pairing
-  in §2 has been chosen against this.
-- **Touch targets:** ≥ 44×44px, with ≥ 8px between adjacent targets.
-- **Focus:** a visible `2px` `--color-primary-500` ring at `2px` offset on every interactive element.
-  Focus indicators are never removed — `outline: none` without a replacement is a review blocker.
-- **Labels:** every control has a programmatic label. Placeholder text is never the only label.
-- **Live region:** the result is announced politely on change.
-- **Motion:** all transitions respect `prefers-reduced-motion: reduce`.
-- **Zoom:** layout holds at 200% zoom without horizontal scrolling.
-
----
-
-## 9. Motion
-
-Motion confirms causality. It never entertains.
-
-| Token             | Value                           | Use                          |
-| ----------------- | ------------------------------- | ---------------------------- |
-| `--duration-fast` | `120ms`                         | Hover, focus                 |
-| `--duration-base` | `200ms`                         | Dropdown open, swap rotation |
-| `--ease-out`      | `cubic-bezier(0.16, 1, 0.3, 1)` | Default easing               |
-
-**The conversion result never animates its value.** Counting-up digits would directly violate the
-3-second promise — it delays comprehension in exchange for a flourish. The number simply is what it
-is, immediately.
-
-Under `prefers-reduced-motion: reduce`, all transitions collapse to `0ms`.
+- **Contrast:** ≥ 4.5:1 text, ≥ 3:1 UI boundaries and meaningful graphics. All 17 pairs measured and
+  passing (§2).
+- **Touch targets:** ≥ 44×44px, automatically checked across the gallery. The check found the amount
+  field rendering at 40px inside its 44px row and it was fixed.
+- **Focus:** a 2px `primary-500` ring at 2px offset on every interactive element. Removing a focus
+  indicator without replacing it is a review blocker.
+- **Labels:** every control has a programmatic label; `IconButton` enforces it at the type level.
+- **Keyboard:** everything operable without a pointer; `Select` implements the full listbox key set.
+- **Live regions:** the result is announced politely on change (Phase 4).
+- **Motion:** all transitions respect `prefers-reduced-motion`.
+- **Zoom:** `maximumScale: 5` — capping zoom fails WCAG 2.2 and hurts exactly the users who need it.
+- **No horizontal scrolling at 320px**, automatically checked.
 
 ---
 
-## 10. Implementation Note (Tailwind 4)
+## 9. Prepared for capture (OCR / camera) — no redesign required
 
-Tailwind 4 is CSS-first: **there is no `tailwind.config.js`.** Tokens are declared in `@theme` inside
-`app/globals.css`, which generates the corresponding utilities automatically:
+Requirement: future OCR and camera features must integrate **without redesigning the interface**.
+That is satisfied structurally, with nothing built and no speculative abstraction (ADR-012):
 
-```css
-@import 'tailwindcss';
+| What capture needs            | What already exists                                                                              |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| A trigger in the input row    | `Input`'s `trailing` slot — takes any node, changes no layout                                    |
+| A circular icon control       | `IconButton`, 44×44, label required                                                              |
+| A full-screen capture surface | The bottom-sheet pattern already in `Select`, at `70dvh`                                         |
+| A reachable position          | The thumb zone (§7) already anchors interactive surfaces to the bottom                           |
+| A loading state for OCR       | `Button isLoading` and `Skeleton`                                                                |
+| An error state                | `danger` tokens, and a degraded pattern that already distinguishes "working with imperfect data" |
 
-@theme {
-  --color-primary-600: #2563eb;
-  --color-neutral-900: #0f172a;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --radius-xl: 1.5rem;
-  /* …full token set from this document… */
-}
-```
+The gallery renders a camera `IconButton` in `Input`'s trailing slot **today**, and a test asserts
+that slot stays focusable and separately reachable. If the seam ever breaks, a test fails rather than
+a future feature discovering it.
 
-This file is the single implementation of this document. Hardcoded hex values, arbitrary
-`text-[13px]` values, or one-off shadows anywhere in `components/` are review blockers — if a value
-is needed and missing, it gets added here first.
+What is deliberately **not** built: no camera permission flow, no OCR pipeline, no capture route.
+`FEATURES.ocr` is `false`.
+
+---
+
+## 10. Implementation
+
+Tailwind 4 is CSS-first: **there is no `tailwind.config.js`.** Tokens live in `@theme` in
+`app/globals.css`, which generates the utilities automatically.
+
+Hardcoded hex values, arbitrary `text-[13px]`, or one-off shadows anywhere in `components/` are review
+blockers — if a value is missing, it is added to `@theme` and documented here first.
+
+Class merging goes through `cn()` (`lib/utils/cn.ts`), which uses `tailwind-merge` so a caller's
+`className` reliably overrides a variant default (ADR-011).
+
+### The gallery
+
+`/design-system` renders every primitive in every state on one page. It exists so a visual regression
+is visible in one place rather than discovered in the product, and so a reviewer can see the system
+without reading JSX. It is `noindex` and unlinked — a team tool, not a page.
