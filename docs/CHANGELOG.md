@@ -9,6 +9,29 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Fixed — consistencia del sistema (auditoría 🟠)
+
+Cuatro incoherencias entre lo que el sistema de diseño documenta y lo que la app renderiza. Todas
+medidas en la build de producción.
+
+- **Los tokens de movimiento estaban muertos.** Tailwind construye las utilidades `duration-*` a
+  partir de `--transition-duration-*`, no de `--duration-*`. Con el nombre antiguo las variables
+  existían, las clases no se generaban y **las ocho componentes que las usan caían al valor por
+  defecto de Tailwind, 150ms**. El sistema documenta 120/200ms y nadie los estaba viendo. Verificado
+  en el navegador: las duraciones en uso pasan de `0.15s` a `0.12s` y `0.2s`.
+  (`ease-out` sí funcionaba: ese namespace es el correcto y resuelve al token del proyecto.)
+- **Tres grosores ópticos de icono distintos** — 1,33px (chevron, borrar), 1,5px (estrella,
+  compartir), 1,67px (intercambiar) — porque el grosor del trazo se escribía sin compensar el tamaño
+  de render. Ahora los seis miden **1,5px**: 2,25 a 16px y 1,8 a 20px, ambos sobre un `viewBox` de 24.
+- **La estrella de favoritos usaba ámbar**, color que el propio sistema reserva para «tasas
+  obsoletas». El principio escrito es «el color significa algo o no está», y el ámbar significaba dos
+  cosas. Ahora usa el acento, que es el color de acción.
+- **El botón de intercambio llevaba `shadow-md`**, la misma elevación que la tarjeta que lo contiene.
+  Un control de 44px elevado tanto como la superficie que lo sostiene aplana la jerarquía en vez de
+  expresarla. Baja a `shadow-sm`.
+
+axe sigue sin violaciones en ambos temas.
+
 ### Changed — el resultado vuelve a estar sobre el pliegue (auditoría 🔴)
 
 Medido en la build de producción antes de tocar nada: **con un solo favorito guardado, el resultado

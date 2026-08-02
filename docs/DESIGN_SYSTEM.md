@@ -243,11 +243,11 @@ Depth comes from space and hierarchy; shadows never stack to compete for attenti
 
 **Motion is micro-interaction only.**
 
-| Token             | Value                      | Use                          |
-| ----------------- | -------------------------- | ---------------------------- |
-| `--duration-fast` | 120ms                      | Hover, focus, color change   |
-| `--duration-base` | 200ms                      | Panel open, chevron rotation |
-| `--ease-out`      | `cubic-bezier(.16,1,.3,1)` | Default                      |
+| Token                        | Value                      | Use                          |
+| ---------------------------- | -------------------------- | ---------------------------- |
+| `--transition-duration-fast` | 120ms                      | Hover, focus, color change   |
+| `--transition-duration-base` | 200ms                      | Panel open, chevron rotation |
+| `--ease-out`                 | `cubic-bezier(.16,1,.3,1)` | Default                      |
 
 Motion confirms that a tap registered, then gets out of the way. Nothing is long enough to be
 _noticed_ as an animation — that is the definition of a micro-interaction and the reason there are no

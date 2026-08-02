@@ -254,7 +254,7 @@ export function Converter() {
                 <path
                   d="M6 6l12 12M18 6L6 18"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="2.25"
                   strokeLinecap="round"
                 />
               </svg>

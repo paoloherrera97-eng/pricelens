@@ -40,7 +40,7 @@ export function SwapButton({ onSwap }: SwapButtonProps) {
         <path
           d="M7 4v13m0 0-3-3m3 3 3-3M17 20V7m0 0-3 3m3-3 3 3"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
