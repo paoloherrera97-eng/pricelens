@@ -48,16 +48,16 @@ with lint, typecheck, tests and build green before merge.
 Two items were already delivered inside V1, so they are narrowed rather than rebuilt — the rule for
 this phase is that nothing already working gets modified.
 
-| #   | Feature                | Status                   | Scope                                                                                                                             |
-| --- | ---------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | SEO                    | To build                 | Metadata, Open Graph, Twitter Cards, `robots.txt`, `sitemap.xml`, canonical URLs                                                  |
-| 2   | PWA                    | **Mostly shipped in V1** | Installable, offline, manifest and icons are live (ADR-007). Only **splash screens** remain                                       |
-| 3   | Conversion history     | To build                 | localStorage, timestamps, clear. Note: V1 deliberately excluded history — this reverses that scope decision and needs its own ADR |
-| 4   | Favourites             | To build                 | Saved pairs, quick access                                                                                                         |
-| 5   | Share                  | To build                 | Web Share API, copy link, QR code. Needs URL state first                                                                          |
-| 6   | Country auto-detection | To build                 | Locale and timezone heuristics, intelligent defaults                                                                              |
-| 7   | Error recovery         | **Shipped in V1**        | Retry, offline notice, and graceful fallback are live (ADR-013). Re-audit rather than rebuild                                     |
-| 8   | Lighthouse 100 × 4     | To build                 | Performance, Accessibility, Best Practices, SEO                                                                                   |
+| #   | Feature                | Status            | Scope                                                                                                                             |
+| --- | ---------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | SEO                    | **Shipped**       | Metadata, Open Graph, Twitter Cards, `robots.txt`, `sitemap.xml`, canonical URLs                                                  |
+| 2   | PWA                    | **Shipped**       | Installable, offline, manifest and icons shipped in V1 (ADR-007); iOS launch screens and the icon `<link>` tags followed          |
+| 3   | Conversion history     | To build          | localStorage, timestamps, clear. Note: V1 deliberately excluded history — this reverses that scope decision and needs its own ADR |
+| 4   | Favourites             | To build          | Saved pairs, quick access                                                                                                         |
+| 5   | Share                  | To build          | Web Share API, copy link, QR code. Needs URL state first                                                                          |
+| 6   | Country auto-detection | To build          | Locale and timezone heuristics, intelligent defaults                                                                              |
+| 7   | Error recovery         | **Shipped in V1** | Retry, offline notice, and graceful fallback are live (ADR-013). Re-audit rather than rebuild                                     |
+| 8   | Lighthouse 100 × 4     | To build          | Performance, Accessibility, Best Practices, SEO                                                                                   |
 
 ### Two of these deserve a flag before they are started
 

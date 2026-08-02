@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { ServiceWorkerRegistrar } from '@/components/pwa/ServiceWorkerRegistrar';
-import { APP_CONFIG, SITE } from '@/config';
+import { APP_CONFIG, SITE, SPLASH_SCREENS } from '@/config';
 
 import './globals.css';
 
@@ -57,6 +57,24 @@ export async function generateMetadata(): Promise<Metadata> {
       'viajes',
       'tipo de cambio',
     ],
+    icons: {
+      icon: [
+        { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      // iOS looks for this by convention at `/apple-touch-icon.png`, which is
+      // not where ours lives — without the link it silently falls back to a
+      // screenshot of the page as the home-screen icon.
+      apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+      // Launch screens. Generated, one per device resolution, because iOS
+      // matches them on exact CSS dimensions and pixel ratio — see
+      // scripts/generate-splash.mjs.
+      other: SPLASH_SCREENS.map(({ url, media }) => ({
+        rel: 'apple-touch-startup-image',
+        url,
+        media,
+      })),
+    },
     // Lets iOS treat the installed app as standalone.
     appleWebApp: {
       capable: true,

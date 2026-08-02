@@ -18,6 +18,8 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "generate:icons": "node scripts/generate-icons.mjs",
+    "generate:splash": "node scripts/generate-splash.mjs",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
