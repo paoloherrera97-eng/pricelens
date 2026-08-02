@@ -274,7 +274,10 @@ export function Select({
                 id={listboxId}
                 role="listbox"
                 aria-label={label}
-                className="overflow-y-auto overscroll-contain"
+                // `touch-action: pan-y` tells the browser this region scrolls
+                // vertically, so it can begin the gesture without waiting to
+                // see whether a handler cancels it.
+                className="touch-pan-y overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]"
               >
                 {filtered.map((option, index) => {
                   const isActive = index === activeIndex;
@@ -286,13 +289,27 @@ export function Select({
                       data-index={index}
                       role="option"
                       aria-selected={isSelected}
-                      onPointerDown={(event) => {
-                        // Keep focus in the search field so the panel does not
-                        // close before the click resolves.
-                        event.preventDefault();
-                        commit(option);
+                      // Selection happens on CLICK, never on pointerdown.
+                      //
+                      // Committing on pointerdown — and calling preventDefault
+                      // to hold focus — made the list impossible to scroll by
+                      // touch: the moment a finger landed on a row it was
+                      // selected, and preventDefault suppressed the browser's
+                      // own scrolling. `click` only fires after a press and
+                      // release without significant travel, so the browser's
+                      // built-in tap-versus-drag discrimination does the work.
+                      //
+                      // Focus is still held in the search field, but via
+                      // `mousedown` only: that event is synthesised after
+                      // touchend on iOS, so preventing it cannot block a scroll.
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => commit(option)}
+                      onPointerEnter={(event) => {
+                        // Hover-to-activate is a pointer affordance. On touch,
+                        // pointerenter fires on the row a scroll starts from,
+                        // which would move the active option while dragging.
+                        if (event.pointerType === 'mouse') setActiveIndex(index);
                       }}
-                      onPointerEnter={() => setActiveIndex(index)}
                       className={cn(
                         'min-h-touch flex cursor-pointer items-center justify-between gap-1 rounded-lg px-2',
                         'duration-fast transition-colors ease-out',

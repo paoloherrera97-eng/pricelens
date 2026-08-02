@@ -10,10 +10,17 @@
  *   - /api/rates    network-first, falling back to the last good rates
  *   - static assets stale-while-revalidate (immutable, hashed)
  *
- * Bump CACHE_VERSION to retire every previous cache on the next activation.
+ * CACHE VERSIONING
+ *
+ * The version comes from the `?v=` parameter the page registers this worker
+ * with, which carries the build id. That matters: with a hardcoded version, a
+ * deploy never retired the previous caches, so a device could keep serving the
+ * assets of an older build indefinitely — a user would see stale UI while
+ * believing they were on the current release. A changing version means the
+ * `activate` handler below deletes every cache that is not in the current set.
  */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = new URL(self.location.href).searchParams.get('v') || 'v1';
 const SHELL_CACHE = `pricelens-shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `pricelens-assets-${CACHE_VERSION}`;
 const DATA_CACHE = `pricelens-data-${CACHE_VERSION}`;

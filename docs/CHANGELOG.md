@@ -9,6 +9,41 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Fixed — iOS Safari
+
+- **The country picker could not be scrolled by touch.** Options committed on `pointerdown` and
+  called `preventDefault()` to hold focus in the search field. Both were wrong for touch: the finger
+  landing on a row selected it instantly, and `preventDefault` on `pointerdown` suppresses the
+  browser's own scrolling. Selection now happens on `click`, which fires only after a press and
+  release without significant travel — the browser's built-in tap-versus-drag discrimination does the
+  work. Focus is still held, but via `mousedown` only, which iOS synthesises _after_ `touchend` and so
+  cannot block a scroll. `pointerenter` no longer moves the active option for touch pointers, which
+  would otherwise drag the highlight along with the finger.
+
+  Every existing test passed while this was broken: `user.click()` and Playwright's `.click()` both
+  fire the full pointerdown → pointerup → click sequence. Three regression tests now assert that
+  pointerdown alone does _not_ select, and a CDP-driven touch drag verifies real scrolling.
+
+- **Service-worker caches are now versioned per build.** `CACHE_VERSION` was hardcoded `'v1'`, so a
+  deploy never retired the previous caches and a device could keep serving an older build's assets
+  indefinitely — stale UI while believing you were on the current release. The build id now rides in
+  the registration URL (`/sw.js?v=…`), so a new deploy installs a new worker and its `activate`
+  handler purges every cache outside the current set.
+
+- **`theme-color` is now per colour scheme.** It was fixed brand blue, so the browser toolbar stayed
+  blue in dark mode instead of following the theme.
+
+### Note on the dark-mode report
+
+The shipped stylesheet was checked end to end and is correct: `.bg-surface` resolves to
+`var(--pl-surface)`, the `prefers-color-scheme: dark` block redefines those variables, and the dark
+`:root` rule is ordered _after_ the light one. No `light-dark()` is emitted. Dark mode renders
+correctly under emulation.
+
+**It was not possible to reproduce the failure on a real WebKit engine** — this environment cannot
+download one. The service-worker versioning fix above is the most likely cause (a device pinned to
+pre-dark-mode assets), but that is a hypothesis, not a confirmed diagnosis.
+
 ### Added — SEO (Phase 2, feature 1 of 8)
 
 - **Metadata**: canonical URL, keywords, and a title template, all resolved against a real origin

@@ -71,7 +71,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#2563eb',
+  // Per-scheme, so the browser chrome follows the theme instead of staying
+  // brand blue in dark mode. These are the resolved values of --pl-bg in each
+  // theme (app/globals.css); Safari tints its toolbar with them.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0e16' },
+  ],
   width: 'device-width',
   initialScale: 1,
   // Never block pinch-zoom: capping it fails WCAG 2.2 and hurts exactly the

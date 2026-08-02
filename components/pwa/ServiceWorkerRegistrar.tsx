@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 
 import { FEATURES } from '@/config';
 
+/** Inlined at build time — see next.config.ts. */
+const BUILD_ID = process.env.NEXT_PUBLIC_BUILD_ID ?? 'dev';
+
 /**
  * Registers the service worker.
  *
@@ -20,7 +23,11 @@ export function ServiceWorkerRegistrar() {
     if (process.env.NODE_ENV !== 'production') return;
 
     const register = () => {
-      void navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
+      // The build id rides along in the query string so a new deploy installs a
+      // new worker and purges the previous build's caches. Without it a device
+      // could stay pinned to stale assets across releases.
+      const url = `/sw.js?v=${encodeURIComponent(BUILD_ID)}`;
+      void navigator.serviceWorker.register(url, { scope: '/' }).catch(() => {
         // Registration failing costs offline support, not the app. Nothing the
         // user could act on, so nothing is shown.
       });
