@@ -20,7 +20,16 @@ function FieldSkeleton({ labelWidth, height }: { labelWidth: string; height: str
  */
 export function ConverterSkeleton({ label }: { label: string }) {
   return (
-    <Card className="flex flex-col gap-1.5 md:gap-2" aria-busy="true" aria-label={label}>
+    // `role="status"` is not decoration: `aria-label` on a plain div is
+    // prohibited ARIA, so before this the loading state had no accessible name
+    // at all and was announced to nobody. The role also makes it a live region,
+    // which is what "Cargando tasas" is for.
+    <Card
+      role="status"
+      className="flex flex-col gap-1.5 md:gap-2"
+      aria-busy="true"
+      aria-label={label}
+    >
       {/* 1. Which country are you visiting? */}
       <FieldSkeleton labelWidth="w-16" height="h-touch" />
 

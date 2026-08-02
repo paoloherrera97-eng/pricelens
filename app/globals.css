@@ -197,8 +197,21 @@
 
   /* A single visible focus treatment everywhere. Removing focus indicators
      without replacing them is a review blocker (DESIGN_SYSTEM.md §8). */
+  /* The ring's colour is set on *every* element, not just the focused one, so
+     there is nothing for a colour transition to animate. `transition-colors`
+     includes `outline-color`, so before this the ring faded in over 150ms from
+     the element's text colour — measurably near-black for the first ~60ms on a
+     light surface, which is neither the token nor a knowable contrast ratio.
+     A focus indicator has to be there the instant focus is. */
+  * {
+    outline-color: var(--color-accent-ring);
+  }
+
   :focus-visible {
-    outline: 2px solid var(--color-accent-ring);
+    /* Longhand deliberately: the `outline` shorthand resets `outline-color`
+       back to `currentColor` and reintroduces the fade. */
+    outline-width: 2px;
+    outline-style: solid;
     outline-offset: 2px;
     border-radius: var(--radius-md);
   }
