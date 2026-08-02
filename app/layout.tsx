@@ -80,6 +80,13 @@ export const viewport: Viewport = {
   ],
   width: 'device-width',
   initialScale: 1,
+  // The picker opens as a bottom sheet and focuses its search field, which
+  // raises the on-screen keyboard. By default the keyboard overlays the layout
+  // viewport, so `dvh` keeps reporting the full screen height and the sheet
+  // sizes itself partly underneath the keyboard — leaving a sliver of list that
+  // is awkward to scroll. `resizes-content` shrinks the layout viewport
+  // instead, so `70dvh` means 70% of what the user can actually see.
+  interactiveWidget: 'resizes-content',
   // Never block pinch-zoom: capping it fails WCAG 2.2 and hurts exactly the
   // users who need it most (DESIGN_SYSTEM.md §8).
   maximumScale: 5,

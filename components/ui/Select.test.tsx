@@ -243,6 +243,86 @@ describe('Select — touch scrolling (iOS Safari regression)', () => {
     expect(onChange).toHaveBeenCalledWith('THB');
   });
 
+  /**
+   * Moving to `click` was necessary but not sufficient. `click` fires after a
+   * drag whenever the browser decided the gesture was not a scroll — which is
+   * what happens when the list cannot scroll — so the component now decides for
+   * itself rather than trusting the engine. These tests exercise that decision
+   * directly, which is why they mean something in a browser that is not the one
+   * where the bug appeared.
+   */
+  it('does not select when the finger travelled beyond the tap slop', async () => {
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    const list = screen.getByRole('listbox');
+    const option = screen.getByRole('option', { name: /THB/ });
+
+    fireEvent.pointerDown(list, { pointerType: 'touch', clientX: 100, clientY: 300 });
+    fireEvent.click(option, { clientX: 100, clientY: 220 });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('still selects when the finger barely moved', async () => {
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    const list = screen.getByRole('listbox');
+    const option = screen.getByRole('option', { name: /THB/ });
+
+    fireEvent.pointerDown(list, { pointerType: 'touch', clientX: 100, clientY: 300 });
+    fireEvent.click(option, { clientX: 103, clientY: 302 });
+
+    expect(onChange).toHaveBeenCalledWith('THB');
+  });
+
+  it('does not select when the list scrolled under the finger', async () => {
+    // A flick can end where it began. Travel alone would call that a tap.
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    const list = screen.getByRole('listbox');
+    const option = screen.getByRole('option', { name: /THB/ });
+
+    fireEvent.pointerDown(list, { pointerType: 'touch', clientX: 100, clientY: 300 });
+    list.scrollTop = 120;
+    fireEvent.scroll(list);
+    fireEvent.click(option, { clientX: 100, clientY: 300 });
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('does not select when the browser cancelled the gesture', async () => {
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    const list = screen.getByRole('listbox');
+    const option = screen.getByRole('option', { name: /THB/ });
+
+    fireEvent.pointerDown(list, { pointerType: 'touch', clientX: 100, clientY: 300 });
+    fireEvent.pointerCancel(list, { pointerType: 'touch' });
+    fireEvent.click(option, { clientX: 100, clientY: 300 });
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('leaves mouse and keyboard selection untouched', async () => {
+    // A click with no recorded press — keyboard activation, assistive tech —
+    // must never be mistaken for a drag.
+    const { onChange } = setup();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button'));
+
+    fireEvent.click(screen.getByRole('option', { name: /USD/ }));
+    expect(onChange).toHaveBeenCalledWith('USD');
+  });
+
   it('does not move the active option on touch pointerenter', async () => {
     // Otherwise the highlight would follow the finger while scrolling.
     const { onChange } = setup();

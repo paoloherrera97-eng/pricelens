@@ -41,6 +41,15 @@ export interface SelectProps {
   isCompact?: boolean;
 }
 
+/**
+ * How far a finger may travel and still count as a tap, in CSS pixels.
+ *
+ * Roughly what iOS and Android use themselves. Small enough that a deliberate
+ * tap on a 44px row is never rejected; large enough to absorb the wobble of a
+ * thumb pressing a moving bus window.
+ */
+const TAP_SLOP_PX = 10;
+
 function matches(option: SelectOption, query: string): boolean {
   if (!query) return true;
   // Fold accents so "Japon" finds "Japón" — a traveler typing one-handed on a
@@ -80,6 +89,15 @@ export function Select({
   const [query, setQuery] = useState('');
   const [rawActiveIndex, setActiveIndex] = useState(0);
 
+  /**
+   * The current press: where it started, where the list was scrolled to at the
+   * time, and whether the browser has since claimed the gesture for itself.
+   * Read on `click` to tell a tap from a drag — see `isTap` below.
+   */
+  const pressRef = useRef<{ x: number; y: number; scrollTop: number; cancelled: boolean } | null>(
+    null,
+  );
+
   const baseId = useId();
   const listboxId = `${baseId}-listbox`;
   const rootRef = useRef<HTMLDivElement>(null);
@@ -110,6 +128,34 @@ export function Select({
     },
     [close, onChange],
   );
+
+  /**
+   * Whether the gesture that produced this click was a tap rather than a drag.
+   *
+   * The browser is supposed to answer this: `click` is meant to fire only after
+   * a press and release without significant travel. Engines disagree about it
+   * in practice, and when a list fails to scroll, a drag degenerates into a tap
+   * and silently selects whatever the finger happened to land on — which is
+   * exactly the bug reported from iPhone Safari.
+   *
+   * So the component decides instead of asking, against two signals: how far
+   * the pointer travelled, and whether the list scrolled underneath it. Neither
+   * depends on the engine's own tap heuristics, which is the point — this is
+   * verifiable in any browser rather than only in the one that misbehaves.
+   *
+   * A click with no recorded press (keyboard activation, synthetic events in
+   * tests) is treated as a tap: only a real press can be a drag.
+   */
+  const isTap = useCallback((event: React.MouseEvent) => {
+    const press = pressRef.current;
+    pressRef.current = null;
+    if (!press) return true;
+    if (press.cancelled) return false;
+
+    const travelled = Math.hypot(event.clientX - press.x, event.clientY - press.y);
+    const scrolled = (listRef.current?.scrollTop ?? 0) !== press.scrollTop;
+    return travelled <= TAP_SLOP_PX && !scrolled;
+  }, []);
 
   /**
    * Filtering can shrink the list out from under the active index. Clamping
@@ -237,6 +283,9 @@ export function Select({
           <div
             className={cn(
               'bg-surface ring-outline-soft z-20 flex flex-col gap-1 p-1 shadow-lg ring-1',
+              // The sheet is the only thing allowed to define the scroll
+              // region's height; nothing may spill past its rounded edge.
+              'overflow-hidden',
               'animate-sheet',
               // Phone: bottom sheet, inside thumb reach.
               'fixed inset-x-0 bottom-0 max-h-[70dvh] rounded-t-2xl pb-[max(0.5rem,env(safe-area-inset-bottom))]',
@@ -274,10 +323,37 @@ export function Select({
                 id={listboxId}
                 role="listbox"
                 aria-label={label}
-                // `touch-action: pan-y` tells the browser this region scrolls
-                // vertically, so it can begin the gesture without waiting to
-                // see whether a handler cancels it.
-                className="touch-pan-y overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]"
+                // `min-h-0` is what actually makes this element scroll.
+                //
+                // A flex item's default `min-height` is `auto`, which refuses to
+                // shrink below its content — 195 rows here. `overflow-y: auto`
+                // then has nothing to scroll, because the box is already as tall
+                // as everything inside it, and the sheet's `max-height` is
+                // resolved by overflowing rather than by scrolling. Blink hides
+                // the mistake; WebKit does not, which is why the list would not
+                // scroll on iPhone Safari. `flex-1` lets it take the space the
+                // search field leaves.
+                //
+                // `touch-action: pan-y` then tells the browser this region
+                // scrolls vertically, so it can start the gesture immediately
+                // instead of waiting to see whether a handler cancels it.
+                className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]"
+                // One handler for the whole list rather than one per row: the
+                // press has to be recorded even when the finger later leaves the
+                // row it landed on, which is precisely what a scroll is.
+                onPointerDown={(event) => {
+                  pressRef.current = {
+                    x: event.clientX,
+                    y: event.clientY,
+                    scrollTop: listRef.current?.scrollTop ?? 0,
+                    cancelled: false,
+                  };
+                }}
+                // The browser took the gesture over — a scroll, or a system
+                // edge swipe. Whatever follows, it was not a tap.
+                onPointerCancel={() => {
+                  if (pressRef.current) pressRef.current.cancelled = true;
+                }}
               >
                 {filtered.map((option, index) => {
                   const isActive = index === activeIndex;
@@ -289,21 +365,20 @@ export function Select({
                       data-index={index}
                       role="option"
                       aria-selected={isSelected}
-                      // Selection happens on CLICK, never on pointerdown.
+                      // Selection happens on CLICK, and only when the gesture
+                      // that produced it was a tap — see `isTap`. Committing on
+                      // pointerdown, as this once did, selects a row the instant
+                      // a finger lands on it, which is not a selection but an
+                      // accident.
                       //
-                      // Committing on pointerdown — and calling preventDefault
-                      // to hold focus — made the list impossible to scroll by
-                      // touch: the moment a finger landed on a row it was
-                      // selected, and preventDefault suppressed the browser's
-                      // own scrolling. `click` only fires after a press and
-                      // release without significant travel, so the browser's
-                      // built-in tap-versus-drag discrimination does the work.
-                      //
-                      // Focus is still held in the search field, but via
-                      // `mousedown` only: that event is synthesised after
-                      // touchend on iOS, so preventing it cannot block a scroll.
+                      // Focus is held in the search field via `mousedown` only:
+                      // iOS synthesises that event after `touchend`, so
+                      // preventing it cannot suppress a scroll the way
+                      // preventing `pointerdown` does.
                       onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => commit(option)}
+                      onClick={(event) => {
+                        if (isTap(event)) commit(option);
+                      }}
                       onPointerEnter={(event) => {
                         // Hover-to-activate is a pointer affordance. On touch,
                         // pointerenter fires on the row a scroll starts from,
