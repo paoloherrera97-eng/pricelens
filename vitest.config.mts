@@ -11,6 +11,10 @@ export default defineConfig({
     },
   },
   test: {
+    // Home-currency detection falls back to the device timezone, so an
+    // unpinned TZ would make the app's default depend on the machine running
+    // the suite. UTC names no country, which is the neutral baseline.
+    env: { TZ: 'UTC' },
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],

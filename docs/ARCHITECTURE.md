@@ -744,3 +744,49 @@ Additionally, results below the smallest unit must show meaningful precision: `$
 
 **Consequences.** Currency metadata must carry a `digits` field per currency. Rounding happens once,
 at display time, never mid-calculation. All of this is unit-tested.
+
+---
+
+### ADR-015 — Detect the home currency from device settings, never from geolocation
+
+**Decision.** Guess a first-time visitor's home currency from the device's locale region subtag,
+falling back to the IANA timezone. The Geolocation API is **not** used, and no permission is ever
+requested.
+
+**Rationale.** Two independent reasons, either of which would be sufficient.
+
+The first is cost. A permission prompt on first paint is the most expensive interaction in the app,
+and it lands before the user has seen anything worth granting it for. The product promises a price
+understood in three seconds; a modal dialog is not part of that.
+
+The second is correctness, and it is the more interesting one. Geolocation answers _where is this
+phone right now_ — which, for the audience this product exists to serve, is the country whose prices
+they are trying to understand, not the currency they think in. A traveler in Bangkok wants baht
+converted **into** their own currency, and geolocation would confidently supply the wrong side of
+that conversion. The locale region comes from the OS region setting and does not move when its owner
+does, which is exactly the property a _home_ currency needs.
+
+The timezone is the weaker second signal, used only when the locale carries no region (`es`, `en`).
+It does follow the phone across borders, so it is wrong for the same reason geolocation is — but it
+is free, and being wrong occasionally beats defaulting every unrecognised visitor to euros.
+
+`Intl.Locale.maximize()` is deliberately not used. Turning a bare `en` into `en-Latn-US` is CLDR's
+most-likely-subtags guess, not information about this user; silently selecting US dollars for every
+English speaker on that basis would be worse than the honest default.
+
+**Consequences.**
+
+- Detection runs **once**, on a visit with nothing stored. A stored currency — chosen or previously
+  detected — is never overridden. Re-detecting would fight the user's own choice, which is the
+  failure mode that makes this class of feature resented.
+- The timezone table is generated from tzdata (`zone1970.tab`, `zone.tab`) rather than hand-written,
+  and is loaded through a dynamic import, so the ~10KB chunk is fetched only by the minority of
+  devices whose locale carries no region.
+- Engines disagree on which timezone spelling is canonical — Node's ICU resolves `Asia/Kolkata` _to_
+  `Asia/Calcutta`, the reverse of what browsers do — so the table carries both spellings and the
+  lookup tries the reported name before any canonicalisation.
+- **No new data is stored.** The detected value is written to the same single key ADR-005 already
+  permits, holding the same kind of value. The storage boundary is unchanged.
+- Detection failing, throwing, or naming a currency with no rate all leave the configured default in
+  place. The feature can only improve on the default or do nothing.
+- Behind `FEATURES.detectHomeCurrency`; turning it off restores the previous behaviour exactly.

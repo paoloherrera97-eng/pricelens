@@ -49,6 +49,19 @@ function writeRaw(key: string, value: string): void {
 }
 
 /**
+ * Reads a stored value without subscribing to it.
+ *
+ * For the one question the hook cannot answer: *has the user ever chosen?* The
+ * hook collapses "absent" and "present but equal to the default" into the same
+ * value, which is right for rendering and wrong for deciding whether a first
+ * visit should be given a detected default. Shares `readRaw`, so the private-mode
+ * fallback applies here too.
+ */
+export function readStoredValue(key: string): string | null {
+  return readRaw(key);
+}
+
+/**
  * State backed by `localStorage`, safe under server rendering.
  *
  * Built on `useSyncExternalStore` rather than an effect that calls `setState`:

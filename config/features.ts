@@ -16,6 +16,14 @@ export const FEATURES = {
   /** Remember the home currency in localStorage (ADR-005). */
   persistHomeCurrency: true,
 
+  // --- Phase 2 --------------------------------------------------------
+  /**
+   * Guess the home currency on a first visit from the device's region and
+   * timezone. Permissionless by construction — see lib/geo/detect.ts. Off
+   * restores the configured default for everyone.
+   */
+  detectHomeCurrency: true,
+
   // --- Deliberately off. Each has a roadmap entry. --------------------
   /** V2 — recent/favourite currencies. */
   recentCurrencies: false,

@@ -9,6 +9,48 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — home-currency detection (Phase 2, feature 6 of 8)
+
+A first-time visitor's home currency is now guessed from their device instead of defaulting to
+euros for everyone. **No permission is requested, and the Geolocation API is not used** — see
+ADR-015 for why that is a correctness argument and not only a politeness one: geolocation says where
+the phone _is_, which for a traveler is the country whose prices they are trying to escape, not the
+currency they think in.
+
+Two signals, in order:
+
+1. **The locale's region subtag** (`es-AR` → `AR` → `ARS`). It comes from the OS region setting and
+   does not move when its owner does, which is exactly the property a _home_ currency needs. Someone
+   from Argentina opening the app in Bangkok still gets pesos.
+2. **The timezone**, used only when the locale carries no region (`es`, `en`). It does follow the
+   phone across borders, so it is the weaker signal — but it beats defaulting to euros for someone
+   in Buenos Aires.
+
+`Intl.Locale.maximize()` is deliberately not used: turning a bare `en` into `en-Latn-US` is CLDR's
+most-likely-subtags guess, not information about this user.
+
+- **Runs once, on a visit with nothing stored.** A stored currency — chosen or previously detected —
+  is never overridden. Re-detecting every visit would fight the user's own choice.
+- **Cannot make anything worse.** Detection returning nothing, throwing, or naming a currency with
+  no rate all leave the configured default exactly where it was, and write nothing to storage.
+- **No new data is stored.** The same single key from ADR-005, holding the same kind of value.
+- **Handles the collision.** A US visitor detecting USD would otherwise sit on USD → USD, a 1:1 dead
+  end (PRD E8); the detected value routes through the picker's own handler, which moves the
+  destination instead.
+- Behind `FEATURES.detectHomeCurrency`.
+
+**The timezone table is generated from tzdata** (`zone1970.tab` and `zone.tab`) rather than
+hand-written, so no entry is invented, and it is loaded through a dynamic import — verified absent
+from the initial HTML and fetched only in the region-less case. Engines disagree on which timezone
+spelling is canonical (Node's ICU resolves `Asia/Kolkata` _to_ `Asia/Calcutta`, the reverse of what
+browsers do), so the generator harvests both spellings from ICU and the lookup tries the reported
+name before canonicalising.
+
+**Tests now pin the device signals.** `navigator.language` in jsdom reports the runner's own locale,
+so before this the app's default home currency would have depended on which machine ran the suite.
+The baseline is a region-less locale and `TZ=UTC`; tests that care about detection set a locale
+themselves.
+
 ### Added — iOS launch screens (Phase 2, feature 2 of 8)
 
 The last piece of the PWA item. Installability, offline support, the manifest and the icon set all
