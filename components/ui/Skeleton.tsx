@@ -21,7 +21,7 @@ export function Skeleton({ className, ...props }: SkeletonProps) {
       // Decorative: the surrounding region announces the loading state, so a
       // screen reader should not also read a row of empty boxes.
       aria-hidden="true"
-      className={cn('animate-pulse rounded-md bg-neutral-100', className)}
+      className={cn('bg-sunken animate-pulse rounded-md', className)}
       {...props}
     />
   );

@@ -3,104 +3,182 @@
 /**
  * Design tokens — the single implementation of docs/DESIGN_SYSTEM.md.
  *
- * Tailwind 4 is CSS-first: this block *is* the configuration, which is why it
- * belongs to project setup rather than to component work. Hardcoded values
- * anywhere else in the codebase are a review blocker; if a value is missing,
- * it gets added here and documented first.
+ * Two layers, deliberately:
+ *
+ *   1. A RAW PALETTE (`--color-primary-600`, `--color-neutral-900`, …) — fixed
+ *      values that never change between themes.
+ *   2. SEMANTIC TOKENS (`--color-surface`, `--color-fg`, `--color-border`, …)
+ *      that describe a *role*, and resolve to different palette values in light
+ *      and dark.
+ *
+ * Components reference the semantic layer. That is what makes dark mode a
+ * palette swap rather than a `dark:` variant on every element — and what stops
+ * the two themes drifting apart as the UI grows.
+ *
+ * Every pairing below is measured, not estimated. Light and dark both meet
+ * WCAG 2.2 AA; the numbers are recorded in DESIGN_SYSTEM.md §2.
  */
-@theme {
+
+/* ---------------------------------------------------------------- light --- */
+:root {
+  color-scheme: light;
+
+  --pl-bg: #f8fafc;
+  --pl-surface: #ffffff;
+  --pl-sunken: #f1f5f9; /* field fill */
+  --pl-hover: #e2e8f0;
+  --pl-tint: #eff6ff; /* active option */
+
+  --pl-fg: #0f172a; /* 17.85:1 on surface */
+  --pl-fg-muted: #5b6b7f; /* 5.45:1 on surface, 4.97:1 on sunken */
+  --pl-fg-subtle: #94a3b8; /* disabled only — exempt from 1.4.3 */
+
+  --pl-border: #828c9c; /* 3.40:1 — identifies a control (1.4.11) */
+  --pl-border-soft: #e2e8f0; /* decorative dividers only */
+  --pl-overlay: rgb(15 23 42 / 0.2);
+
+  --pl-accent: #2563eb; /* 5.17:1 on surface */
+  --pl-accent-strong: #1d4ed8;
+  --pl-accent-ring: #3b82f6; /* 3.68:1 — focus ring */
+  --pl-on-accent: #ffffff;
+
+  --pl-success: #047857;
+  --pl-warning: #b45309;
+  --pl-warning-surface: #fffbeb;
+  --pl-danger: #dc2626;
+
+  --pl-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.04);
+  --pl-shadow-md: 0 4px 16px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.04);
+  --pl-shadow-lg: 0 16px 40px -8px rgb(15 23 42 / 0.16), 0 4px 12px -4px rgb(15 23 42 / 0.08);
+}
+
+/* ----------------------------------------------------------------- dark --- */
+/* System-detected. No toggle, no stored preference, no flash: the browser
+   resolves this before first paint, which a JavaScript toggle cannot. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --pl-bg: #0a0e16;
+    --pl-surface: #131a26;
+    --pl-sunken: #1c2534;
+    --pl-hover: #263145;
+    --pl-tint: #1e293b;
+
+    --pl-fg: #f1f5f9; /* 15.93:1 on surface */
+    --pl-fg-muted: #9fb0c6; /* 7.89:1 on surface, 6.97:1 on sunken */
+    --pl-fg-subtle: #64748b;
+
+    --pl-border: #647391; /* 4.02:1 on surface, 3.56:1 on sunken */
+    --pl-border-soft: #263145;
+    --pl-overlay: rgb(0 0 0 / 0.5);
+
+    /* The accent lightens: #2563EB is only 2.4:1 as text on a dark surface.
+       The button keeps the darker fill, because white-on-#2563EB is 5.17:1. */
+    --pl-accent: #60a5fa; /* 6.86:1 on surface */
+    --pl-accent-strong: #93c5fd;
+    --pl-accent-ring: #60a5fa;
+
+    --pl-success: #34d399; /* 9.08:1 */
+    --pl-warning: #fbbf24; /* 10.45:1 */
+    --pl-warning-surface: #2a2109;
+    --pl-danger: #f87171; /* 6.31:1 */
+
+    /* Shadows read as noise on dark surfaces; elevation comes from the
+       surface stepping lighter instead. */
+    --pl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+    --pl-shadow-md: 0 4px 16px -2px rgb(0 0 0 / 0.4);
+    --pl-shadow-lg: 0 16px 40px -8px rgb(0 0 0 / 0.6);
+  }
+}
+
+@theme inline {
   /* --- Spacing: the 8-point grid -------------------------------------
      Tailwind's spacing scale is a multiple of `--spacing`. Setting it to 8px
-     makes the 8-point grid structural rather than a convention people remember:
-     `p-1` is 8px, `p-2` is 16px, `gap-3` is 24px, and there is no way to express
-     a 5px gap without deliberately reaching for a half-step.
+     makes the 8-point grid structural rather than a convention people remember.
 
      NOTE FOR ANYONE ARRIVING FROM ANOTHER TAILWIND PROJECT: the numbers here are
-     8px units, not the stock 4px ones. `p-4` is 32px.
-
-     Half-steps (`p-0.5` = 4px) exist only for optical alignment of icons and
-     text against a box — never for layout rhythm. */
+     8px units, not the stock 4px ones. `p-4` is 32px. */
   --spacing: 0.5rem;
-
-  /* Minimum comfortable touch targets (DESIGN_SYSTEM.md §8). Named rather than
-     numeric because 44px is an accessibility floor, not a rhythm value. */
   --spacing-touch: 2.75rem; /* 44px — WCAG 2.2 AA target size */
   --spacing-touch-lg: 3.25rem; /* 52px — primary actions in the thumb zone */
 
-  /* --- Color: primary ------------------------------------------------ */
+  /* --- Semantic colour (theme-aware) ---------------------------------- */
+  --color-bg: var(--pl-bg);
+  --color-surface: var(--pl-surface);
+  --color-sunken: var(--pl-sunken);
+  --color-hover: var(--pl-hover);
+  --color-tint: var(--pl-tint);
+
+  --color-fg: var(--pl-fg);
+  --color-fg-muted: var(--pl-fg-muted);
+  --color-fg-subtle: var(--pl-fg-subtle);
+
+  --color-outline: var(--pl-border);
+  --color-outline-soft: var(--pl-border-soft);
+  --color-overlay: var(--pl-overlay);
+
+  --color-accent: var(--pl-accent);
+  --color-accent-strong: var(--pl-accent-strong);
+  --color-accent-ring: var(--pl-accent-ring);
+  --color-on-accent: var(--pl-on-accent);
+
+  --color-success-600: var(--pl-success);
+  --color-warning-600: var(--pl-warning);
+  --color-warning-50: var(--pl-warning-surface);
+  --color-danger-600: var(--pl-danger);
+
+  /* --- Raw palette ----------------------------------------------------
+     Fixed in both themes. `primary-600` stays the button fill in dark mode
+     because white on it measures 5.17:1 either way. */
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
   --color-primary-500: #3b82f6;
   --color-primary-600: #2563eb;
   --color-primary-700: #1d4ed8;
-
-  /* --- Color: neutral ------------------------------------------------ */
   --color-neutral-50: #f8fafc;
   --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0; /* decorative dividers only — 1.23:1, never a boundary */
-  --color-neutral-400: #94a3b8; /* DISABLED text only — exempt from 1.4.3 */
-  --color-neutral-500: #5b6b7f; /* secondary text: 5.45:1 on white, 4.97:1 on neutral-100 */
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #5b6b7f;
   --color-neutral-700: #334155;
   --color-neutral-900: #0f172a;
 
-  /* The boundary that identifies a field or trigger as an interactive control.
-     WCAG 1.4.11 wants 3:1 for that, and a neutral-100 fill on white is 1.09:1 —
-     nowhere near it. A hairline is the smallest honest way to meet the rule:
-     3.40:1 on white, 3.10:1 on neutral-100. */
-  --color-outline: #828c9c;
-
-  /* --- Color: semantic ----------------------------------------------- */
-  /* Semantic colours are darker than their common Tailwind equivalents because
-     they are used as TEXT, not just as dots. Emerald-600 (#059669) and
-     amber-600 (#D97706) measure 3.77:1 and 3.19:1 on white — both fail AA. */
-  --color-success-50: #ecfdf5;
-  --color-success-600: #047857; /* 5.48:1 on white */
-  --color-danger-50: #fef2f2;
-  --color-danger-600: #dc2626; /* 4.83:1 on white */
-  /* Amber carries "stale but working" — red would imply failure, green would
-     misrepresent stale data as live. See DESIGN_SYSTEM.md §2. */
-  --color-warning-50: #fffbeb;
-  --color-warning-600: #b45309; /* 5.02:1 on white */
-
-  /* --- Typography ----------------------------------------------------- */
-  /* Inter first, with a metrically close system stack behind it. Declaring the
-     stack here is what makes swapping in a self-hosted Inter a one-line change
-     in layout.tsx — see DESIGN_SYSTEM.md §3. */
+  /* --- Typography ------------------------------------------------------ */
   --font-sans:
     'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
-  --text-display: 3.5rem;
-  --text-display--line-height: 1.05;
+  --text-display: 4rem;
+  --text-display--line-height: 1;
   --text-display--font-weight: 700;
-  --text-display-sm: 2.5rem;
-  --text-display-sm--line-height: 1.1;
+  --text-display--letter-spacing: -0.035em;
+  --text-display-sm: 3rem;
+  --text-display-sm--line-height: 1.02;
   --text-display-sm--font-weight: 700;
+  --text-display-sm--letter-spacing: -0.03em;
 
-  /* --- Radius --------------------------------------------------------- */
+  /* --- Radius ----------------------------------------------------------- */
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
+  --radius-2xl: 1.75rem;
 
-  /* --- Elevation ------------------------------------------------------ */
-  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.04);
-  --shadow-md: 0 4px 12px rgb(15 23 42 / 0.06);
-  --shadow-lg: 0 12px 32px rgb(15 23 42 / 0.1);
+  /* --- Elevation --------------------------------------------------------- */
+  --shadow-sm: var(--pl-shadow-sm);
+  --shadow-md: var(--pl-shadow-md);
+  --shadow-lg: var(--pl-shadow-lg);
 
-  /* --- Motion ---------------------------------------------------------
+  /* --- Motion -----------------------------------------------------------
      Micro-interactions only: motion confirms that a tap registered, and then
      gets out of the way. Nothing here is long enough to be noticed as an
      animation, which is the point. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 120ms; /* hover, focus, color changes */
-  --duration-base: 200ms; /* dropdown open, swap rotation */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
 }
 
-/**
- * Base layer. Deliberately minimal — anything reusable becomes a component in
- * Phase 3 rather than a global rule.
- */
 @layer base {
   html {
     /* Never let a mobile browser silently re-scale our type. */
@@ -108,23 +186,75 @@
   }
 
   body {
-    background-color: var(--color-neutral-50);
-    color: var(--color-neutral-900);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
     font-family: var(--font-sans);
     /* Room for the iOS home indicator on installed PWAs. */
     padding-bottom: env(safe-area-inset-bottom);
+    /* Optical weight correction — Inter reads heavy without it on dark. */
+    -webkit-font-smoothing: antialiased;
   }
 
   /* A single visible focus treatment everywhere. Removing focus indicators
      without replacing them is a review blocker (DESIGN_SYSTEM.md §8). */
   :focus-visible {
-    outline: 2px solid var(--color-primary-500);
+    outline: 2px solid var(--color-accent-ring);
     outline-offset: 2px;
+    border-radius: var(--radius-md);
   }
 
   /* Digits must not change width while the user types, or the result jitters. */
   .tabular {
     font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+}
+
+@layer utilities {
+  /* The result's entrance: opacity and a 2px lift, 140ms. Long enough to read
+     as a change, far too short to delay comprehension — the value itself is
+     never animated (DESIGN_SYSTEM.md §5). */
+  @keyframes pl-rise {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .animate-rise {
+    animation: pl-rise 140ms var(--ease-out) both;
+  }
+
+  @keyframes pl-sheet-up {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  .animate-sheet {
+    animation: pl-sheet-up var(--duration-base) var(--ease-out) both;
+  }
+
+  @keyframes pl-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade {
+    animation: pl-fade var(--duration-fast) var(--ease-out) both;
   }
 }
 

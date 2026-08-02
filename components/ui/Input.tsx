@@ -43,10 +43,7 @@ export function Input({
     <div className="w-full">
       <label
         htmlFor={inputId}
-        className={cn(
-          'mb-0.5 block text-sm font-medium text-neutral-500',
-          isLabelHidden && 'sr-only',
-        )}
+        className={cn('text-fg-muted mb-0.5 block text-sm font-medium', isLabelHidden && 'sr-only')}
       >
         {label}
       </label>
@@ -57,14 +54,14 @@ export function Input({
         className={cn(
           // The hairline is what identifies this as a control (WCAG 1.4.11);
           // the fill alone is 1.09:1 against the card.
-          'ring-outline flex items-center gap-1 rounded-md bg-neutral-100 px-2 ring-1',
+          'ring-outline bg-sunken flex items-center gap-1 rounded-lg px-2 ring-1',
           'duration-fast transition-colors ease-out',
           'focus-within:outline-primary-500 focus-within:outline-2 focus-within:outline-offset-2',
           isEmphasised ? 'min-h-touch-lg' : 'min-h-touch',
         )}
       >
         {leading && (
-          <span aria-hidden="true" className="shrink-0 text-neutral-500">
+          <span aria-hidden="true" className="text-fg-muted shrink-0">
             {leading}
           </span>
         )}
@@ -77,8 +74,8 @@ export function Input({
             // tappable area is the whole 44px row rather than the ~40px the text
             // line happens to occupy. Verified in-browser; without it the input
             // measures 40px and misses the WCAG target-size floor.
-            'min-w-0 flex-1 self-stretch bg-transparent text-neutral-900 outline-none',
-            'placeholder:text-neutral-500',
+            'text-fg min-w-0 flex-1 self-stretch bg-transparent outline-none',
+            'placeholder:text-fg-muted',
             // 1rem minimum: anything smaller triggers iOS Safari's zoom-on-focus,
             // which throws the user out of the layout mid-tap.
             isEmphasised ? 'tabular text-lg font-medium' : 'text-base',
@@ -91,7 +88,7 @@ export function Input({
       </div>
 
       {hint && (
-        <p id={hintId} className="mt-0.5 text-xs text-neutral-500">
+        <p id={hintId} className="text-fg-muted mt-0.5 text-xs">
           {hint}
         </p>
       )}

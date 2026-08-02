@@ -14,7 +14,8 @@
     "rateLine": "1 {from} = {rate} {to}",
     "announcement": "{amount} equivale a {converted}",
     "unavailablePair": "No tenemos la tasa de esta moneda ahora mismo.",
-    "countryLabel": "¿A qué país viajas?"
+    "countryLabel": "¿A qué país viajas?",
+    "clear": "Borrar importe"
   },
   "currencyPicker": {
     "search": "Buscar moneda o país",

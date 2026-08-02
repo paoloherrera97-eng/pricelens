@@ -20,7 +20,7 @@ function FieldSkeleton({ labelWidth, height }: { labelWidth: string; height: str
  */
 export function ConverterSkeleton({ label }: { label: string }) {
   return (
-    <Card className="flex flex-col gap-2" aria-busy="true" aria-label={label}>
+    <Card className="flex flex-col gap-1.5 md:gap-2" aria-busy="true" aria-label={label}>
       {/* 1. Which country are you visiting? */}
       <FieldSkeleton labelWidth="w-16" height="h-touch" />
 

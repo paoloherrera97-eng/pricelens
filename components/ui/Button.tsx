@@ -16,9 +16,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-700',
-  secondary: 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-200',
-  ghost: 'bg-transparent text-neutral-700 hover:bg-neutral-100 active:bg-neutral-100',
+  // `bg-primary-600` is the raw palette value in both themes: white on it
+  // measures 5.17:1 either way, so the fill does not need to change.
+  primary: 'bg-primary-600 text-white shadow-sm hover:bg-primary-700 active:bg-primary-700',
+  secondary: 'bg-sunken text-fg hover:bg-hover active:bg-hover',
+  ghost: 'bg-transparent text-fg-muted hover:bg-sunken hover:text-fg active:bg-hover',
 };
 
 const SIZES: Record<ButtonSize, string> = {
@@ -48,7 +50,10 @@ export function Button({
       disabled={disabled || isLoading}
       className={cn(
         'relative inline-flex items-center justify-center gap-1 rounded-lg font-medium',
-        'duration-fast transition-colors ease-out',
+        // `active:scale` is the whole press interaction: 120ms, 1% travel. It
+        // reads as the surface accepting the tap rather than as an animation.
+        'duration-fast transition-[background-color,box-shadow,transform] ease-out',
+        'active:scale-[0.98] motion-reduce:active:scale-100',
         'disabled:pointer-events-none disabled:opacity-40',
         VARIANTS[variant],
         SIZES[size],

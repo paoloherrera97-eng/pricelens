@@ -15,9 +15,10 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const VARIANTS: Record<IconButtonVariant, string> = {
-  solid: 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
-  subtle: 'bg-white text-neutral-700 hover:bg-neutral-100 shadow-sm',
-  ghost: 'bg-transparent text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700',
+  solid: 'bg-primary-600 text-white shadow-md hover:bg-primary-700',
+  subtle:
+    'bg-surface text-fg-muted shadow-sm ring-1 ring-outline-soft hover:bg-sunken hover:text-fg',
+  ghost: 'bg-transparent text-fg-muted hover:bg-sunken hover:text-fg',
 };
 
 /**
@@ -41,7 +42,8 @@ export function IconButton({
       aria-label={label}
       className={cn(
         'size-touch inline-flex shrink-0 items-center justify-center rounded-full',
-        'duration-fast transition-colors ease-out',
+        'duration-fast transition-[background-color,color,box-shadow,transform] ease-out',
+        'active:scale-95 motion-reduce:active:scale-100',
         'disabled:pointer-events-none disabled:opacity-40',
         VARIANTS[variant],
         className,

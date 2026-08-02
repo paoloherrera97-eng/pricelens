@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 import { Select, type SelectOption } from '@/components/ui';
 import { COUNTRIES, getCurrency } from '@/config';
 
+import { Flag } from './Flag';
+
 export interface CountryPickerProps {
   label: string;
   /** ISO 3166-1 alpha-2 code of the selected country. */
@@ -18,13 +20,16 @@ export interface CountryPickerProps {
  * Built once at module scope — 195 static entries that never change.
  *
  * The flag leads because it is recognised faster than any string, and the
- * currency trails as reassurance rather than as the thing being chosen.
+ * currency trails as reassurance rather than as the thing being chosen. The
+ * flag is `aria-hidden` inside `Flag`, so each option's accessible name stays
+ * the country name alone.
  */
 const OPTIONS: readonly SelectOption[] = COUNTRIES.map((country) => {
   const currency = getCurrency(country.currency);
   return {
     value: country.code,
-    label: `${country.flag} ${country.name}`,
+    leading: <Flag emoji={country.flag} code={country.code} />,
+    label: country.name,
     description: currency.code,
     meta: currency.symbol === currency.code ? undefined : currency.symbol,
     // Searchable by currency too, for the traveler who does know the code.

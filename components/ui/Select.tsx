@@ -1,11 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
 export interface SelectOption {
   value: string;
+  /**
+   * Decorative node shown before the label — a flag, an icon.
+   * Must be `aria-hidden`, so the option's accessible name stays the label.
+   */
+  leading?: ReactNode;
   /** Primary line, e.g. the currency code. */
   label: string;
   /** Secondary line, e.g. the currency name. */
@@ -184,10 +189,7 @@ export function Select({
     <div ref={rootRef} className={cn('relative w-full', className)}>
       <span
         id={`${baseId}-label`}
-        className={cn(
-          'mb-0.5 block text-sm font-medium text-neutral-500',
-          isLabelHidden && 'sr-only',
-        )}
+        className={cn('text-fg-muted mb-0.5 block text-sm font-medium', isLabelHidden && 'sr-only')}
       >
         {label}
       </span>
@@ -208,15 +210,16 @@ export function Select({
           }
         }}
         className={cn(
-          'min-h-touch ring-outline flex w-full items-center justify-between gap-1 rounded-md bg-neutral-100 px-2 ring-1',
+          'min-h-touch ring-outline bg-sunken flex w-full items-center justify-between gap-1 rounded-lg px-2 ring-1',
           'duration-fast text-left transition-colors ease-out',
-          'hover:bg-neutral-200 disabled:pointer-events-none disabled:opacity-40',
+          'hover:bg-hover hover:ring-fg-muted active:scale-[0.99] motion-reduce:active:scale-100',
+          'disabled:pointer-events-none disabled:opacity-40',
         )}
       >
         <span className="flex min-w-0 items-baseline gap-1">
-          <span className="font-medium text-neutral-900">{selected?.label ?? value}</span>
+          <span className="text-fg font-medium">{selected?.label ?? value}</span>
           {!isCompact && selected?.description && (
-            <span className="truncate text-sm text-neutral-500">{selected.description}</span>
+            <span className="text-fg-muted truncate text-sm">{selected.description}</span>
           )}
         </span>
         <ChevronIcon isOpen={isOpen} />
@@ -226,13 +229,17 @@ export function Select({
         <>
           {/* Dims the page behind the sheet on phones only; on larger screens the
               panel is a plain dropdown and needs no scrim. */}
-          <div className="fixed inset-0 z-10 bg-neutral-900/20 sm:hidden" aria-hidden="true" />
+          <div
+            className="animate-fade bg-overlay fixed inset-0 z-10 sm:hidden"
+            aria-hidden="true"
+          />
 
           <div
             className={cn(
-              'z-20 flex flex-col gap-1 bg-white p-1 shadow-lg',
+              'bg-surface ring-outline-soft z-20 flex flex-col gap-1 p-1 shadow-lg ring-1',
+              'animate-sheet',
               // Phone: bottom sheet, inside thumb reach.
-              'fixed inset-x-0 bottom-0 max-h-[70dvh] rounded-t-xl pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+              'fixed inset-x-0 bottom-0 max-h-[70dvh] rounded-t-2xl pb-[max(0.5rem,env(safe-area-inset-bottom))]',
               // Tablet and up: anchored dropdown.
               'sm:absolute sm:inset-x-auto sm:bottom-auto sm:mt-0.5 sm:w-full sm:rounded-xl sm:pb-1',
             )}
@@ -253,14 +260,14 @@ export function Select({
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={onSearchKeyDown}
               className={cn(
-                'min-h-touch ring-outline w-full rounded-md bg-neutral-100 px-2 text-base text-neutral-900 ring-1',
-                'placeholder:text-neutral-500',
+                'min-h-touch ring-outline bg-sunken text-fg w-full rounded-lg px-2 text-base ring-1',
+                'placeholder:text-fg-muted',
                 'focus-visible:outline-primary-500 outline-none focus-visible:outline-2 focus-visible:outline-offset-2',
               )}
             />
 
             {filtered.length === 0 ? (
-              <p className="px-2 py-3 text-center text-sm text-neutral-500">{noResultsLabel}</p>
+              <p className="text-fg-muted px-2 py-3 text-center text-sm">{noResultsLabel}</p>
             ) : (
               <ul
                 ref={listRef}
@@ -287,21 +294,23 @@ export function Select({
                       }}
                       onPointerEnter={() => setActiveIndex(index)}
                       className={cn(
-                        'min-h-touch flex cursor-pointer items-center justify-between gap-1 rounded-md px-2',
-                        isActive && 'bg-primary-50',
+                        'min-h-touch flex cursor-pointer items-center justify-between gap-1 rounded-lg px-2',
+                        'duration-fast transition-colors ease-out',
+                        isActive && 'bg-tint',
                         isSelected && 'font-medium',
                       )}
                     >
-                      <span className="flex min-w-0 items-baseline gap-1">
-                        <span className="text-neutral-900">{option.label}</span>
+                      <span className="flex min-w-0 items-center gap-1">
+                        {option.leading}
+                        <span className="text-fg">{option.label}</span>
                         {option.description && (
-                          <span className="truncate text-sm text-neutral-500">
+                          <span className="text-fg-muted truncate text-sm">
                             {option.description}
                           </span>
                         )}
                       </span>
                       {option.meta && (
-                        <span className="shrink-0 text-sm text-neutral-500">{option.meta}</span>
+                        <span className="text-fg-muted shrink-0 text-sm">{option.meta}</span>
                       )}
                     </li>
                   );
@@ -320,7 +329,7 @@ function ChevronIcon({ isOpen }: { isOpen: boolean }) {
     <svg
       className={cn(
         // neutral-400 would be 2.34:1 here — too low for a meaningful UI graphic.
-        'duration-base size-2 shrink-0 text-neutral-500 transition-transform ease-out',
+        'duration-base text-fg-muted size-2 shrink-0 transition-transform ease-out',
         isOpen && 'rotate-180',
       )}
       viewBox="0 0 24 24"

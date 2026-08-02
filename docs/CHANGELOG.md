@@ -9,6 +9,43 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — Production polish
+
+- **Dark mode**, system-detected via `prefers-color-scheme`. No toggle and no stored preference: the
+  browser resolves the theme before first paint, so there is no flash of the wrong one. Every pairing
+  measured at WCAG AA in both themes before it was written.
+- **Two-layer colour tokens** — a fixed raw palette plus semantic roles (`surface`, `fg`, `outline`,
+  `accent`) that resolve per theme. Dark mode is a palette swap, not a `dark:` variant on every
+  element.
+- **`Flag` component** with a real fallback: emoji flags render beautifully on iOS, Android and
+  macOS, but **Windows ships no flag glyphs at all** and draws two bare letters. Support is detected
+  once via canvas metrics; where it is missing, a deliberate country-code chip is shown instead. No
+  images, no sprite sheet, no dependency.
+- **Clear button** on the amount field, appearing only when there is something to clear.
+- **Empty state** — the result recedes to muted rather than reading as a computed zero.
+- **Micro-interactions**: 140ms rise on a new result (the digits never animate), a swap icon that
+  keeps rotating the same way on repeated taps, and a 1–5% press response on buttons. All respect
+  `prefers-reduced-motion`.
+
+### Fixed
+
+- **The conversion result was rendering at 16px instead of 48px** — since Phase 4. `tailwind-merge`
+  classifies any unrecognised `text-*` value as a colour, so the custom `text-display-sm` font-size
+  token collided with `text-fg` and was silently dropped. `cn()` now extends tailwind-merge with the
+  project's custom font-size tokens. Any future custom `--text-*` token must be registered there too.
+- **The answer fell below the fold on an iPhone SE.** Spacing was desktop-generous applied at every
+  size; it is now compact-first and expands from `md`. The result is above the fold on every phone
+  tested, and iPhone 13 and Pixel 5 need no scrolling at all.
+- The result card reserved 88px for a 48px line, leaving ~40px of dead space under the number.
+
+### Verified
+
+- `lint`, `typecheck`, **148 tests**, `format:check`, `build` — all clean, and **no test was modified**
+- **axe: 0 violations** across 8 states — light and dark, mobile/desktop/320px, empty, error, and the
+  open country picker
+- Bundle +2.8KB gzipped (tailwind-merge config, flag fallback); **no new dependencies**. Dark mode is
+  CSS-only.
+
 ### Added
 
 - **Vercel Web Analytics** (`@vercel/analytics@2.0.1`), mounted in the root layout via the

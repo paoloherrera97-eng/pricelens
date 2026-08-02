@@ -38,7 +38,7 @@ export function RateFreshness({ age, isStale, isOffline }: RateFreshnessProps) {
     <p
       className={cn(
         'flex items-center justify-center gap-1 text-xs font-medium',
-        isDegraded ? 'text-warning-600' : 'text-neutral-500',
+        isDegraded ? 'text-warning-600' : 'text-fg-muted',
       )}
     >
       <span
