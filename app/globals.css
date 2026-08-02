@@ -149,6 +149,11 @@
     'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
+  /* El sistema documenta 1,4 para `text-xs`; Tailwind trae 1rem sobre 0,75rem,
+     o sea 1,33. El valor es el multiplicador directo — escribirlo como
+     `calc(1.4 / 0.75)` da 1,87 y 22px de interlineado, no 16,8. */
+  --text-xs--line-height: 1.4;
+
   --text-display: 4rem;
   --text-display--line-height: 1;
   --text-display--font-weight: 700;

@@ -51,4 +51,13 @@ describe('ConversionResult', () => {
 
     expect(screen.getByText(`${base.original} equivale a ${base.converted}`)).toBeInTheDocument();
   });
+
+  it('says nothing at all before an amount is entered', () => {
+    // The visible "0,00 €" is a placeholder holding the card's height open.
+    // Announcing it tells a screen-reader user that a conversion happened.
+    render(<ConversionResult {...base} original="0,00 ฿" converted="0,00 €" isEmpty />);
+
+    expect(screen.getByText('0,00 €')).toBeInTheDocument();
+    expect(screen.queryByText(/equivale a/)).not.toBeInTheDocument();
+  });
 });

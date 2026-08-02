@@ -84,7 +84,13 @@ export function ConversionResult({
             >
               {converted}
             </p>
-            <span className="sr-only">{t('announcement', { amount: original, converted })}</span>
+            {/* Sin importe, el valor visible es un marcador que mantiene el
+                alto de la tarjeta — pero anunciarlo le dice a un lector de
+                pantalla que "0,00 ฿ equivale a 0,00 €", una conversión que
+                nadie ha pedido. El hueco se reserva igual; solo calla. */}
+            {!isEmpty && (
+              <span className="sr-only">{t('announcement', { amount: original, converted })}</span>
+            )}
           </>
         ) : (
           <p className="text-fg-muted px-2 py-2 text-base">{t('unavailablePair')}</p>
