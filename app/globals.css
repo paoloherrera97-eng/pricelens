@@ -258,6 +258,53 @@
   }
 }
 
+/* ------------------------------------------------------ content-aware type ---
+   The converted amount is the one string in the app whose length is not known
+   at design time. "49,12 €" is 7 characters; "48.154.088,37 ARS" is 17, and a
+   fixed 3rem renders that one 490px wide inside a 208px card.
+   A viewport-relative `clamp()` alone cannot fix this, because the viewport
+   says nothing about how long the string is — the two inputs that decide
+   whether the number fits are the width of its container and its own length.
+   So both are inputs here: `100cqw` from the container, and `--len` set by the
+   component from `converted.length`.
+   0.64 is the per-character advance, measured rather than guessed: the worst
+   realistic result string (all digits plus a three-letter code, bold, tabular
+   figures, -0.03em tracking) measures 0.54em/char in Liberation Sans, 0.54 in
+   FreeSans and 0.66 in DejaVu Sans — the widest sans on hand, and far wider
+   than SF Pro, Roboto or Inter, which are what this actually renders in.
+   Tabular figures are what make the estimate safe at all: every digit and
+   separator has the same advance, so length really does predict width.
+   The margin against a font wider than 0.64 is physical rather than numeric.
+   The container carries 8px of its own horizontal padding, so `100cqw` is
+   already inset from the card's inner edge: a string only reaches that edge at
+   0.68em/char, and the card's own padding absorbs up to 0.76em/char — past the
+   widest face measured. Nothing on the path sets `overflow: hidden`, so the
+   failure mode beyond even that is a wider number, never a clipped one. */
+@utility text-fit {
+  --fit-max: var(--text-display-sm);
+
+  /* Fallback for engines without container queries; superseded below. */
+  font-size: clamp(1rem, 9vw, 3rem);
+  font-size: clamp(1rem, calc(100cqw / (var(--len, 8) * 0.64)), var(--fit-max));
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  /* The result is a single number. It never wraps — a second line would move
+     everything below it and read as two values rather than one. */
+  white-space: nowrap;
+}
+
+/* Raises only the ceiling, so wide viewports keep the full 4rem display size
+   for short results while long ones stay governed by the container. */
+@utility text-fit-lg {
+  --fit-max: var(--text-display);
+}
+
+/* Establishes the query container the utility above measures against. */
+@utility fit-container {
+  container-type: inline-size;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

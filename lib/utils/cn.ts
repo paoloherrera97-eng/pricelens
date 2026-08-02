@@ -14,11 +14,15 @@ import { extendTailwindMerge } from 'tailwind-merge';
  * whenever a real colour like `text-fg` appeared alongside them — rendering the
  * conversion result at 16px instead of 48px. Declaring them here restores the
  * distinction. Any future custom `--text-*` token must be added too.
+ *
+ * `text-fit` and `text-fit-lg` are the same hazard: they are font sizes that
+ * look like colours. `text-fit` sits next to `text-fg` on the result value, so
+ * leaving them out would drop the sizing utility exactly as before.
  */
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
-      'font-size': [{ text: ['display', 'display-sm'] }],
+      'font-size': [{ text: ['display', 'display-sm', 'fit', 'fit-lg'] }],
     },
   },
 });

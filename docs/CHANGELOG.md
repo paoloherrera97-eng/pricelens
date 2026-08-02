@@ -9,6 +9,50 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Fixed — the result no longer overflows its card
+
+Reported from a real iPhone: `43.863,13 ARS` almost touched both edges of the result card, and
+anything larger — millions, or JPY/VND/IDR totals — ran past them.
+
+Confirmed by measurement before changing anything. At a fixed `3rem`, `48.154.088,37 ARS` renders
+**490px wide inside a 208px card** on a 320px viewport, a 2.4× overflow; three of five stress cases
+overflowed on both an iPhone SE and an iPhone 13.
+
+The result is now sized from the two things that actually decide whether it fits — the width of its
+container and the length of the string:
+
+```
+font-size: clamp(1rem, calc(100cqw / (var(--len) * 0.64)), var(--fit-max));
+```
+
+A viewport-relative `clamp()` on its own cannot solve this, because the viewport says nothing about
+how long the number is. `100cqw` comes from a container query on the live region, `--len` is set by
+the component from `converted.length`, and `--fit-max` stays the existing display token, so short
+results still render at the full 3rem (4rem from `sm`).
+
+- `0.64` is the per-character advance ceiling, **measured, not guessed**: the worst realistic result
+  string measures 0.54em/char in Liberation Sans, 0.54 in FreeSans and 0.66 in DejaVu Sans — wider
+  than SF Pro, Roboto or Inter, which are what this renders in. Tabular figures are what make length
+  a valid proxy for width at all.
+- The margin against a wider face is physical, not numeric: the live region carries its own 8px
+  inset, so a string that beats the estimate spends padding instead of overflowing, and nothing on
+  the path sets `overflow: hidden`, so the worst case is a wider number and never a clipped one.
+- The value is centred inside its reserved height, which is no longer always filled now that the
+  size varies.
+
+Verified against the production build in Chromium at five viewports (320 → 1440) × nine cases,
+including the reported value and all three requested stress cases: every result is one line, inside
+its card, with **at least 18px of clearance on both sides**.
+
+`text-fit`/`text-fit-lg` are registered in `lib/utils/cn.ts` for the same reason `text-display` is —
+tailwind-merge classifies unrecognised `text-*` utilities as colours and silently drops them.
+
+### Known issue, not fixed here
+
+Compact notation renders `269,3 mil MARS` for 269.3 billion pesos: Spanish uses `mil M` for 10⁹ and
+`Intl.NumberFormat` sets the currency code straight after it. The layout is now correct in that case;
+the _string_ is not. It is a formatting change rather than a typography one, so it ships separately.
+
 ### Fixed — iOS Safari
 
 - **The country picker could not be scrolled by touch.** Options committed on `pointerdown` and
