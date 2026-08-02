@@ -9,6 +9,49 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Fixed — the picker list actually scrolls on touch (second attempt)
+
+The first attempt moved selection from `pointerdown` to `click`. That was necessary and it was not
+sufficient: it was still reported as broken from a real iPhone.
+
+**The root cause was layout, not events.** The list is a flex item inside the sheet, and a flex
+item's default `min-height` is `auto` — it refuses to shrink below its content, which here is 195
+rows. `overflow-y: auto` then has nothing to scroll, because the box is already as tall as
+everything inside it, and the sheet's `max-height` gets resolved by overflowing rather than by
+scrolling. **Blink hides this; WebKit does not.** With no scroll to perform, iOS classified the
+drag as a tap, fired a `click`, and the row under the finger was selected — precisely the symptom.
+The fix is `min-h-0 flex-1` on the list, plus `overflow-hidden` on the sheet so nothing can spill
+past its rounded edge.
+
+That also explains why the first attempt looked verified: the list already scrolled in Chromium, so
+the test that "passed" was never testing the thing that was broken.
+
+**The component now decides tap-versus-drag itself** rather than trusting the engine, because that
+judgement is exactly what differs between engines. A press records its position and the list's
+scroll offset; the click that follows only commits if the pointer travelled ≤10px **and** the list
+did not scroll underneath it, and never if the browser cancelled the gesture. A click with no
+recorded press — keyboard activation, assistive technology — still selects, since only a real press
+can be a drag. The upshot is that correctness no longer depends on which browser is running, which
+is what makes it verifiable here at all.
+
+**The keyboard no longer sits on top of the sheet.** `interactiveWidget: 'resizes-content'` in the
+viewport metadata: the sheet is anchored to the bottom and focuses its search field on open, and by
+default the on-screen keyboard overlays the layout viewport, so `dvh` keeps reporting the full
+screen height and `70dvh` sizes the sheet partly underneath the keyboard. `resizes-content` shrinks
+the layout viewport instead, so the sheet is sized against what the user can actually see.
+
+Verified: real CDP touch drags and flicks on both selectors, at iPhone 13, Pixel 7 (Android Chrome)
+and 320px — list scrolls, momentum carries, nothing is selected by dragging, a deliberate tap still
+selects. The tap guard is additionally exercised end to end against the built app with a
+press-then-click-90px-away sequence — the event shape an engine produces when it mistakes a drag for
+a tap. 24 unit tests on `Select`, 5 of them new and covering slop, scroll, cancellation and the
+keyboard path. axe: 0 violations.
+
+**Still not verified on WebKit.** This environment cannot install it (the download is blocked at the
+proxy), so the `min-h-0` half of this fix is reasoned from the CSS flexbox specification and the
+known engine difference, not observed. The tap-guard half is engine-independent by construction and
+is observed.
+
 ### Fixed — the result no longer overflows its card
 
 Reported from a real iPhone: `43.863,13 ARS` almost touched both edges of the result card, and
