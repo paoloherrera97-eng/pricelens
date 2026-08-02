@@ -1,5 +1,27 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+/**
+ * `tailwind-merge` configured for this project's custom tokens.
+ *
+ * The `extend` block is not optional polish — without it the design system is
+ * quietly broken. tailwind-merge decides which class group a utility belongs to
+ * by pattern: `text-lg` is a font size because `lg` is a t-shirt size, while
+ * anything unrecognised after `text-` falls through to the *colour* group.
+ *
+ * Our display sizes are named `text-display` and `text-display-sm`, which match
+ * no size pattern. They were therefore treated as colours and silently dropped
+ * whenever a real colour like `text-fg` appeared alongside them — rendering the
+ * conversion result at 16px instead of 48px. Declaring them here restores the
+ * distinction. Any future custom `--text-*` token must be added too.
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      'font-size': [{ text: ['display', 'display-sm'] }],
+    },
+  },
+});
 
 /**
  * Merges class names, with later Tailwind utilities winning over earlier ones.

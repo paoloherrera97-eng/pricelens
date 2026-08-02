@@ -1,6 +1,6 @@
 # PriceLens — Design System
 
-**Status:** Implemented (Phase 3) · **Applies to:** V1 MVP
+**Status:** Implemented · **Applies to:** V1 · **Themes:** light + dark
 
 The source of truth for every visual decision. Tokens defined here are implemented verbatim in the
 Tailwind 4 `@theme` block in `app/globals.css` — that block and this document must never disagree.
@@ -90,8 +90,45 @@ boundary. **The rule wins**, and a 1px hairline is the smallest honest way to sa
 It is drawn as a `ring` (box-shadow) rather than a `border`, because a border consumes 2px of the
 row's content box and drops the field below the 44px target floor — measured, not assumed.
 
-**Dark mode is out of scope for V1**, but every value above is a CSS custom property, so V2 adds a
-palette rather than a refactor.
+### Two token layers, and why
+
+Colour is defined twice on purpose:
+
+1. A **raw palette** (`--color-primary-600`, `--color-neutral-900`) — fixed values, identical in both
+   themes.
+2. **Semantic tokens** (`--color-surface`, `--color-fg`, `--color-outline`, `--color-accent`) that
+   name a _role_ and resolve differently per theme.
+
+Components reference the semantic layer. That is what makes dark mode a palette swap rather than a
+`dark:` variant on every element — and what stops the two themes drifting apart as the UI grows.
+
+### Dark mode
+
+System-detected via `prefers-color-scheme`, with `color-scheme` set so form controls and scrollbars
+follow. **No toggle and no stored preference**: the browser resolves the media query before first
+paint, which no JavaScript toggle can, so there is no flash of the wrong theme.
+
+| Role     | Light     | Dark      | Measured (dark, on surface) |
+| -------- | --------- | --------- | --------------------------- |
+| bg       | `#F8FAFC` | `#0A0E16` | —                           |
+| surface  | `#FFFFFF` | `#131A26` | —                           |
+| sunken   | `#F1F5F9` | `#1C2534` | —                           |
+| fg       | `#0F172A` | `#F1F5F9` | 15.93:1                     |
+| fg-muted | `#5B6B7F` | `#9FB0C6` | 7.89:1                      |
+| outline  | `#828C9C` | `#647391` | 4.02:1                      |
+| accent   | `#2563EB` | `#60A5FA` | 6.86:1                      |
+| success  | `#047857` | `#34D399` | 9.08:1                      |
+| warning  | `#B45309` | `#FBBF24` | 10.45:1                     |
+| danger   | `#DC2626` | `#F87171` | 6.31:1                      |
+
+Two things the dark palette does differently, both deliberate:
+
+- **The accent lightens.** `#2563EB` measures 2.4:1 as text on a dark surface. The _button_ keeps the
+  darker fill, because white on `#2563EB` is 5.17:1 either way — only accent **text** changes.
+- **Elevation stops using shadow.** Shadows read as noise on dark surfaces, so the card separates
+  from the page by stepping lighter, plus a hairline ring. In light mode the shadow does the work.
+
+Every pairing above was measured before it was written, in both themes.
 
 ---
 

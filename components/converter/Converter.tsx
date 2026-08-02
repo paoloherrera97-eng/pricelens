@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { Button, Card, Input } from '@/components/ui';
+import { Button, Card, IconButton, Input } from '@/components/ui';
 import {
   APP_CONFIG,
   DEFAULT_LOCALE,
@@ -140,8 +140,8 @@ export function Converter() {
   if (rates.status === 'error') {
     return (
       <Card className="text-center">
-        <p className="text-base font-medium text-neutral-900">{tError('ratesUnavailableTitle')}</p>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="text-fg text-base font-medium">{tError('ratesUnavailableTitle')}</p>
+        <p className="text-fg-muted mt-1 text-sm">
           {isOnline ? tError('ratesUnavailableBody') : tError('offlineBody')}
         </p>
         <Button className="mt-3" onClick={rates.retry} isFullWidth size="lg">
@@ -152,7 +152,7 @@ export function Converter() {
   }
 
   return (
-    <Card className="flex flex-col gap-2">
+    <Card className="flex flex-col gap-1.5 md:gap-2">
       {!isOnline && (
         <p
           role="status"
@@ -180,6 +180,23 @@ export function Converter() {
         leading={getCurrency(from).symbol}
         value={amountText}
         onChange={(event) => handleAmountChange(event.target.value)}
+        // Clearing a long price one backspace at a time is the kind of small
+        // friction that adds up on a phone. Appears only when there is
+        // something to clear, so the resting field stays uncluttered.
+        trailing={
+          amountText ? (
+            <IconButton label={t('clear')} variant="ghost" onClick={() => setAmountText('')}>
+              <svg className="size-2" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M6 6l12 12M18 6L6 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </IconButton>
+          ) : undefined
+        }
       />
 
       <div className="flex justify-center">
@@ -193,6 +210,7 @@ export function Converter() {
         converted={conversion?.converted ?? null}
         rateLine={conversion?.rateLine ?? null}
         isLoading={false}
+        isEmpty={amountText.trim() === ''}
       />
 
       {freshness && (
