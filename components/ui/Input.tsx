@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
+import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
@@ -22,6 +22,14 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   hint?: string;
   /** Large, tabular presentation for the amount field. */
   isEmphasised?: boolean;
+  /**
+   * Ref to the `input` itself, not the wrapping row.
+   *
+   * Named rather than the bare `ref` prop because this component renders three
+   * elements and "the ref" would be ambiguous. The amount field needs it to put
+   * the caret back after live formatting rewrites the value.
+   */
+  inputRef?: Ref<HTMLInputElement>;
 }
 
 export function Input({
@@ -31,6 +39,7 @@ export function Input({
   trailing,
   hint,
   isEmphasised = false,
+  inputRef,
   className,
   id,
   ...props
@@ -67,6 +76,7 @@ export function Input({
         )}
 
         <input
+          ref={inputRef}
           id={inputId}
           aria-describedby={hint ? hintId : undefined}
           className={cn(

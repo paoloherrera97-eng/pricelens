@@ -9,6 +9,29 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Changed — el campo «Importe» se formatea mientras escribes
+
+Un precio de seis cifras sin separadores es ilegible de un vistazo, y leerlo de un vistazo es
+justo lo que promete el producto. El campo ahora agrupa los miles según el idioma
+(`1000 → 1.000`, `1000000 → 1.000.000`) y conserva los decimales tal cual se escriben
+(`12345,50 → 12.345,50`).
+
+- **El cursor no se mueve nunca.** Al reformatear, la posición se recupera contando **dígitos**, no
+  caracteres: los dígitos son lo único en lo que el texto anterior y el reformateado coinciden,
+  porque los separadores se desplazan al crecer el número. Contar caracteres es exactamente lo que
+  hace saltar el cursor en los campos formateados mal hechos. La corrección se aplica en
+  `useLayoutEffect`, antes de que el navegador pinte.
+- **Sin dependencias nuevas.** `Intl.NumberFormat` con `useGrouping: 'always'`, que hace falta
+  porque el CLDR español agrupa a partir de cinco cifras: por defecto `1000` se muestra `1000` y el
+  campo parecería roto justo al pasar del millar. Los separadores se leen con `formatToParts` en
+  lugar de fijarlos, así que un idioma que agrupe con espacio fino sigue funcionando.
+- **El motor de conversión no se toca.** `parseAmount` ya entendía la agrupación, de modo que la
+  conversión, el enlace compartido y los favoritos leen exactamente lo mismo que antes.
+- **Un enlace se interpreta con `parseAmount`, no con las reglas de tecleo**, porque las URL se
+  escriben a mano: `?amount=1890.5` es un decimal, no 18.905. La normalización pasa a devolver
+  texto (`normaliseAmount`) en vez de un número, para que `12,50` no vuelva como `12,5`.
+- Se mantiene `inputmode="decimal"`: el teclado numérico del móvil no cambia.
+
 ### Added — tipo de cambio seleccionable en Argentina (ADR-018)
 
 El peso se cotiza de varias formas según cómo pagues, y hasta ahora la app usaba la oficial sin
