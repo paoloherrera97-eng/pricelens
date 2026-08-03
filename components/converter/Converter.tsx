@@ -11,7 +11,7 @@ import {
   LOCALE_FORMATTING,
   countryForCurrency,
   getCountry,
-  getCurrency,
+  currencyMarker,
   isCurrencyCode,
   type CurrencyCode,
 } from '@/config';
@@ -295,7 +295,10 @@ export function Converter() {
         autoFocus
         enterKeyHint="done"
         placeholder={t('amountPlaceholder')}
-        leading={getCurrency(from).symbol}
+        // El código cuando el símbolo no identifica nada: «$ 25.000» en
+        // Argentina se lee como dólares, y el error va en la dirección
+        // peligrosa. `currencyMarker` lo decide desde la propia tabla.
+        leading={currencyMarker(from)}
         value={amountText}
         inputRef={amountField.inputRef}
         onChange={amountField.onChange}

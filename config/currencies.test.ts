@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CURRENCIES, getCurrency, isCurrencyCode } from './currencies';
+import { CURRENCIES, currencyMarker, getCurrency, isCurrencyCode } from './currencies';
 
 describe('currency metadata', () => {
   it('has a meaningful number of currencies for a travel product', () => {
@@ -78,5 +78,38 @@ describe('getCurrency', () => {
     // Returning a default here would produce a plausible-looking wrong price.
     // @ts-expect-error — deliberately outside the CurrencyCode union.
     expect(() => getCurrency('XYZ')).toThrow(/Unknown currency/);
+  });
+});
+
+describe('currencyMarker', () => {
+  it.each([
+    ['ARS', 'ARS', '28 currencies use "$"; in Argentina it reads as dollars'],
+    ['USD', 'USD', 'the dollar has no more claim to "$" than the peso'],
+    ['GBP', 'GBP', 'six currencies use "£"'],
+    ['NOK', 'NOK', 'four use "kr"'],
+    ['JPY', 'JPY', 'the yen shares "¥" with the yuan'],
+  ])('gives %s the code, not its symbol (%s)', (code, expected, _reason) => {
+    expect(currencyMarker(code as 'ARS')).toBe(expected);
+  });
+
+  it.each([
+    ['EUR', '€'],
+    ['THB', '฿'],
+    ['VND', '₫'],
+  ])('keeps %s on its own symbol %o', (code, expected) => {
+    // A symbol only one currency wears identifies it perfectly, and is shorter.
+    expect(currencyMarker(code as 'EUR')).toBe(expected);
+  });
+
+  it('never returns a marker that two currencies could share', () => {
+    const markers = CURRENCIES.map((currency) => currencyMarker(currency.code));
+    const duplicated = markers.filter((marker, i, all) => all.indexOf(marker) !== i);
+    expect(duplicated).toEqual([]);
+  });
+
+  it('returns something for every currency we carry', () => {
+    for (const currency of CURRENCIES) {
+      expect(currencyMarker(currency.code).length).toBeGreaterThan(0);
+    }
   });
 });
