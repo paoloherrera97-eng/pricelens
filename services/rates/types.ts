@@ -8,13 +8,13 @@
  */
 
 import type { CurrencyCode, ProviderId } from '@/config';
-import type { RateTable } from '@/types';
+import type { RateTable, RateVariant } from '@/types';
 
 /**
  * Rates expressed against a single base currency (ADR-001). Defined in `types/`
  * so pure `lib/` code can use it without importing across a boundary.
  */
-export type { RateTable };
+export type { RateTable, RateVariant };
 
 export interface RateSnapshot {
   /** The currency all rates in `rates` are quoted against. */
@@ -30,6 +30,34 @@ export interface RateSnapshot {
    * product must never do (PROJECT_BIBLE, Value #4).
    */
   readonly degraded: boolean;
+  /**
+   * Alternative quotations, keyed by currency code. Absent for every currency
+   * with a single rate, which is nearly all of them.
+   *
+   * `rates` above is left exactly as the base provider returned it — the server
+   * does not choose on the user's behalf. The client substitutes the selected
+   * variant into its own copy of the table before converting.
+   */
+  readonly variants?: Readonly<Record<string, readonly RateVariant[]>>;
+}
+
+/**
+ * Supplies alternative quotations for a single currency.
+ *
+ * Deliberately separate from `RateProvider`: a provider answers "what is the
+ * whole table", an overlay answers "what else could this one currency be".
+ * Overlays are additive and optional — one failing must leave the base table
+ * exactly as it was.
+ */
+export interface RateOverlayProvider {
+  readonly id: string;
+  /** The currency this overlay quotes. */
+  readonly currency: CurrencyCode;
+  /**
+   * Variants quoted per one unit of `base`.
+   * Rejects on failure; the caller drops the overlay and keeps the base table.
+   */
+  fetchVariants(base: CurrencyCode): Promise<readonly RateVariant[]>;
 }
 
 export interface RateProvider {

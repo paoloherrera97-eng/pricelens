@@ -55,5 +55,25 @@
     "qr": "Mostrar código QR",
     "qrLabel": "Código QR con el enlace a esta conversión",
     "shareTitle": "PriceLens — {from} a {to}"
+  },
+  "rateVariants": {
+    "legend": "Tipo de cambio",
+    "blue": {
+      "short": "Blue",
+      "full": "Blue, el que se obtiene pagando en efectivo"
+    },
+    "card": {
+      "short": "Tarjeta",
+      "full": "Tarjeta, el que se aplica al pagar con tarjeta"
+    },
+    "official": {
+      "short": "Oficial",
+      "full": "Oficial, el del banco central"
+    },
+    "hint": {
+      "blue": "En Argentina el precio cambia según cómo pagues. Estás viendo el blue, el del efectivo.",
+      "card": "Estás viendo el tipo tarjeta, el que se aplica al pagar con tarjeta.",
+      "official": "Estás viendo el tipo oficial. Casi ningún visitante cambia a esta tasa."
+    }
   }
 }

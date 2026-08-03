@@ -885,3 +885,64 @@ would justify hand-rolling it.
   write, which would hand the user a link they just declined to send.
 - The address bar now changes as the user types, which means **tests must reset it**: jsdom shares
   one `window` per file, so one test's URL would otherwise become the next test's shared link.
+
+---
+
+### ADR-018 — Rate overlays: several quotations for one currency, chosen by the user
+
+**Decision.** Keep the base provider and its single table exactly as they are, and add an _overlay_
+layer that supplies alternative quotations for individual currencies. The snapshot carries them
+alongside `rates`; the client substitutes the selected one into its own copy of the table before
+converting. Argentina is the first and currently only overlay.
+
+**Rationale.** The peso trades at materially different rates depending on how you pay — cash gets
+the "blue" rate, a card gets a tourist rate, and the official rate is what almost no visitor
+transacts at. The gap has historically been large enough that showing the official rate to a
+traveler paying cash is not an approximation, it is a wrong answer delivered confidently, which
+PROJECT_BIBLE names as the one failure this product cannot have.
+
+Three shapes were considered:
+
+1. **Swap the provider for Argentina.** Rejected: the chain is a _fallback_ chain, first success
+   wins, so "a different provider for one country" has no place to live in it — and it would still
+   pick one rate silently.
+2. **Overlay with a silent default.** Rejected for the same reason as the status quo: it replaces
+   one unannounced choice with another. The user cannot audit a number whose basis is invisible.
+3. **Overlay plus a visible selector.** Chosen.
+
+**Why the conversion engine does not change.** This is the load-bearing property of the design.
+`applyVariant` substitutes a single key in the rate table and returns a table; `getRate` and
+`convert` receive what they always received and stay pure, synchronous, and unaware that variants
+exist (ADR-001). A variant is not a new kind of rate — it is a different number in the same slot.
+
+**Consequences.**
+
+- **`rates` is never chosen on the user's behalf by the server.** It keeps exactly what the base
+  provider returned. The variants ride alongside, and selection happens client-side.
+- **An overlay can never break the app.** Each is awaited independently via `allSettled`; a
+  rejection is logged and dropped. Everyone outside Argentina depends on the base table, and it must
+  not be hostage to a community-run API.
+- **A single quotation is not a variant.** An overlay returning one rate is discarded rather than
+  rendering a selector with one option.
+- **The source is not a central bank**, so its payload is treated as hostile: unknown houses ignored,
+  non-numeric values skipped, and the _whole_ overlay dropped if any quotation diverges from the
+  official rate by more than 10×. One bad number among good ones is worse than falling back to
+  official, which is wrong-but-sane.
+- **The default is blue, and the reasoning is contestable enough to write down.** "Safest" can mean
+  minimising the error's _direction_ — official never makes something look cheaper than it is — or
+  its _size_, where official is the worst of the three. The second reading wins **because the
+  selector is visible**: the interface provides the protection the conservative default would have
+  bought.
+- **The rate line names the variant** (`1 ARS = 0,000736 EUR · Blue`). An unattributed number is
+  exactly the failure ADR-013 exists to prevent, and it costs no vertical space.
+- **A fourth storage key**, holding a currency → variant map. Same category ADR-005 and ADR-016
+  permit: a preference the user chose, no amounts and no timestamps.
+- Overlays revalidate every 5 minutes rather than the base table's hour: parallel rates move
+  intraday, and an hour-old blue rate is its own kind of wrong.
+- Behind `FEATURES.rateVariants`; off restores the previous behaviour exactly.
+
+**Not verified from this environment.** The sandbox blocks outbound HTTP, so the upstream contract —
+that the endpoint is reachable and its payload has the shape the parser expects — is **unconfirmed**.
+The parser is written so that a wrong guess degrades to the official rate with no selector rather
+than to a wrong price, and every branch of it is unit-tested against fixtures. It still needs one
+check against production before the feature can be called done.

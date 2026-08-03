@@ -25,6 +25,12 @@ export const FEATURES = {
   detectHomeCurrency: true,
   /** Save and recall currency pairs (ADR-016). Off hides the star and the row. */
   favourites: true,
+  /**
+   * Offer the parallel quotations where a currency has more than one rate
+   * (ADR-018). Off falls back to the base provider's single rate for every
+   * currency, which is exactly the behaviour before this flag existed.
+   */
+  rateVariants: true,
 
   // --- Deliberately off. Each has a roadmap entry. --------------------
   /** V2 — automatically surfaced recents, distinct from saved favourites. */

@@ -9,6 +9,40 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — tipo de cambio seleccionable en Argentina (ADR-018)
+
+El peso se cotiza de varias formas según cómo pagues, y hasta ahora la app usaba la oficial sin
+decirlo. Para un viajero pagando en efectivo eso no es una aproximación: es un número equivocado
+dado con confianza, que es justo el fallo que este producto no puede permitirse.
+
+**Arquitectura de superposición.** El proveedor base y su tabla única no cambian. Se añade una capa
+de _overlays_ que aporta cotizaciones alternativas para monedas concretas; el snapshot las lleva
+junto a `rates` y el cliente sustituye la elegida en su propia copia de la tabla antes de convertir.
+
+**El motor de conversión no se toca, y esa es la propiedad que sostiene el diseño.** `applyVariant`
+cambia una clave de la tabla y devuelve una tabla; `getRate` y `convert` reciben lo de siempre y
+siguen puros, síncronos y sin enterarse de que existen variantes. Una variante no es un tipo nuevo
+de tasa: es otro número en el mismo hueco.
+
+- **Selector visible** —Blue, Tarjeta, Oficial— solo donde hay más de una cotización. El resto de
+  destinos se ve exactamente igual que antes: sin selector y con la línea de tasa intacta.
+- **Por defecto Blue**, y el razonamiento se deja escrito porque es discutible: «más segura» puede
+  significar minimizar la _dirección_ del error —la oficial nunca abarata— o su _tamaño_, donde la
+  oficial es la peor de las tres. Gana la segunda lectura **porque el selector es visible**.
+- **La elección se recuerda** entre visitas, por moneda.
+- **La línea de tasa nombra la cotización** (`1 ARS = 0,000736 EUR · Blue`). Un número sin atribuir
+  es el fallo que ADR-013 existe para evitar, y no cuesta una línea de alto.
+- **Un overlay caído no puede romper la app**: se espera con `allSettled` y un rechazo se descarta.
+  Sin variantes, el comportamiento es idéntico al anterior.
+- **La fuente no es un banco central**, así que se trata como entrada hostil: casas desconocidas
+  ignoradas, valores no numéricos descartados y el overlay **entero** rechazado si alguna cotización
+  se aleja más de 10× de la oficial.
+
+**Sin verificar contra producción:** este entorno bloquea el tráfico saliente, así que el contrato
+del endpoint —que responda y tenga la forma que el parser espera— **no está confirmado**. El parser
+está escrito para que un fallo degrade a la tasa oficial sin selector, nunca a un precio erróneo, y
+todas sus ramas están cubiertas con fixtures. Necesita una comprobación en producción.
+
 ### Fixed — detalles de acabado (auditoría 🟢)
 
 - **El estado vacío ya no anuncia una conversión que no ha ocurrido.** El «0,00 €» visible es un
