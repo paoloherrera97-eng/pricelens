@@ -15,6 +15,32 @@ import type { CurrencyCode } from '@/config';
  */
 export type RateTable = Readonly<Record<string, number>>;
 
+/**
+ * One quotation for a currency that has more than one.
+ *
+ * Lives here rather than in `services/` for the same reason `RateTable` does:
+ * pure `lib/` code and components both need it, and neither may import across
+ * the services boundary (docs/ARCHITECTURE.md §5).
+ *
+ * Most currencies have exactly one rate and never produce a variant. A few —
+ * Argentina is the reason this exists — trade at materially different rates
+ * depending on how you pay, and picking one silently would be the "confidently
+ * wrong price" this product exists not to give (ADR-018).
+ *
+ * `rate` is quoted in the snapshot's base, exactly like an entry in
+ * `RateTable`, so applying a variant is a single-key substitution and the
+ * conversion engine never learns that variants exist.
+ */
+export interface RateVariant {
+  /** Stable identifier, also the message key for its label. */
+  readonly id: string;
+  /** Units of this currency per one unit of the snapshot's base. */
+  readonly rate: number;
+  /** Human-readable attribution, shown with the rate. */
+  readonly source: string;
+  readonly fetchedAt: string;
+}
+
 /** The result of a conversion, carrying enough context to render it honestly. */
 export interface ConversionResult {
   readonly amount: number;

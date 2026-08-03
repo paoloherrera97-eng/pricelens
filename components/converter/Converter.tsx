@@ -17,6 +17,7 @@ import {
 } from '@/config';
 import { useDetectedHomeCurrency } from '@/hooks/useDetectedHomeCurrency';
 import { useFavourites } from '@/hooks/useFavourites';
+import { useRateVariant } from '@/hooks/useRateVariant';
 import { useSharedLink } from '@/hooks/useSharedLink';
 import { useShareUrl } from '@/hooks/useShareUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -25,6 +26,7 @@ import { useRates } from '@/hooks/useRates';
 import { convert, getRate } from '@/lib/currency/convert';
 import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency/format';
 import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
+import { applyVariant, resolveVariant, variantsFor } from '@/lib/rates/variants';
 import type { PartialShareState } from '@/lib/share/url';
 import { parseAmount, sanitizeAmountInput } from '@/lib/currency/parse';
 
@@ -35,6 +37,7 @@ import { CurrencyPicker } from './CurrencyPicker';
 import { FavouriteList } from './FavouriteList';
 import { FavouriteToggle } from './FavouriteToggle';
 import { RateFreshness } from './RateFreshness';
+import { RateVariantPicker } from './RateVariantPicker';
 import { ShareControls } from './ShareControls';
 import { SwapButton } from './SwapButton';
 
@@ -58,6 +61,7 @@ export function Converter() {
   const t = useTranslations('converter');
   const tRates = useTranslations('rates');
   const tError = useTranslations('errors');
+  const tVariants = useTranslations('rateVariants');
   const rates = useRates();
   const isOnline = useOnlineStatus();
 
@@ -81,6 +85,23 @@ export function Converter() {
 
   const amount = useMemo(() => parseAmount(amountText) ?? 0, [amountText]);
 
+  // A few currencies are quoted several ways — Argentina is why this exists.
+  // The choice is resolved here and substituted into the table *before* any
+  // conversion happens, so `getRate` and `convert` never learn that variants
+  // exist and stay exactly as pure as ADR-001 requires.
+  const { selection, select } = useRateVariant();
+  const variants = useMemo(
+    () =>
+      FEATURES.rateVariants && rates.status === 'ready'
+        ? variantsFor(rates.snapshot.variants, from)
+        : [],
+    [rates, from],
+  );
+  const activeVariant = useMemo(
+    () => resolveVariant(variants, selection, from),
+    [variants, selection, from],
+  );
+
   /**
    * The whole conversion, recomputed only when an input actually changes.
    * No network, no debounce — this is arithmetic (ADR-001).
@@ -88,16 +109,23 @@ export function Converter() {
   const conversion = useMemo(() => {
     if (rates.status !== 'ready') return null;
 
-    const table = rates.snapshot.rates;
+    // `applyVariant` returns the same object when there is nothing to
+    // substitute, so every destination that is not Argentina allocates nothing.
+    const table = applyVariant(rates.snapshot.rates, from, activeVariant);
     const rate = getRate(table, from, to);
     const converted = convert(amount, table, from, to);
     if (rate === null || converted === null) return null;
 
     return {
       converted: formatCurrency(converted, to, LOCALE),
-      rateLine: t('rateLine', { from, to, rate: formatRate(rate, LOCALE) }),
+      // La variante se nombra en la propia línea de tasa. Sin eso el número
+      // queda sin atribuir, que es justo el fallo que ADR-013 existe para
+      // evitar — y no cuesta una línea extra de alto.
+      rateLine:
+        t('rateLine', { from, to, rate: formatRate(rate, LOCALE) }) +
+        (activeVariant ? ` · ${tVariants(`${activeVariant.id}.short`)}` : ''),
     };
-  }, [rates, amount, from, to, t]);
+  }, [rates, amount, from, to, t, tVariants, activeVariant]);
 
   const originalFormatted = useMemo(() => formatCurrency(amount, from, LOCALE), [amount, from]);
 
@@ -227,6 +255,19 @@ export function Converter() {
       )}
 
       <CountryPicker label={t('countryLabel')} value={countryCode} onChange={handleCountryChange} />
+
+      {/* Directamente bajo el país porque es una propiedad del destino, no del
+          importe: en Argentina el precio cambia según cómo pagues. Solo aparece
+          donde hay más de una cotización, así que el resto de destinos se ven
+          exactamente igual que antes. */}
+      {activeVariant && variants.length > 1 && (
+        <RateVariantPicker
+          className="-mt-1"
+          variants={variants}
+          selectedId={activeVariant.id}
+          onSelect={(variantId) => select(from, variantId)}
+        />
+      )}
 
       {/* No currency selector here: the country above already determines the
           currency, and its symbol leads the field. Repeating the code would be

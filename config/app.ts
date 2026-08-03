@@ -31,6 +31,13 @@ export const APP_CONFIG = {
    */
   ratesRevalidateSeconds: 3600,
 
+  /**
+   * How long the Data Cache holds a parallel quotation, in seconds.
+   * Far shorter than the base table's hour: these move intraday, and an
+   * hour-old blue rate is its own kind of wrong (ADR-018).
+   */
+  parallelRevalidateSeconds: 300,
+
   /** Beyond this age, the UI marks rates as stale (PRD FR-5). */
   ratesStaleAfterSeconds: 60 * 60 * 24,
 
@@ -48,5 +55,6 @@ export const APP_CONFIG = {
   storageKeys: {
     homeCurrency: 'pricelens.home-currency',
     favourites: 'pricelens.favourites',
+    rateVariants: 'pricelens.rate-variants',
   },
 } as const;

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 
 import { APP_CONFIG } from '@/config';
-import { render, screen, waitFor } from '@/tests/render';
+import { render, screen, waitFor, within } from '@/tests/render';
 
 import { Converter } from './Converter';
 
@@ -637,5 +637,116 @@ describe('Converter — share', () => {
     await user.click(shareButton());
 
     expect(await resultText()).toBe(before);
+  });
+});
+
+describe('Converter — tipo de cambio en Argentina', () => {
+  const VARIANTS_KEY = APP_CONFIG.storageKeys.rateVariants;
+
+  /** ARS oficial en la tabla base; blue y tarjeta llegan como variantes. */
+  const WITH_VARIANTS = {
+    ...SNAPSHOT,
+    rates: { ...SNAPSHOT.rates, ARS: 1000 },
+    variants: {
+      ARS: [
+        { id: 'official', rate: 1000, source: 'test', fetchedAt: SNAPSHOT.fetchedAt },
+        { id: 'blue', rate: 1250, source: 'test', fetchedAt: SNAPSHOT.fetchedAt },
+        { id: 'card', rate: 1300, source: 'test', fetchedAt: SNAPSHOT.fetchedAt },
+      ],
+    },
+  };
+
+  async function argentina(user: ReturnType<typeof userEvent.setup>) {
+    await screen.findByLabelText('Importe');
+    await user.click(screen.getByRole('button', { name: /país viajas/ }));
+    await user.type(screen.getByRole('combobox'), 'Argentina');
+    await user.click(await screen.findByRole('option', { name: /Argentina/ }));
+  }
+
+  it('ofrece las tres cotizaciones al elegir Argentina', async () => {
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const group = await screen.findByRole('radiogroup', { name: 'Tipo de cambio' });
+    expect(within(group).getAllByRole('radio')).toHaveLength(3);
+  });
+
+  it('usa el blue por defecto y lo dice en la línea de tasa', async () => {
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const blue = await screen.findByRole('radio', { name: /Blue/ });
+    expect(blue).toHaveAttribute('aria-checked', 'true');
+    // 1 ARS = 0,92/1250 EUR con el blue, no 0,92/1000 con el oficial.
+    expect(screen.getByText(/1 ARS =/)).toHaveTextContent('Blue');
+  });
+
+  it('cambia el resultado al cambiar de cotización', async () => {
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+    await user.type(screen.getByLabelText('Importe'), '100000');
+
+    const conBlue = await resultText();
+    await user.click(await screen.findByRole('radio', { name: /Oficial/ }));
+
+    const conOficial = await resultText();
+    expect(conOficial).not.toBe(conBlue);
+    // El oficial sobrevalora el peso, así que el mismo precio cuesta más.
+    expect(screen.getByText(/1 ARS =/)).toHaveTextContent('Oficial');
+  });
+
+  it('recuerda la elección entre visitas', async () => {
+    window.localStorage.setItem(VARIANTS_KEY, JSON.stringify({ ARS: 'card' }));
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    expect(await screen.findByRole('radio', { name: /Tarjeta/ })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+  });
+
+  it('guarda la elección al hacerla', async () => {
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+    await user.click(await screen.findByRole('radio', { name: /Tarjeta/ }));
+
+    await waitFor(() =>
+      expect(JSON.parse(window.localStorage.getItem(VARIANTS_KEY)!)).toEqual({ ARS: 'card' }),
+    );
+  });
+
+  it('no muestra nada de esto en el resto de destinos', async () => {
+    // La garantía que importa: el resto del mundo se ve exactamente igual.
+    mockRates(WITH_VARIANTS);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(screen.getByText(/1 USD =/)).not.toHaveTextContent('·');
+  });
+
+  it('cae a la tasa oficial sin selector cuando la superposición falla', async () => {
+    // El proveedor comunitario caído no puede romper la app: sin variantes, el
+    // comportamiento es exactamente el de antes de que existiera esta capa.
+    mockRates({ ...SNAPSHOT, rates: { ...SNAPSHOT.rates, ARS: 1000 } });
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    await waitFor(() => expect(screen.getByText(/1 ARS =/)).toBeInTheDocument());
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(screen.getByText(/1 ARS =/)).not.toHaveTextContent('·');
   });
 });
