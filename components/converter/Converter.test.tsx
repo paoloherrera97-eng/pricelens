@@ -725,6 +725,59 @@ describe('Converter — tipo de cambio en Argentina', () => {
     expect(screen.getByText(RATE_LINE)).toHaveTextContent('Blue');
   });
 
+  it('explica qué significa la cotización elegida', async () => {
+    // «Blue» no le dice nada a quien llega por primera vez, y hasta ahora esa
+    // explicación solo existía en el nombre accesible del botón.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    expect(await screen.findByText('Efectivo (mercado informal)')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: /Tarjeta/ }));
+    expect(await screen.findByText('Pago con tarjeta')).toBeInTheDocument();
+    expect(screen.queryByText('Efectivo (mercado informal)')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: /Oficial/ }));
+    expect(await screen.findByText('Tipo de cambio oficial')).toBeInTheDocument();
+  });
+
+  it('no repite la explicación a un lector de pantalla', async () => {
+    // El nombre accesible del botón ya la lleva; la línea visible es para
+    // quien ve la pantalla, y anunciarla otra vez sería decirlo dos veces.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const hint = await screen.findByText('Efectivo (mercado informal)');
+    expect(hint).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('se queda sin línea, no rota, ante una cotización que no conoce', async () => {
+    // `variantsFor` conserva a propósito lo que no reconoce: un «mep» que
+    // añada la fuente mañana llega hasta aquí sin texto que mostrar.
+    const withMep = {
+      ...SNAPSHOT,
+      rates: { ...SNAPSHOT.rates, ARS: 1000 },
+      variants: {
+        ARS: [
+          { id: 'mep', rate: 1180, source: 'test', fetchedAt: new Date().toISOString() },
+          { id: 'official', rate: 1000, source: 'test', fetchedAt: new Date().toISOString() },
+        ],
+      },
+    };
+    mockRates(withMep);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    expect(await screen.findByRole('radiogroup')).toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: /mep/i }));
+    expect(screen.getByText(RATE_LINE)).toBeInTheDocument();
+  });
+
   it('cambia el resultado al cambiar de cotización', async () => {
     mockRates(WITH_VARIANTS);
     const user = userEvent.setup();

@@ -71,9 +71,9 @@
       "full": "Oficial, el del banco central"
     },
     "hint": {
-      "blue": "En Argentina el precio cambia según cómo pagues. Estás viendo el blue, el del efectivo.",
-      "card": "Estás viendo el tipo tarjeta, el que se aplica al pagar con tarjeta.",
-      "official": "Estás viendo el tipo oficial. Casi ningún visitante cambia a esta tasa."
+      "blue": "Efectivo (mercado informal)",
+      "card": "Pago con tarjeta",
+      "official": "Tipo de cambio oficial"
     }
   }
 }
