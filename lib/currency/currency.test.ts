@@ -206,9 +206,32 @@ describe('formatCurrency', () => {
     expect(formatCurrency(0, 'EUR', ES)).toMatch(/0,00/);
   });
 
-  it('compacts very large amounts so the line cannot overflow (E6)', () => {
-    const out = formatCurrency(2_500_000_000, 'VND', ES);
-    expect(out.length).toBeLessThan(20);
+  it('writes very large amounts in full, never compacted (E6)', () => {
+    // Compact notation collapsed distinct prices onto one string and read
+    // differently in Spanish and English. Fitting the result is `text-fit`'s
+    // job, not the formatter's.
+    expect(formatCurrency(25_399_974_600, 'VND', ES)).toContain('25.399.974.600');
+    expect(formatCurrency(1_250_000, 'EUR', ES)).toContain('1.250.000');
+  });
+
+  it.each([
+    [999_999, 'VND'],
+    [1_000_000, 'VND'],
+    [1_000_001, 'VND'],
+  ])('gives %d %s a string of its own', (value, code) => {
+    // The defect this replaces: 999.999 and 1.000.000 both rendered "25,4 mil M₫".
+    const others = [999_999, 1_000_000, 1_000_001].filter((v) => v !== value);
+    for (const other of others) {
+      expect(formatCurrency(value, code as 'VND', ES)).not.toBe(
+        formatCurrency(other, code as 'VND', ES),
+      );
+    }
+  });
+
+  it.each([['mil M'], ['B'], ['M']])('never emits the compact marker %o', (marker) => {
+    for (const value of [1e9, 2.5e9, 1e12, 25_399_974_600]) {
+      expect(formatCurrency(value, 'VND', ES)).not.toContain(marker);
+    }
   });
 
   it('returns empty string for non-finite input rather than "NaN €"', () => {

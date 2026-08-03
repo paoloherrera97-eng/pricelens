@@ -14,9 +14,16 @@ import { getCurrency, type CurrencyCode } from '@/config';
  * Sub-unit values keep meaningful precision instead of collapsing: `$0.0031` is
  * useful, `$0.00` is a falsehood (PRD E7).
  *
- * Very large values switch to compact notation so the result never overflows
- * its line, which matters for currencies like VND where ordinary prices run to
- * seven digits (PRD E6).
+ * **Every amount is shown in full, with the locale's thousands separators.**
+ * Large values used to switch to compact notation, and it was wrong twice over:
+ * `999.999` and `1.000.000` VND both rendered as `25,4 mil M₫` — two different
+ * prices, one string — and Spanish `B` means 10¹² where English `B` means 10⁹,
+ * so the same screen read a thousandfold differently to two travelers.
+ *
+ * Overflow, which is what compact notation existed to prevent (PRD E6), is
+ * handled where it belongs: `text-fit` in globals.css sizes the value from its
+ * own length and its container. Measured — the widest realistic result,
+ * `25.399.974.600 ₫`, lays out at 239px inside a 278px card.
  */
 export function formatCurrency(value: number, code: CurrencyCode, locale: string): string {
   if (!Number.isFinite(value)) return '';
@@ -32,15 +39,6 @@ export function formatCurrency(value: number, code: CurrencyCode, locale: string
       currency: code,
       // Two significant digits past the leading zeros.
       maximumSignificantDigits: 2,
-    }).format(value);
-  }
-
-  if (magnitude >= 1_000_000_000) {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: code,
-      notation: 'compact',
-      maximumFractionDigits: 1,
     }).format(value);
   }
 
