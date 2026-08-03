@@ -25,7 +25,13 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRates } from '@/hooks/useRates';
 import { convert, getRate } from '@/lib/currency/convert';
-import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency/format';
+import {
+  describeAge,
+  formatCurrency,
+  formatRate,
+  isStale,
+  readableRate,
+} from '@/lib/currency/format';
 import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
 import { applyVariant, resolveVariant, variantsFor } from '@/lib/rates/variants';
 import type { PartialShareState } from '@/lib/share/url';
@@ -117,14 +123,21 @@ export function Converter() {
     const converted = convert(amount, table, from, to);
     if (rate === null || converted === null) return null;
 
+    // La línea se muestra en la dirección cuya cifra es legible. Solo cambia el
+    // texto: `converted` de arriba usa la tasa tal cual la devolvió `getRate`.
+    const shown = readableRate(rate, from, to);
+
     return {
       converted: formatCurrency(converted, to, LOCALE),
       // La variante se nombra en la propia línea de tasa. Sin eso el número
       // queda sin atribuir, que es justo el fallo que ADR-013 existe para
       // evitar — y no cuesta una línea extra de alto.
       rateLine:
-        t('rateLine', { from, to, rate: formatRate(rate, LOCALE) }) +
-        (activeVariant ? ` · ${tVariants(`${activeVariant.id}.short`)}` : ''),
+        t('rateLine', {
+          from: shown.from,
+          to: shown.to,
+          rate: formatRate(shown.rate, LOCALE),
+        }) + (activeVariant ? ` · ${tVariants(`${activeVariant.id}.short`)}` : ''),
     };
   }, [rates, amount, from, to, t, tVariants, activeVariant]);
 

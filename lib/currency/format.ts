@@ -65,6 +65,34 @@ export function formatRate(rate: number, locale: string): string {
   }).format(rate);
 }
 
+/** A pair rate, oriented so the figure is the one a person can read. */
+export interface ReadableRate {
+  readonly from: CurrencyCode;
+  readonly to: CurrencyCode;
+  readonly rate: number;
+}
+
+/**
+ * Picks the direction of the rate line.
+ *
+ * Always the direction whose figure is at least 1. `1 ARS = 0,000628 EUR` is
+ * arithmetically fine and humanly useless — nobody reasons in six leading
+ * zeros — where `1 EUR = 1592,36 ARS` is a number a traveler can hold in their
+ * head and sanity-check against a price board. It is what Wise and Revolut both
+ * show, for the same reason.
+ *
+ * Display only. The conversion still uses the rate `getRate` returned, in the
+ * direction it returned it — this function never touches the arithmetic.
+ */
+export function readableRate(rate: number, from: CurrencyCode, to: CurrencyCode): ReadableRate {
+  // A rate that is not a positive number has no readable direction; hand it
+  // back untouched and let `formatRate` return the empty string it already
+  // returns for these.
+  if (!Number.isFinite(rate) || rate <= 0 || rate >= 1) return { from, to, rate };
+
+  return { from: to, to: from, rate: 1 / rate };
+}
+
 export type RateAge =
   | { readonly unit: 'now' }
   | { readonly unit: 'minutes' | 'hours' | 'days'; readonly count: number };

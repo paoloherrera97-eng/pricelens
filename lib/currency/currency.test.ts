@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { convert, getRate } from './convert';
-import { describeAge, formatCurrency, formatRate, isStale } from './format';
+import { describeAge, formatCurrency, formatRate, isStale, readableRate } from './format';
 import { normaliseAmount, parseAmount, sanitizeAmountInput } from './parse';
 
 const ES = 'es-ES';
@@ -236,6 +236,40 @@ describe('formatCurrency', () => {
 
   it('returns empty string for non-finite input rather than "NaN €"', () => {
     expect(formatCurrency(Number.NaN, 'EUR', ES)).toBe('');
+  });
+});
+
+describe('readableRate', () => {
+  it('inverts a rate below 1 so the figure is one a person can read', () => {
+    // The line this replaces: "1 ARS = 0,000628 EUR".
+    const shown = readableRate(0.92 / 1010, 'ARS', 'EUR');
+    expect(shown).toMatchObject({ from: 'EUR', to: 'ARS' });
+    expect(shown.rate).toBeGreaterThan(1);
+  });
+
+  it('leaves a rate of 1 or more alone', () => {
+    expect(readableRate(35.4, 'USD', 'THB')).toEqual({ from: 'USD', to: 'THB', rate: 35.4 });
+    expect(readableRate(1, 'EUR', 'EUR')).toEqual({ from: 'EUR', to: 'EUR', rate: 1 });
+  });
+
+  it('always yields a figure of at least 1, whichever way the pair runs', () => {
+    for (const rate of [0.92, 0.0000362, 25_400, 1.0869, 0.5]) {
+      expect(readableRate(rate, 'USD', 'EUR').rate).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it.each([[0], [-1], [Number.NaN], [Number.POSITIVE_INFINITY]])(
+    'hands back %o untouched rather than dividing by it',
+    (rate) => {
+      // 1/0 is Infinity, and "1 EUR = ∞ ARS" is worse than the empty string
+      // `formatRate` already returns for these.
+      expect(readableRate(rate, 'ARS', 'EUR')).toEqual({ from: 'ARS', to: 'EUR', rate });
+    },
+  );
+
+  it('round-trips: inverting the inverse returns the original pair', () => {
+    const once = readableRate(0.0000362, 'VND', 'EUR');
+    expect(readableRate(once.rate, once.from, once.to)).toEqual(once);
   });
 });
 

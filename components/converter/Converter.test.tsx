@@ -6,6 +6,16 @@ import { render, screen, waitFor, within } from '@/tests/render';
 
 import { Converter } from './Converter';
 
+/**
+ * The rate line, whichever way round it reads.
+ *
+ * The line is shown in the direction whose figure is at least 1, so which code
+ * leads depends on the pair — asserting on a fixed one would test the pair
+ * rather than the behaviour. Where the direction itself is the point, the test
+ * says so explicitly.
+ */
+const RATE_LINE = /1 [A-Z]{3} = /;
+
 const SNAPSHOT = {
   base: 'USD',
   rates: { USD: 1, EUR: 0.92, THB: 35, JPY: 150, VND: 25_000 },
@@ -45,7 +55,7 @@ describe('Converter — loading and ready', () => {
     render(<Converter />);
 
     expect(await screen.findByLabelText('Importe')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
   });
 
   it('fetches the rate table exactly once per session (ADR-001)', async () => {
@@ -98,7 +108,7 @@ describe('Converter — conversion', () => {
   it('shows the effective rate so the working is visible', async () => {
     mockRates(SNAPSHOT);
     render(<Converter />);
-    expect(await screen.findByText(/1 USD = 0,92 EUR/)).toBeInTheDocument();
+    expect(await screen.findByText(/1 EUR = 1,08696 USD/)).toBeInTheDocument();
   });
 
   it('shows when the rates were last updated', async () => {
@@ -190,7 +200,22 @@ describe('Converter — country-first selection (ADR-014)', () => {
     await user.click(screen.getByRole('option', { name: /Tailandia/ }));
 
     // The traveler picked a country; the app worked out THB.
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('THB'));
+  });
+
+  it('muestra la tasa en la dirección legible, no en la que salga', async () => {
+    // 1 ARS = 0,000911 EUR es correcto y no le sirve a nadie. La línea se da
+    // siempre en la dirección cuya cifra llega a 1.
+    mockRates({ ...SNAPSHOT, rates: { ...SNAPSHOT.rates, ARS: 1010 } });
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.click(await screen.findByRole('button', { name: /país viajas/ }));
+    await user.type(screen.getByRole('combobox'), 'Argentina');
+    await user.click(screen.getByRole('option', { name: /Argentina/ }));
+
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('1 EUR ='));
+    expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('0,000');
   });
 
   it('searches countries by name, and by currency code for those who know it', async () => {
@@ -261,7 +286,7 @@ describe('Converter — failure states', () => {
 
     expect(await screen.findByText('No hemos podido obtener las tasas')).toBeInTheDocument();
     // ADR-013: no fabricated rates behind the error.
-    expect(screen.queryByText(/1 USD =/)).not.toBeInTheDocument();
+    expect(screen.queryByText(RATE_LINE)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument();
   });
 
@@ -276,7 +301,7 @@ describe('Converter — failure states', () => {
     render(<Converter />);
 
     await user.click(await screen.findByRole('button', { name: 'Reintentar' }));
-    expect(await screen.findByText(/1 USD = 0,92 EUR/)).toBeInTheDocument();
+    expect(await screen.findByText(/1 EUR = 1,08696 USD/)).toBeInTheDocument();
   });
 
   it('explains the failure differently when the device is offline', async () => {
@@ -338,7 +363,7 @@ describe('Converter — home currency detection', () => {
     render(<Converter />);
 
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD = /)).toHaveTextContent('GBP'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('GBP'));
     expect(window.localStorage.getItem(APP_CONFIG.storageKeys.homeCurrency)).toBe('GBP');
   });
 
@@ -351,9 +376,9 @@ describe('Converter — home currency detection', () => {
     render(<Converter />);
 
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
 
-    expect(screen.getByText(/1 USD =/)).toHaveTextContent('JPY');
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY');
     expect(window.localStorage.getItem(APP_CONFIG.storageKeys.homeCurrency)).toBe('JPY');
   });
 
@@ -363,8 +388,8 @@ describe('Converter — home currency detection', () => {
     render(<Converter />);
 
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
-    expect(screen.getByText(/1 USD =/)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
   });
 
   it('moves the destination when the detected currency is the one being converted from', async () => {
@@ -389,7 +414,7 @@ describe('Converter — favourites', () => {
 
   async function ready() {
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
   }
 
   function star() {
@@ -443,7 +468,7 @@ describe('Converter — favourites', () => {
 
     await user.click(screen.getByRole('button', { name: /Tailandia, de THB a JPY/ }));
 
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY'));
     expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
   });
 
@@ -510,7 +535,7 @@ describe('Converter — share', () => {
 
   async function ready() {
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 [A-Z]{3} =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
   }
 
   it('restores country, currency and amount from a shared link', async () => {
@@ -523,7 +548,7 @@ describe('Converter — share', () => {
     // A link may have been hand-written, so its amount is read the same way the
     // conversion reads it and then shown grouped, like anything else typed.
     expect(screen.getByLabelText('Importe')).toHaveValue('1.890');
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY'));
   });
 
   it('shows a hand-written decimal amount as the number it means', async () => {
@@ -546,7 +571,7 @@ describe('Converter — share', () => {
     render(<Converter />);
     await ready();
 
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY'));
   });
 
   it('ignores the broken half of a mangled link', async () => {
@@ -556,7 +581,7 @@ describe('Converter — share', () => {
     await ready();
 
     expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
-    expect(screen.getByText(/1 THB =/)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
   });
 
   it('writes the conversion into the address bar', async () => {
@@ -697,7 +722,7 @@ describe('Converter — tipo de cambio en Argentina', () => {
     const blue = await screen.findByRole('radio', { name: /Blue/ });
     expect(blue).toHaveAttribute('aria-checked', 'true');
     // 1 ARS = 0,92/1250 EUR con el blue, no 0,92/1000 con el oficial.
-    expect(screen.getByText(/1 ARS =/)).toHaveTextContent('Blue');
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent('Blue');
   });
 
   it('cambia el resultado al cambiar de cotización', async () => {
@@ -713,7 +738,7 @@ describe('Converter — tipo de cambio en Argentina', () => {
     const conOficial = await resultText();
     expect(conOficial).not.toBe(conBlue);
     // El oficial sobrevalora el peso, así que el mismo precio cuesta más.
-    expect(screen.getByText(/1 ARS =/)).toHaveTextContent('Oficial');
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent('Oficial');
   });
 
   it('recuerda la elección entre visitas', async () => {
@@ -746,10 +771,10 @@ describe('Converter — tipo de cambio en Argentina', () => {
     mockRates(WITH_VARIANTS);
     render(<Converter />);
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
 
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-    expect(screen.getByText(/1 USD =/)).not.toHaveTextContent('·');
+    expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('·');
   });
 
   it('cae a la tasa oficial sin selector cuando la superposición falla', async () => {
@@ -760,8 +785,8 @@ describe('Converter — tipo de cambio en Argentina', () => {
     render(<Converter />);
     await argentina(user);
 
-    await waitFor(() => expect(screen.getByText(/1 ARS =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-    expect(screen.getByText(/1 ARS =/)).not.toHaveTextContent('·');
+    expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('·');
   });
 });
