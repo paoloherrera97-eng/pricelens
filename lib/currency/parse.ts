@@ -35,26 +35,30 @@ function isGroupingPair(head: string, tail: string): boolean {
 }
 
 /**
- * Parses a user-typed amount.
+ * Rewrites an amount in one canonical form: ASCII digits, `.` for the decimal
+ * point, no grouping.
  *
  * Handles both decimal conventions, because a European traveler types `12,50`
  * and an American types `12.50`:
  *
- *   "12.50"      → 12.5
- *   "12,50"      → 12.5
- *   "1.234,56"   → 1234.56   (rightmost separator wins)
- *   "1,234.56"   → 1234.56
- *   "1 890"      → 1890      (thin spaces from some keyboards)
- *   "1.234.567"  → 1234567   (repeated separator ⇒ grouping)
- *   "1.890"      → 1890      (lone separator + 3 digits ⇒ grouping)
- *   "0.500"      → 0.5       (…but nobody writes zero thousands)
+ *   "12.50"      → "12.50"
+ *   "12,50"      → "12.50"
+ *   "1.234,56"   → "1234.56"   (rightmost separator wins)
+ *   "1,234.56"   → "1234.56"
+ *   "1 890"      → "1890"      (thin spaces from some keyboards)
+ *   "1.234.567"  → "1234567"   (repeated separator ⇒ grouping)
+ *   "1.890"      → "1890"      (lone separator + 3 digits ⇒ grouping)
+ *   "0.500"      → "0.5"       (…but nobody writes zero thousands)
  *
- * Returns `null` for input that is not a number, and `0` for empty input —
- * empty is a valid, neutral state rather than an error (PRD E1).
+ * Returns `null` for input that is not a number, and `""` for empty input.
+ *
+ * This is text, not a number, on purpose: `12,50` normalises to `"12.50"` and
+ * keeps its trailing zero, which `Number` would drop. Re-displaying a price
+ * without its cents is a visible change to what someone wrote.
  */
-export function parseAmount(input: string): number | null {
+export function normaliseAmount(input: string): string | null {
   const trimmed = input.replace(/\s/g, '');
-  if (trimmed === '') return 0;
+  if (trimmed === '') return '';
   if (!/^[\d.,]+$/.test(trimmed)) return null;
 
   const lastDot = trimmed.lastIndexOf('.');
@@ -88,7 +92,21 @@ export function parseAmount(input: string): number | null {
   // A bare separator, or one with nothing after it, is mid-typing rather than
   // invalid — treat "12." as 12 so the result does not blink out.
   if (normalised.endsWith('.')) normalised = normalised.slice(0, -1);
-  if (normalised === '' || normalised === '.') return 0;
+  if (normalised === '' || normalised === '.') return '';
+
+  return normalised;
+}
+
+/**
+ * Parses a user-typed amount.
+ *
+ * Returns `null` for input that is not a number, and `0` for empty input —
+ * empty is a valid, neutral state rather than an error (PRD E1).
+ */
+export function parseAmount(input: string): number | null {
+  const normalised = normaliseAmount(input);
+  if (normalised === null) return null;
+  if (normalised === '') return 0;
 
   const value = Number(normalised);
   return Number.isFinite(value) ? value : null;

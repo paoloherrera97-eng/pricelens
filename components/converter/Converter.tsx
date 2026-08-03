@@ -15,6 +15,7 @@ import {
   isCurrencyCode,
   type CurrencyCode,
 } from '@/config';
+import { useAmountField } from '@/hooks/useAmountField';
 import { useDetectedHomeCurrency } from '@/hooks/useDetectedHomeCurrency';
 import { useFavourites } from '@/hooks/useFavourites';
 import { useRateVariant } from '@/hooks/useRateVariant';
@@ -28,7 +29,7 @@ import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency
 import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
 import { applyVariant, resolveVariant, variantsFor } from '@/lib/rates/variants';
 import type { PartialShareState } from '@/lib/share/url';
-import { parseAmount, sanitizeAmountInput } from '@/lib/currency/parse';
+import { parseAmount } from '@/lib/currency/parse';
 
 import { ConversionResult } from './ConversionResult';
 import { ConverterSkeleton } from './ConverterSkeleton';
@@ -138,11 +139,10 @@ export function Converter() {
     };
   }, [rates]);
 
-  const handleAmountChange = useCallback((raw: string) => {
-    // Invalid characters never appear rather than producing an error. This is
-    // also what makes pasting "฿1.890" work without any paste handling.
-    setAmountText(sanitizeAmountInput(raw));
-  }, []);
+  // El campo guarda el texto **ya formateado** («1.234,50»), no el crudo.
+  // `parseAmount` ya entiende la agrupación, así que la conversión, el enlace
+  // compartido y los favoritos siguen leyendo exactamente lo mismo que antes.
+  const amountField = useAmountField(amountText, setAmountText, LOCALE);
 
   const handleSwap = useCallback(() => {
     // Swapping is currency-level; the country selector follows to whichever
@@ -202,9 +202,9 @@ export function Converter() {
     (shared: PartialShareState) => {
       if (shared.country) setCountryCode(shared.country);
       if (shared.to) setTo(shared.to);
-      if (shared.amount !== undefined) setAmountText(shared.amount);
+      if (shared.amount !== undefined) setAmountText(amountField.format(shared.amount));
     },
-    [setTo],
+    [setTo, amountField],
   );
 
   const { hadHomeCurrency } = useSharedLink(applyShared);
@@ -284,7 +284,8 @@ export function Converter() {
         placeholder={t('amountPlaceholder')}
         leading={getCurrency(from).symbol}
         value={amountText}
-        onChange={(event) => handleAmountChange(event.target.value)}
+        inputRef={amountField.inputRef}
+        onChange={amountField.onChange}
         // Clearing a long price one backspace at a time is the kind of small
         // friction that adds up on a phone. Appears only when there is
         // something to clear, so the resting field stays uncluttered.

@@ -520,8 +520,21 @@ describe('Converter — share', () => {
     await ready();
 
     expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
-    expect(screen.getByLabelText('Importe')).toHaveValue('1890');
+    // A link may have been hand-written, so its amount is read the same way the
+    // conversion reads it and then shown grouped, like anything else typed.
+    expect(screen.getByLabelText('Importe')).toHaveValue('1.890');
     await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+  });
+
+  it('shows a hand-written decimal amount as the number it means', async () => {
+    // `1890.5` in a URL is a decimal, not 18905: the field defers to
+    // `parseAmount` for links rather than assuming it wrote the separator.
+    window.history.replaceState(null, '', '/?country=TH&to=JPY&amount=1890.5');
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    expect(screen.getByLabelText('Importe')).toHaveValue('1.890,5');
   });
 
   it('does not let detection overrule a currency the link named', async () => {
@@ -556,7 +569,9 @@ describe('Converter — share', () => {
 
     await waitFor(() => {
       const params = new URLSearchParams(window.location.search);
-      expect(params.get('amount')).toBe('1890');
+      // The link carries the field's text, which is now grouped — and reads
+      // back to the same number, so what the recipient sees is what was sent.
+      expect(params.get('amount')).toBe('1.890');
       expect(params.get('country')).toBe('US');
       expect(params.get('to')).toBe('EUR');
     });
@@ -570,7 +585,7 @@ describe('Converter — share', () => {
     await ready();
 
     await user.type(screen.getByLabelText('Importe'), '1890');
-    await waitFor(() => expect(window.location.search).toContain('amount=1890'));
+    await waitFor(() => expect(window.location.search).toContain('amount=1.890'));
 
     expect(pushState).not.toHaveBeenCalled();
   });

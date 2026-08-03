@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { convert, getRate } from './convert';
 import { describeAge, formatCurrency, formatRate, isStale } from './format';
-import { parseAmount, sanitizeAmountInput } from './parse';
+import { normaliseAmount, parseAmount, sanitizeAmountInput } from './parse';
 
 const ES = 'es-ES';
 
@@ -27,6 +27,33 @@ describe('sanitizeAmountInput', () => {
 
   it('keeps digits and both decimal separators', () => {
     expect(sanitizeAmountInput('1.234,56')).toBe('1.234,56');
+  });
+});
+
+describe('normaliseAmount', () => {
+  it.each([
+    ['12,50', '12.50', 'a trailing zero that `Number` would drop'],
+    ['12.50', '12.50', 'the same price written the American way'],
+    ['1.234,56', '1234.56', 'a Spanish formatted number'],
+    ['1,234.56', '1234.56', 'an English formatted number'],
+    ['1.890', '1890', 'a lone separator grouping a thousand'],
+    ['1 890', '1890', 'thin spaces from some keyboards'],
+    ['12,', '12', 'a separator with nothing after it'],
+    ['', '', 'empty input'],
+  ])('rewrites %o as %o (%s)', (raw, expected, _reason) => {
+    // Text, not a number: the amount field re-displays this, and "12,5" is not
+    // what someone who typed a price with cents wrote.
+    expect(normaliseAmount(raw)).toBe(expected);
+  });
+
+  it('rejects what is not a number at all', () => {
+    expect(normaliseAmount('abc')).toBeNull();
+  });
+
+  it('is the single reading parseAmount gives the conversion', () => {
+    for (const raw of ['12,50', '1.234,56', '1,234.56', '1.890', '0.500']) {
+      expect(parseAmount(raw)).toBe(Number(normaliseAmount(raw)));
+    }
   });
 });
 
