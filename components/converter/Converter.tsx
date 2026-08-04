@@ -275,7 +275,6 @@ export function Converter() {
           exactamente igual que antes. */}
       {activeVariant && variants.length > 1 && (
         <RateVariantPicker
-          className="-mt-1"
           variants={variants}
           selectedId={activeVariant.id}
           onSelect={(variantId) => select(from, variantId)}

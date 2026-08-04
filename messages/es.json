@@ -72,9 +72,9 @@
       "full": "Oficial, el del banco central"
     },
     "hint": {
-      "blue": "Efectivo (mercado informal)",
-      "card": "Pago con tarjeta",
-      "official": "Tipo de cambio oficial"
+      "blue": "Efectivo, el que usan los viajeros",
+      "card": "Al pagar con tarjeta",
+      "official": "El oficial del banco central"
     }
   }
 }

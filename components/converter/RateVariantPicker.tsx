@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils/cn';
@@ -25,6 +26,14 @@ export interface RateVariantPickerProps {
  * `radiogroup` rather than a row of buttons: these are mutually exclusive
  * choices over one value, which is what radios mean, and it gives arrow-key
  * navigation for free.
+ *
+ * **The label is visible, like every other control's.** Country, amount and
+ * home currency all carry one; this was the only control on the screen whose
+ * title existed solely in an `aria-label`, so a sighted visitor met three
+ * unexplained pills and had to infer what they governed. Naming it is the whole
+ * of the hierarchy fix — the control itself is unchanged, because a segmented
+ * control showing the option in force is already the right form for three short,
+ * mutually exclusive choices.
  */
 export function RateVariantPicker({
   variants,
@@ -33,12 +42,22 @@ export function RateVariantPicker({
   className,
 }: RateVariantPickerProps) {
   const t = useTranslations('rateVariants');
+  const labelId = useId();
 
   return (
     <div className={className}>
+      {/* Same treatment as `Input` and `Select` give theirs, deliberately: the
+          consistency is what makes it read as one more field rather than as
+          decoration between two fields. */}
+      <span id={labelId} className="text-fg-muted mb-0.5 block text-sm font-medium">
+        {t('legend')}
+      </span>
+
       <div
         role="radiogroup"
-        aria-label={t('legend')}
+        // Pointed at the visible label rather than repeating it in an
+        // `aria-label`: one name, and it is the one on the screen.
+        aria-labelledby={labelId}
         className="bg-sunken ring-outline-soft flex gap-0.5 rounded-lg ring-1"
       >
         {variants.map((variant) => {
@@ -79,7 +98,7 @@ export function RateVariantPicker({
           una cotización sin texto debe quedarse sin línea, no romper la
           pantalla. */}
       {t.has(`hint.${selectedId}`) && (
-        <p aria-hidden="true" className="text-fg-muted mt-0.5 text-center text-xs">
+        <p aria-hidden="true" className="text-fg-muted mt-0.5 text-xs">
           {t(`hint.${selectedId}`)}
         </p>
       )}

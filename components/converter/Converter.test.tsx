@@ -858,6 +858,23 @@ describe('Converter — tipo de cambio en Argentina', () => {
     expect(screen.getByText(RATE_LINE)).toHaveTextContent('Blue');
   });
 
+  it('lleva su título a la vista, como el resto de controles', async () => {
+    // Era el único control de la pantalla cuyo título vivía solo en un
+    // `aria-label`: quien miraba veía tres pastillas sin explicar.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const label = await screen.findByText('Tipo de cambio');
+    expect(label).toBeVisible();
+    // Y un solo nombre accesible, el de la etiqueta visible — no dos.
+    expect(screen.getByRole('radiogroup', { name: 'Tipo de cambio' })).toHaveAttribute(
+      'aria-labelledby',
+      label.id,
+    );
+  });
+
   it('explica qué significa la cotización elegida', async () => {
     // «Blue» no le dice nada a quien llega por primera vez, y hasta ahora esa
     // explicación solo existía en el nombre accesible del botón.
@@ -866,14 +883,14 @@ describe('Converter — tipo de cambio en Argentina', () => {
     render(<Converter />);
     await argentina(user);
 
-    expect(await screen.findByText('Efectivo (mercado informal)')).toBeInTheDocument();
+    expect(await screen.findByText('Efectivo, el que usan los viajeros')).toBeInTheDocument();
 
     await user.click(screen.getByRole('radio', { name: /Tarjeta/ }));
-    expect(await screen.findByText('Pago con tarjeta')).toBeInTheDocument();
-    expect(screen.queryByText('Efectivo (mercado informal)')).not.toBeInTheDocument();
+    expect(await screen.findByText('Al pagar con tarjeta')).toBeInTheDocument();
+    expect(screen.queryByText('Efectivo, el que usan los viajeros')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('radio', { name: /Oficial/ }));
-    expect(await screen.findByText('Tipo de cambio oficial')).toBeInTheDocument();
+    expect(await screen.findByText('El oficial del banco central')).toBeInTheDocument();
   });
 
   it('no repite la explicación a un lector de pantalla', async () => {
@@ -884,7 +901,7 @@ describe('Converter — tipo de cambio en Argentina', () => {
     render(<Converter />);
     await argentina(user);
 
-    const hint = await screen.findByText('Efectivo (mercado informal)');
+    const hint = await screen.findByText('Efectivo, el que usan los viajeros');
     expect(hint).toHaveAttribute('aria-hidden', 'true');
   });
 
