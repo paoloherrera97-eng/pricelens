@@ -229,10 +229,38 @@
       "body": { "px": 14, "pt": 11, "lh": 20, "weight": 400, "tracking": "0" },
       "body-strong": { "px": 14, "pt": 11, "lh": 20, "weight": 500, "tracking": "0" },
       "caption": { "px": 12, "pt": 9, "lh": 16, "weight": 400, "tracking": "0.004em" },
-      "overline": { "px": 11, "pt": 8, "lh": 16, "weight": 600, "tracking": "0.06em", "case": "uppercase" },
-      "metric-lg": { "px": 32, "pt": 24, "lh": 36, "weight": 600, "tracking": "-0.02em", "numerals": "tabular" },
-      "metric-md": { "px": 24, "pt": 18, "lh": 28, "weight": 600, "tracking": "-0.014em", "numerals": "tabular" },
-      "metric-sm": { "px": 14, "pt": 11, "lh": 20, "weight": 500, "tracking": "0", "numerals": "tabular" }
+      "overline": {
+        "px": 11,
+        "pt": 8,
+        "lh": 16,
+        "weight": 600,
+        "tracking": "0.06em",
+        "case": "uppercase"
+      },
+      "metric-lg": {
+        "px": 32,
+        "pt": 24,
+        "lh": 36,
+        "weight": 600,
+        "tracking": "-0.02em",
+        "numerals": "tabular"
+      },
+      "metric-md": {
+        "px": 24,
+        "pt": 18,
+        "lh": 28,
+        "weight": 600,
+        "tracking": "-0.014em",
+        "numerals": "tabular"
+      },
+      "metric-sm": {
+        "px": 14,
+        "pt": 11,
+        "lh": 20,
+        "weight": 500,
+        "tracking": "0",
+        "numerals": "tabular"
+      }
     },
     "features": {
       "$description": "Toda cifra que pueda alinearse en columna usa versalitas tabulares y cero rasgado.",
@@ -302,7 +330,11 @@
     "control-sm": { "px": 28, "pt": 21 },
     "control-md": { "px": 36, "pt": 27 },
     "control-lg": { "px": 44, "pt": 33 },
-    "target-min": { "px": 24, "pt": 18, "$note": "WCAG 2.2 AA (2.5.8). El objetivo de diseño es 44 px salvo en retícula densa." },
+    "target-min": {
+      "px": 24,
+      "pt": 18,
+      "$note": "WCAG 2.2 AA (2.5.8). El objetivo de diseño es 44 px salvo en retícula densa."
+    },
     "row-compact": { "px": 28, "pt": 21 },
     "row-default": { "px": 36, "pt": 27 },
     "row-relaxed": { "px": 44, "pt": 33 },

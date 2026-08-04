@@ -10,14 +10,14 @@ no invente nada.
 El Design System se diseñó contra las restricciones de Excel. La consecuencia buscada es
 que **la web no necesita rediseño, solo implementación**:
 
-| Decisión tomada por Excel | Lo que regala en web |
-| --- | --- |
-| Rejilla de 8 px = 6 pt | Rejilla limpia y divisible |
-| Retícula de esquina viva | Tablas que no parecen tarjetas |
+| Decisión tomada por Excel                     | Lo que regala en web                      |
+| --------------------------------------------- | ----------------------------------------- |
+| Rejilla de 8 px = 6 pt                        | Rejilla limpia y divisible                |
+| Retícula de esquina viva                      | Tablas que no parecen tarjetas            |
 | Elevación por superficie antes que por sombra | Modo oscuro que funciona sin rehacer nada |
-| Nada depende del hover | Táctil resuelto de origen |
-| Nada depende solo del color | Accesibilidad de origen |
-| Sin animación de cifras | Cero cifras falsas en pantalla |
+| Nada depende del hover                        | Táctil resuelto de origen                 |
+| Nada depende solo del color                   | Accesibilidad de origen                   |
+| Sin animación de cifras                       | Cero cifras falsas en pantalla            |
 
 Al revés no habría funcionado: un sistema diseñado en web con sombras, radios y hover se
 queda sin la mitad al llegar a Excel.

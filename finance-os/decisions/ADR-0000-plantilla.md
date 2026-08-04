@@ -19,8 +19,8 @@ Qué se decide, en presente y en una frase. "Usamos X" — no "deberíamos consi
 ## Alternativas consideradas
 
 | Alternativa | Por qué no |
-| --- | --- |
-| | |
+| ----------- | ---------- |
+|             |            |
 
 Una decisión sin alternativas descartadas no es una decisión: es un valor por defecto que
 nadie revisó.
@@ -49,16 +49,16 @@ Cómo se comprueba que la decisión se aplicó (comando, medición, lista de ver
 
 ## Cuándo hace falta un ADR
 
-| Situación | ADR |
-| --- | :---: |
-| Cambiar el valor de un token existente | **Sí** |
-| Añadir un token nuevo | No — basta el CHANGELOG |
-| Añadir un componente | No |
-| Eliminar o renombrar un componente | **Sí** |
-| Cambiar un principio UX o UI | **Sí** |
-| Enmendar la Línea Base Oficial | **Sí**, y con los cuatro pasos de `../baseline/README.md` |
-| Cambiar la convención de polaridad por defecto | **Sí** |
-| Corregir una errata | No |
+| Situación                                      |                            ADR                            |
+| ---------------------------------------------- | :-------------------------------------------------------: |
+| Cambiar el valor de un token existente         |                          **Sí**                           |
+| Añadir un token nuevo                          |                  No — basta el CHANGELOG                  |
+| Añadir un componente                           |                            No                             |
+| Eliminar o renombrar un componente             |                          **Sí**                           |
+| Cambiar un principio UX o UI                   |                          **Sí**                           |
+| Enmendar la Línea Base Oficial                 | **Sí**, y con los cuatro pasos de `../baseline/README.md` |
+| Cambiar la convención de polaridad por defecto |                          **Sí**                           |
+| Corregir una errata                            |                            No                             |
 
 ## Enmendar la Línea Base
 

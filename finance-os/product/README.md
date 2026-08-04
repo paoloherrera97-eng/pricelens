@@ -10,11 +10,11 @@ Línea Base Oficial: la interpreta en clave de diseño.
 El usuario de Finance OS **trabaja con dinero ajeno o propio bajo responsabilidad**. No es
 un usuario casual. Tres perfiles, en orden de peso para el diseño:
 
-| Perfil                | Qué hace en el producto                       | Qué le duele                                    |
-| --------------------- | --------------------------------------------- | ----------------------------------------------- |
-| **El operador**       | Carga, concilia y corrige datos               | Perder el sitio en una tabla de 4.000 filas      |
-| **El analista**       | Compara real contra plan y explica desviaciones| No distinguir de un vistazo lo estimado de lo real |
-| **El decisor**        | Mira 8 cifras y decide                        | Que la cifra grande sea la equivocada           |
+| Perfil          | Qué hace en el producto                         | Qué le duele                                       |
+| --------------- | ----------------------------------------------- | -------------------------------------------------- |
+| **El operador** | Carga, concilia y corrige datos                 | Perder el sitio en una tabla de 4.000 filas        |
+| **El analista** | Compara real contra plan y explica desviaciones | No distinguir de un vistazo lo estimado de lo real |
+| **El decisor**  | Mira 8 cifras y decide                          | Que la cifra grande sea la equivocada              |
 
 Los tres usan el mismo sistema. La diferencia no es de producto: es de **densidad**. El
 operador quiere filas compactas; el decisor quiere una cifra enorme y nada más.
@@ -33,27 +33,27 @@ operador quiere filas compactas; el decisor quiere una cifra enorme y nada más.
 
 ## Las tres promesas del producto (y su consecuencia de diseño)
 
-| Promesa                                         | Consecuencia visual obligatoria                                     |
-| ----------------------------------------------- | -------------------------------------------------------------------- |
-| **1. Lo que ves es lo que hay.**                | Nada de números animados, nada de estimaciones sin marcar             |
-| **2. Sabes de dónde sale cada cifra.**          | Toda cifra agregada tiene una ruta de descenso al detalle             |
-| **3. No pierdes tu sitio.**                     | Encabezados fijos, foco persistente, nada de saltos de layout         |
+| Promesa                                | Consecuencia visual obligatoria                               |
+| -------------------------------------- | ------------------------------------------------------------- |
+| **1. Lo que ves es lo que hay.**       | Nada de números animados, nada de estimaciones sin marcar     |
+| **2. Sabes de dónde sale cada cifra.** | Toda cifra agregada tiene una ruta de descenso al detalle     |
+| **3. No pierdes tu sitio.**            | Encabezados fijos, foco persistente, nada de saltos de layout |
 
 ## Excel primero — y qué obliga eso
 
 Excel no es una limitación temporal que se tolere: es la primera plataforma real, y sus
 restricciones son las que hacen que el sistema sea sólido.
 
-| Excel no tiene…              | Lo que obliga                                                     |
-| ---------------------------- | ------------------------------------------------------------------ |
-| Sombras en celdas            | La elevación se expresa además con superficie y filete             |
-| Esquinas redondeadas         | La retícula es de esquina viva en las dos plataformas              |
-| Fuentes garantizadas         | La tipografía se elige entre las que Office ya trae instaladas     |
-| Píxeles                      | El espaciado se define en una unidad que convierte exacto a puntos |
-| Estados de foco reales       | El foco se refuerza con relleno y borde, no solo con anillo        |
-| Modo oscuro utilizable       | El modo claro es el canónico; el oscuro es una extensión web       |
+| Excel no tiene…        | Lo que obliga                                                      |
+| ---------------------- | ------------------------------------------------------------------ |
+| Sombras en celdas      | La elevación se expresa además con superficie y filete             |
+| Esquinas redondeadas   | La retícula es de esquina viva en las dos plataformas              |
+| Fuentes garantizadas   | La tipografía se elige entre las que Office ya trae instaladas     |
+| Píxeles                | El espaciado se define en una unidad que convierte exacto a puntos |
+| Estados de foco reales | El foco se refuerza con relleno y borde, no solo con anillo        |
+| Modo oscuro utilizable | El modo claro es el canónico; el oscuro es una extensión web       |
 
-Un sistema diseñado para lo que Excel *sí* puede hacer se implementa en web sin perder
+Un sistema diseñado para lo que Excel _sí_ puede hacer se implementa en web sin perder
 nada. Al revés no funciona.
 
 ---

@@ -28,62 +28,62 @@ responde alguna, está incompleto.
 
 ### Fundamentos
 
-| #   | Documento                                                        | Decide                                          |
-| --- | ---------------------------------------------------------------- | ----------------------------------------------- |
-| 01  | [Filosofía visual](foundations/01-filosofia-visual.md)           | Por qué el producto se ve así                   |
-| 02  | [Personalidad de marca](foundations/02-personalidad-marca.md)    | Cómo suena y qué carácter tiene                 |
-| 03  | [Principios UX](foundations/03-principios-ux.md)                 | Cómo se comporta                                |
-| 04  | [Principios UI](foundations/04-principios-ui.md)                 | Cómo se dibuja                                  |
-| 05  | [Color](foundations/05-color.md)                                 | Paleta, roles, polaridad, contraste medido      |
-| 06  | [Tipografía](foundations/06-tipografia.md)                       | Familias, escala, cifras, formato numérico      |
-| 07  | [Espaciado](foundations/07-espaciado.md)                         | La rejilla de 8 px = 6 pt                       |
-| 08  | [Grid](foundations/08-grid.md)                                   | Columnas en web y esqueleto de columnas en Excel|
-| 09  | [Iconografía](foundations/09-iconografia.md)                     | Estilo, rejilla, inventario, uso                |
-| 10  | [Elevación y sombras](foundations/10-elevacion.md)               | Los cuatro niveles y su doble expresión         |
-| 11  | [Bordes y radios](foundations/11-bordes-radios.md)               | Cuándo hay línea y cuánto se curva              |
+| #   | Documento                                                     | Decide                                           |
+| --- | ------------------------------------------------------------- | ------------------------------------------------ |
+| 01  | [Filosofía visual](foundations/01-filosofia-visual.md)        | Por qué el producto se ve así                    |
+| 02  | [Personalidad de marca](foundations/02-personalidad-marca.md) | Cómo suena y qué carácter tiene                  |
+| 03  | [Principios UX](foundations/03-principios-ux.md)              | Cómo se comporta                                 |
+| 04  | [Principios UI](foundations/04-principios-ui.md)              | Cómo se dibuja                                   |
+| 05  | [Color](foundations/05-color.md)                              | Paleta, roles, polaridad, contraste medido       |
+| 06  | [Tipografía](foundations/06-tipografia.md)                    | Familias, escala, cifras, formato numérico       |
+| 07  | [Espaciado](foundations/07-espaciado.md)                      | La rejilla de 8 px = 6 pt                        |
+| 08  | [Grid](foundations/08-grid.md)                                | Columnas en web y esqueleto de columnas en Excel |
+| 09  | [Iconografía](foundations/09-iconografia.md)                  | Estilo, rejilla, inventario, uso                 |
+| 10  | [Elevación y sombras](foundations/10-elevacion.md)            | Los cuatro niveles y su doble expresión          |
+| 11  | [Bordes y radios](foundations/11-bordes-radios.md)            | Cuándo hay línea y cuánto se curva               |
 
 ### Componentes
 
-| #   | Documento                                                | Decide                                     |
-| --- | -------------------------------------------------------- | ------------------------------------------ |
-| 12  | [Botones](components/12-botones.md)                      | Jerarquía de acción                        |
-| 13  | [Inputs](components/13-inputs.md)                        | Entrada de texto y de importe              |
-| 14  | [Selectores](components/14-selectores.md)                | Elegir entre opciones                      |
-| 15  | [Tablas](components/15-tablas.md)                        | El componente central del producto         |
-| 16  | [Cards](components/16-cards.md)                          | Agrupar sin encerrar                       |
-| 17  | [Badges](components/17-badges.md)                        | Estado en una palabra                      |
-| 18  | [Alertas](components/18-alertas.md)                      | Decir algo importante sin gritar           |
-| 19  | [KPIs](components/19-kpis.md)                            | La cifra que manda                         |
-| 20  | [Gráficos](components/20-graficos.md)                    | Datos en forma visual                      |
+| #   | Documento                                 | Decide                             |
+| --- | ----------------------------------------- | ---------------------------------- |
+| 12  | [Botones](components/12-botones.md)       | Jerarquía de acción                |
+| 13  | [Inputs](components/13-inputs.md)         | Entrada de texto y de importe      |
+| 14  | [Selectores](components/14-selectores.md) | Elegir entre opciones              |
+| 15  | [Tablas](components/15-tablas.md)         | El componente central del producto |
+| 16  | [Cards](components/16-cards.md)           | Agrupar sin encerrar               |
+| 17  | [Badges](components/17-badges.md)         | Estado en una palabra              |
+| 18  | [Alertas](components/18-alertas.md)       | Decir algo importante sin gritar   |
+| 19  | [KPIs](components/19-kpis.md)             | La cifra que manda                 |
+| 20  | [Gráficos](components/20-graficos.md)     | Datos en forma visual              |
 
 ### Patrones
 
-| #   | Documento                                          | Decide                                |
-| --- | -------------------------------------------------- | ------------------------------------- |
-| 21  | [Dashboard](patterns/21-dashboard.md)              | La composición de la pantalla madre   |
-| 22  | [Navegación](patterns/22-navegacion.md)            | Modelo de navegación y jerarquía      |
-| 23  | [Sidebar](patterns/23-sidebar.md)                  | La navegación principal               |
-| 24  | [Header](patterns/24-header.md)                    | Contexto y acciones de página         |
-| 25  | [Footer](patterns/25-footer.md)                    | Procedencia del dato                  |
-| 26  | [Modales](patterns/26-modales.md)                  | Interrumpir, y cuándo no              |
-| 27  | [Menús](patterns/27-menus.md)                      | Acciones secundarias                  |
-| 28  | [Estados vacíos](patterns/28-estados-vacios.md)    | Cuando no hay nada que mostrar        |
-| 29  | [Loading](patterns/29-loading.md)                  | Cuando todavía no hay nada            |
-| 30  | [Skeletons](patterns/30-skeletons.md)              | Cuando ya se sabe la forma            |
+| #   | Documento                                       | Decide                              |
+| --- | ----------------------------------------------- | ----------------------------------- |
+| 21  | [Dashboard](patterns/21-dashboard.md)           | La composición de la pantalla madre |
+| 22  | [Navegación](patterns/22-navegacion.md)         | Modelo de navegación y jerarquía    |
+| 23  | [Sidebar](patterns/23-sidebar.md)               | La navegación principal             |
+| 24  | [Header](patterns/24-header.md)                 | Contexto y acciones de página       |
+| 25  | [Footer](patterns/25-footer.md)                 | Procedencia del dato                |
+| 26  | [Modales](patterns/26-modales.md)               | Interrumpir, y cuándo no            |
+| 27  | [Menús](patterns/27-menus.md)                   | Acciones secundarias                |
+| 28  | [Estados vacíos](patterns/28-estados-vacios.md) | Cuando no hay nada que mostrar      |
+| 29  | [Loading](patterns/29-loading.md)               | Cuando todavía no hay nada          |
+| 30  | [Skeletons](patterns/30-skeletons.md)           | Cuando ya se sabe la forma          |
 
 ### Plataforma
 
-| #   | Documento                                              | Decide                            |
-| --- | ------------------------------------------------------ | --------------------------------- |
-| 31  | [Responsive mindset](platform/31-responsive.md)        | Comportamiento entre tamaños      |
+| #   | Documento                                       | Decide                       |
+| --- | ----------------------------------------------- | ---------------------------- |
+| 31  | [Responsive mindset](platform/31-responsive.md) | Comportamiento entre tamaños |
 
 ### Apéndices
 
-| Documento                                          | Contenido                                   |
-| -------------------------------------------------- | ------------------------------------------- |
-| [A1 · Movimiento](appendix/A1-movimiento.md)       | Duraciones, curvas y qué nunca se anima     |
-| [A2 · Accesibilidad](appendix/A2-accesibilidad.md) | Compromiso WCAG 2.2 AA y cómo se verifica   |
-| [A3 · Glosario](appendix/A3-glosario.md)           | Vocabulario común del sistema               |
+| Documento                                          | Contenido                                 |
+| -------------------------------------------------- | ----------------------------------------- |
+| [A1 · Movimiento](appendix/A1-movimiento.md)       | Duraciones, curvas y qué nunca se anima   |
+| [A2 · Accesibilidad](appendix/A2-accesibilidad.md) | Compromiso WCAG 2.2 AA y cómo se verifica |
+| [A3 · Glosario](appendix/A3-glosario.md)           | Vocabulario común del sistema             |
 
 ---
 

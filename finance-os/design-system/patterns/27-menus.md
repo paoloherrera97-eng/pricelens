@@ -6,12 +6,12 @@
 
 ## 1. Tipos
 
-| Tipo | Disparador | Uso |
-| --- | --- | --- |
-| **De acciones** (`⋯`) | Botón terciario con `more-horizontal` | Acciones secundarias de un objeto |
-| **Desplegable** | Botón con `chevron-down` | Elegir entre variantes de una acción |
-| **Contextual** | Clic derecho | Atajos sobre una fila o celda |
-| **Paleta de comandos** | `Cmd/Ctrl + K` | Todo el producto |
+| Tipo                   | Disparador                            | Uso                                  |
+| ---------------------- | ------------------------------------- | ------------------------------------ |
+| **De acciones** (`⋯`)  | Botón terciario con `more-horizontal` | Acciones secundarias de un objeto    |
+| **Desplegable**        | Botón con `chevron-down`              | Elegir entre variantes de una acción |
+| **Contextual**         | Clic derecho                          | Atajos sobre una fila o celda        |
+| **Paleta de comandos** | `Cmd/Ctrl + K`                        | Todo el producto                     |
 
 ## 2. Anatomía
 
@@ -28,15 +28,15 @@
    ancho mínimo 200 · máximo 320 · radio 8 · elevación 2 · padding vertical 4
 ```
 
-| Propiedad | Valor |
-| --- | --- |
-| Alto de elemento | 32 px |
-| Padding horizontal | 12 px |
-| Tipografía | `body` 14 px |
-| Icono | 16 px, `text-secondary`, a 8 px del texto |
-| Atajo | `caption` 12 px, `text-tertiary`, a la derecha |
-| Radio | `radius-lg` 8 px |
-| Elevación | Nivel 2 |
+| Propiedad          | Valor                                          |
+| ------------------ | ---------------------------------------------- |
+| Alto de elemento   | 32 px                                          |
+| Padding horizontal | 12 px                                          |
+| Tipografía         | `body` 14 px                                   |
+| Icono              | 16 px, `text-secondary`, a 8 px del texto      |
+| Atajo              | `caption` 12 px, `text-tertiary`, a la derecha |
+| Radio              | `radius-lg` 8 px                               |
+| Elevación          | Nivel 2                                        |
 
 ## 3. Reglas
 
@@ -61,7 +61,7 @@
 - Se voltea automáticamente si no cabe (abajo → arriba, derecha → izquierda).
 - 4 px de separación con el disparador.
 - **Nunca tapa a su propio disparador**: hay que poder ver qué se abrió.
-- Si no cabe en ninguna orientación (móvil), pasa a hoja inferior (*bottom sheet*).
+- Si no cabe en ninguna orientación (móvil), pasa a hoja inferior (_bottom sheet_).
 
 ## 5. Paleta de comandos
 
@@ -103,12 +103,12 @@ Cmd/Ctrl + K
 
 ## 7. Excel
 
-| Componente | Implementación |
-| --- | --- |
-| **Menú de acciones** | Forma `⋯` con macro que muestra un menú emergente construido con `CommandBars` |
-| **Desplegable** | Validación de datos, o control *Cuadro combinado* |
-| **Menú contextual** | Personalizable por VBA (`Application.CommandBars("Cell")`) |
-| **Paleta de comandos** | No existe. **Se sustituye por la cinta** |
+| Componente             | Implementación                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| **Menú de acciones**   | Forma `⋯` con macro que muestra un menú emergente construido con `CommandBars` |
+| **Desplegable**        | Validación de datos, o control _Cuadro combinado_                              |
+| **Menú contextual**    | Personalizable por VBA (`Application.CommandBars("Cell")`)                     |
+| **Paleta de comandos** | No existe. **Se sustituye por la cinta**                                       |
 
 La decisión importante: **en Excel no se reinventa el menú, se usa la cinta.**
 

@@ -56,19 +56,19 @@ Cada una desarrollada en el capítulo que se cita:
 
 ## Lo que Excel no tiene, y cómo se resuelve
 
-| Excel no tiene | Solución del sistema | Capítulo |
-| --- | --- | --- |
-| Sombras en celdas | Elevación por superficie + filete | [10](../../design-system/foundations/10-elevacion.md) |
-| Esquinas redondeadas | Retícula de esquina viva en ambas plataformas | [11](../../design-system/foundations/11-bordes-radios.md) |
-| Padding | Filas y columnas espaciadoras, y sangría de celda | [07](../../design-system/foundations/07-espaciado.md) |
-| Píxeles | Escala de 8 px que convierte a 6 pt exactos | [07](../../design-system/foundations/07-espaciado.md) |
-| Estados hover / foco | Controles mayores, más separación, relleno reservado | [12](../../design-system/components/12-botones.md), [13](../../design-system/components/13-inputs.md) |
-| Sistema de iconos | PNG exportados del mismo SVG de Lucide | [09](../../design-system/foundations/09-iconografia.md#6-excel) |
-| Modo oscuro utilizable | El claro es canónico; el oscuro es solo web | [05](../../design-system/foundations/05-color.md#7-modo-oscuro--y-por-qué-excel-no-lo-tiene) |
-| Carga asíncrona | Barra de estado + celda de control | [29](../../design-system/patterns/29-loading.md#6-excel) |
-| Skeletons | No se simulan. `—`, nunca `0,00` | [30](../../design-system/patterns/30-skeletons.md#7-excel) |
-| Sidebar | Hoja "Inicio" con índice + "‹ Inicio" en B1 | [23](../../design-system/patterns/23-sidebar.md#7-excel) |
-| Paleta de comandos | Pestaña propia en la cinta | [27](../../design-system/patterns/27-menus.md#7-excel) |
+| Excel no tiene         | Solución del sistema                                 | Capítulo                                                                                              |
+| ---------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Sombras en celdas      | Elevación por superficie + filete                    | [10](../../design-system/foundations/10-elevacion.md)                                                 |
+| Esquinas redondeadas   | Retícula de esquina viva en ambas plataformas        | [11](../../design-system/foundations/11-bordes-radios.md)                                             |
+| Padding                | Filas y columnas espaciadoras, y sangría de celda    | [07](../../design-system/foundations/07-espaciado.md)                                                 |
+| Píxeles                | Escala de 8 px que convierte a 6 pt exactos          | [07](../../design-system/foundations/07-espaciado.md)                                                 |
+| Estados hover / foco   | Controles mayores, más separación, relleno reservado | [12](../../design-system/components/12-botones.md), [13](../../design-system/components/13-inputs.md) |
+| Sistema de iconos      | PNG exportados del mismo SVG de Lucide               | [09](../../design-system/foundations/09-iconografia.md#6-excel)                                       |
+| Modo oscuro utilizable | El claro es canónico; el oscuro es solo web          | [05](../../design-system/foundations/05-color.md#7-modo-oscuro--y-por-qué-excel-no-lo-tiene)          |
+| Carga asíncrona        | Barra de estado + celda de control                   | [29](../../design-system/patterns/29-loading.md#6-excel)                                              |
+| Skeletons              | No se simulan. `—`, nunca `0,00`                     | [30](../../design-system/patterns/30-skeletons.md#7-excel)                                            |
+| Sidebar                | Hoja "Inicio" con índice + "‹ Inicio" en B1          | [23](../../design-system/patterns/23-sidebar.md#7-excel)                                              |
+| Paleta de comandos     | Pestaña propia en la cinta                           | [27](../../design-system/patterns/27-menus.md#7-excel)                                                |
 
 ## Trampas conocidas
 

@@ -36,14 +36,14 @@ medición. Los cuatro tokens implicados se corrigieron antes de publicar. Se dej
 registrados porque los cuatro colores originales **se veían bien**, y esa es la razón por la
 que el auditor existe.
 
-| Token | Antes | Después | Par que fallaba | Antes → después |
-| --- | --- | --- | --- | --- |
-| `graphite.500` (texto terciario) | `#6E7889` | `#636C7A` | sobre `surface` | 4,46:1 → **5,31:1** |
-| | | | sobre `surface-sunken` | 3,90:1 → **4,64:1** |
-| `jade.600` (texto positivo) | `#15804A` | `#127543` | sobre `surface-positive` | 4,47:1 → **5,17:1** |
-| `amber` (texto de aviso) | `500` `#B7791F` | `600` `#8F5B12` | sobre `surface` | 3,64:1 → **5,72:1** |
-| | | | sobre `surface-warning` | 3,34:1 → **5,24:1** |
-| `graphite.450` (límite de control) | `#838D9D` | `#7C8695` | sobre `surface-sunken` | 2,93:1 → **3,22:1** |
+| Token                              | Antes           | Después         | Par que fallaba          | Antes → después     |
+| ---------------------------------- | --------------- | --------------- | ------------------------ | ------------------- |
+| `graphite.500` (texto terciario)   | `#6E7889`       | `#636C7A`       | sobre `surface`          | 4,46:1 → **5,31:1** |
+|                                    |                 |                 | sobre `surface-sunken`   | 3,90:1 → **4,64:1** |
+| `jade.600` (texto positivo)        | `#15804A`       | `#127543`       | sobre `surface-positive` | 4,47:1 → **5,17:1** |
+| `amber` (texto de aviso)           | `500` `#B7791F` | `600` `#8F5B12` | sobre `surface`          | 3,64:1 → **5,72:1** |
+|                                    |                 |                 | sobre `surface-warning`  | 3,34:1 → **5,24:1** |
+| `graphite.450` (límite de control) | `#838D9D`       | `#7C8695`       | sobre `surface-sunken`   | 2,93:1 → **3,22:1** |
 
 Además, en modo oscuro: `accent-hover` pasó de `indigo.400` `#6480E6` a un paso nuevo,
 `indigo.450` `#4A68DF`. El original dejaba el texto blanco del botón primario en 3,64:1. El

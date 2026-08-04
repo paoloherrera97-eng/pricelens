@@ -20,37 +20,37 @@ El color va **el último**. Casi todos los gráficos malos eligen color primero.
 
 ## 2. Elegir la forma
 
-| La pregunta es… | Forma | No usar |
-| --- | --- | --- |
-| ¿Cuánto vale ahora? | **Una cifra** ([KPI](19-kpis.md)) | Gráfico de un dato |
-| ¿Cómo evoluciona? | Línea | Barras a lo largo del tiempo |
-| ¿Cómo se comparan categorías? | Barras horizontales | Circular |
-| ¿Cómo se compone un total? | Barras apiladas o cascada | Circular, donut |
-| ¿Real contra plan? | Barras agrupadas o **cascada** | Dos ejes |
-| ¿De dónde viene la diferencia? | **Cascada** | Cualquier otra |
-| ¿Qué relación hay entre dos variables? | Dispersión | Línea |
-| ¿Dónde se concentra? | Mapa de calor | Burbujas |
-| ¿Cómo se distribuye? | Histograma o caja | Barras ordenadas |
+| La pregunta es…                        | Forma                             | No usar                      |
+| -------------------------------------- | --------------------------------- | ---------------------------- |
+| ¿Cuánto vale ahora?                    | **Una cifra** ([KPI](19-kpis.md)) | Gráfico de un dato           |
+| ¿Cómo evoluciona?                      | Línea                             | Barras a lo largo del tiempo |
+| ¿Cómo se comparan categorías?          | Barras horizontales               | Circular                     |
+| ¿Cómo se compone un total?             | Barras apiladas o cascada         | Circular, donut              |
+| ¿Real contra plan?                     | Barras agrupadas o **cascada**    | Dos ejes                     |
+| ¿De dónde viene la diferencia?         | **Cascada**                       | Cualquier otra               |
+| ¿Qué relación hay entre dos variables? | Dispersión                        | Línea                        |
+| ¿Dónde se concentra?                   | Mapa de calor                     | Burbujas                     |
+| ¿Cómo se distribuye?                   | Histograma o caja                 | Barras ordenadas             |
 
 ### Prohibiciones de forma
 
-| Prohibido | Por qué |
-| --- | --- |
-| **Doble eje Y** | El error nº 1 en gráficos. Dos escalas distintas hacen que la correlación la decida la elección de escala, no los datos. Si hay dos magnitudes: dos gráficos, o indexadas a base 100 |
-| **Circular y donut** | El ojo humano compara ángulos mal. Con más de 3 porciones es ilegible; con 3, una tabla informa mejor |
-| **3D, cualquier cosa** | La perspectiva falsea las magnitudes. Literalmente miente |
-| **Eje Y que no arranca en cero** (en barras) | La longitud de la barra **es** el valor. Truncarla multiplica visualmente la diferencia. En líneas sí puede recortarse, indicándolo |
-| **Área apilada con más de 4 series** | Solo la serie inferior tiene una línea base legible |
-| **Degradados de relleno** | No codifican nada y complican leer el valor |
+| Prohibido                                    | Por qué                                                                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Doble eje Y**                              | El error nº 1 en gráficos. Dos escalas distintas hacen que la correlación la decida la elección de escala, no los datos. Si hay dos magnitudes: dos gráficos, o indexadas a base 100 |
+| **Circular y donut**                         | El ojo humano compara ángulos mal. Con más de 3 porciones es ilegible; con 3, una tabla informa mejor                                                                                |
+| **3D, cualquier cosa**                       | La perspectiva falsea las magnitudes. Literalmente miente                                                                                                                            |
+| **Eje Y que no arranca en cero** (en barras) | La longitud de la barra **es** el valor. Truncarla multiplica visualmente la diferencia. En líneas sí puede recortarse, indicándolo                                                  |
+| **Área apilada con más de 4 series**         | Solo la serie inferior tiene una línea base legible                                                                                                                                  |
+| **Degradados de relleno**                    | No codifican nada y complican leer el valor                                                                                                                                          |
 
 ## 3. El trabajo del color
 
-| Trabajo | Codifica | Estructura |
-| --- | --- | --- |
-| **Categórica** | Identidad (qué serie) | 8 tonos, orden fijo, asignados en secuencia, **nunca en ciclo** |
-| **Secuencial** | Magnitud | Un solo tono, claro → oscuro |
-| **Divergente** | Polaridad respecto a una base | Dos tonos + punto medio gris |
-| **Estado** | Situación | Escala reservada, siempre con icono y texto |
+| Trabajo        | Codifica                      | Estructura                                                      |
+| -------------- | ----------------------------- | --------------------------------------------------------------- |
+| **Categórica** | Identidad (qué serie)         | 8 tonos, orden fijo, asignados en secuencia, **nunca en ciclo** |
+| **Secuencial** | Magnitud                      | Un solo tono, claro → oscuro                                    |
+| **Divergente** | Polaridad respecto a una base | Dos tonos + punto medio gris                                    |
+| **Estado**     | Situación                     | Escala reservada, siempre con icono y texto                     |
 
 ### 3.1 Paleta categórica — validada, no elegida
 
@@ -58,27 +58,27 @@ Orden fijo. **El orden es el mecanismo de seguridad frente al daltonismo**, no u
 preferencia estética: se validó que cada par adyacente se distingue bajo simulación de
 protanopia y deuteranopia.
 
-| Ranura | Tono | Claro | Oscuro |
-| ---: | --- | --- | --- |
-| 1 | Índigo | `#3B5BDB` | `#5C7CE8` |
-| 2 | Naranja | `#E07A1F` | `#CE7526` |
-| 3 | Verde azulado | `#0E9F8A` | `#14A18C` |
-| 4 | Oro | `#A8801A` | `#AE8A22` |
-| 5 | Rosa | `#D2699E` | `#CB6693` |
-| 6 | Verde | `#2E8B4E` | `#327F49` |
-| 7 | Violeta | `#6D4AA8` | `#8A66C8` |
-| 8 | Bermellón | `#D64B4B` | `#E25C5C` |
+| Ranura | Tono          | Claro     | Oscuro    |
+| -----: | ------------- | --------- | --------- |
+|      1 | Índigo        | `#3B5BDB` | `#5C7CE8` |
+|      2 | Naranja       | `#E07A1F` | `#CE7526` |
+|      3 | Verde azulado | `#0E9F8A` | `#14A18C` |
+|      4 | Oro           | `#A8801A` | `#AE8A22` |
+|      5 | Rosa          | `#D2699E` | `#CB6693` |
+|      6 | Verde         | `#2E8B4E` | `#327F49` |
+|      7 | Violeta       | `#6D4AA8` | `#8A66C8` |
+|      8 | Bermellón     | `#D64B4B` | `#E25C5C` |
 
 **Resultados de la validación** (Machado-Oliveira-Fernandes 2009, severidad 1.0; ΔE euclídea
 en OKLab ×100; objetivo ≥ 8 en CVD y ≥ 15 en visión normal):
 
-| Comprobación | Claro | Oscuro |
-| --- | --- | --- |
-| Banda de luminosidad | OK (L 0,43–0,77) | OK (L 0,48–0,67) |
-| Suelo de croma | OK (C ≥ 0,10) | OK |
+| Comprobación                           | Claro                                     | Oscuro                                    |
+| -------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| Banda de luminosidad                   | OK (L 0,43–0,77)                          | OK (L 0,48–0,67)                          |
+| Suelo de croma                         | OK (C ≥ 0,10)                             | OK                                        |
 | **Separación CVD, peor par adyacente** | **ΔE 11,7** (`#2E8B4E`↔`#D2699E`, deutan) | **ΔE 11,0** (`#327F49`↔`#CB6693`, protan) |
-| **Visión normal, peor par adyacente** | **ΔE 17,1** (`#A8801A`↔`#0E9F8A`) | **ΔE 16,8** (`#AE8A22`↔`#14A18C`) |
-| Contraste sobre superficie | Los 8 ≥ 3:1 | Los 8 ≥ 3:1 |
+| **Visión normal, peor par adyacente**  | **ΔE 17,1** (`#A8801A`↔`#0E9F8A`)         | **ΔE 16,8** (`#AE8A22`↔`#14A18C`)         |
+| Contraste sobre superficie             | Los 8 ≥ 3:1                               | Los 8 ≥ 3:1                               |
 
 Reproducible:
 
@@ -115,17 +115,17 @@ más, cuando es precisamente "nada".
 
 ## 4. Marcas y anatomía
 
-| Elemento | Especificación |
-| --- | --- |
-| Línea | 2 px, sin sombra, sin degradado |
-| Barra | Separación de 2 px del color de la superficie entre barras contiguas y entre segmentos apilados |
-| Punto | ≥ 8 px de diámetro; anillo de 2 px del color de la superficie al solaparse |
-| Extremos de barra | Radio 4 px en el extremo del dato; **esquina viva en la línea base** |
-| Cuadrícula | Solo horizontal, 1 px, `border-subtle`. **Nunca vertical** |
-| Eje | Solo la línea base del eje de valores, `border-default` |
-| Marcas de eje | Sin marcas (*ticks*): la etiqueta ya indica la posición |
-| Etiquetas de eje | `caption` 12 px, `text-tertiary` |
-| Área bajo la línea | Solo con una serie, `accent` al 8 % |
+| Elemento           | Especificación                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| Línea              | 2 px, sin sombra, sin degradado                                                                 |
+| Barra              | Separación de 2 px del color de la superficie entre barras contiguas y entre segmentos apilados |
+| Punto              | ≥ 8 px de diámetro; anillo de 2 px del color de la superficie al solaparse                      |
+| Extremos de barra  | Radio 4 px en el extremo del dato; **esquina viva en la línea base**                            |
+| Cuadrícula         | Solo horizontal, 1 px, `border-subtle`. **Nunca vertical**                                      |
+| Eje                | Solo la línea base del eje de valores, `border-default`                                         |
+| Marcas de eje      | Sin marcas (_ticks_): la etiqueta ya indica la posición                                         |
+| Etiquetas de eje   | `caption` 12 px, `text-tertiary`                                                                |
+| Área bajo la línea | Solo con una serie, `accent` al 8 %                                                             |
 
 ### Etiquetas de datos
 
@@ -191,8 +191,8 @@ Nunca:           Gráfico circular, 3D, eje secundario, escala logarítmica sin 
 ```
 
 **El gráfico se ancla a un rango de celdas** del esqueleto (ver
-[08 · Grid](../foundations/08-grid.md#3-excel-el-esqueleto-de-columnas)), con *Mover y cambiar
-tamaño con celdas* activado para que siga a su bloque al cambiar densidad.
+[08 · Grid](../foundations/08-grid.md#3-excel-el-esqueleto-de-columnas)), con _Mover y cambiar
+tamaño con celdas_ activado para que siga a su bloque al cambiar densidad.
 
 **Minigráficos** (sparklines) sí son nativos y sí encajan: línea, sin marcadores, `3B5BDB`,
 sin eje. Es la forma correcta de meter tendencia en una tabla sin insertar un gráfico por

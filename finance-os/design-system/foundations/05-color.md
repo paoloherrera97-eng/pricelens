@@ -13,13 +13,13 @@ tres colores de estado que solo significan lo que significan en finanzas.**
 
 Cuatro familias. Ni una más:
 
-| Familia        | Nombre         | Significado — único e innegociable                  |
-| -------------- | -------------- | ---------------------------------------------------- |
-| **Grafito**    | Neutro         | Estructura, texto, superficie. No significa nada.     |
-| **Índigo**     | Acento         | Acción, selección, enfoque. **Nunca** estado del dato.|
-| **Jade**       | Positivo       | Variación favorable                                   |
-| **Bermellón**  | Negativo       | Variación desfavorable                                |
-| **Ámbar**      | Aviso          | Estimado, aproximado, requiere atención               |
+| Familia       | Nombre   | Significado — único e innegociable                     |
+| ------------- | -------- | ------------------------------------------------------ |
+| **Grafito**   | Neutro   | Estructura, texto, superficie. No significa nada.      |
+| **Índigo**    | Acento   | Acción, selección, enfoque. **Nunca** estado del dato. |
+| **Jade**      | Positivo | Variación favorable                                    |
+| **Bermellón** | Negativo | Variación desfavorable                                 |
+| **Ámbar**     | Aviso    | Estimado, aproximado, requiere atención                |
 
 ### Por qué el acento es azul y no verde
 
@@ -46,19 +46,19 @@ semántica.
 
 ### Grafito — el 95 % del producto
 
-| Paso | Hex | Papel |
-| --- | --- | --- |
-| `0` | `#FFFFFF` | Superficie de card |
-| `25` | `#FBFCFD` | Alternancia de fila |
-| `50` | `#F6F8FA` | Fondo de aplicación |
-| `100` | `#EDF0F4` | Campo relleno, hover |
-| `150` | `#E4E8EE` | Activo, filete sutil |
-| `200` | `#D8DDE5` | Divisor |
-| `300` | `#C2C9D4` | Borde decorativo |
-| `400` | `#98A2B1` | Texto deshabilitado |
-| `450` | `#7C8695` | **Límite de control** |
-| `500` | `#636C7A` | Texto terciario |
-| `600` | `#55606F` | Texto secundario |
+| Paso        | Hex                   | Papel                                |
+| ----------- | --------------------- | ------------------------------------ |
+| `0`         | `#FFFFFF`             | Superficie de card                   |
+| `25`        | `#FBFCFD`             | Alternancia de fila                  |
+| `50`        | `#F6F8FA`             | Fondo de aplicación                  |
+| `100`       | `#EDF0F4`             | Campo relleno, hover                 |
+| `150`       | `#E4E8EE`             | Activo, filete sutil                 |
+| `200`       | `#D8DDE5`             | Divisor                              |
+| `300`       | `#C2C9D4`             | Borde decorativo                     |
+| `400`       | `#98A2B1`             | Texto deshabilitado                  |
+| `450`       | `#7C8695`             | **Límite de control**                |
+| `500`       | `#636C7A`             | Texto terciario                      |
+| `600`       | `#55606F`             | Texto secundario                     |
 | `700`–`950` | `#3D4654` … `#0C1016` | Texto primario y superficies oscuras |
 
 El grafito lleva un matiz azulado mínimo (H ≈ 220). Un gris perfectamente neutro junto a un
@@ -70,12 +70,12 @@ matiz es tan bajo que nadie lo nombra — y ese es el objetivo.
 Cuatro rampas de trabajo. Solo se documentan los pasos que la interfaz usa de verdad; una
 rampa con doce pasos de los que se usan tres es deuda, no flexibilidad.
 
-| Familia | Fondo tenue | Texto / marca | Presionado |
-| --- | --- | --- | --- |
-| Índigo | `50 #EEF2FE` | `500 #3B5BDB` · texto `600 #2F49B4` | `700 #263B8E` |
-| Jade | `50 #E8F6EF` | texto `600 #127543` | `700 #0F6238` |
-| Bermellón | `50 #FDECEB` | texto `600 #C22B24` | `700 #9B211B` |
-| Ámbar | `50 #FDF4E4` | texto `600 #8F5B12` | `700 #7A4E0F` |
+| Familia   | Fondo tenue  | Texto / marca                       | Presionado    |
+| --------- | ------------ | ----------------------------------- | ------------- |
+| Índigo    | `50 #EEF2FE` | `500 #3B5BDB` · texto `600 #2F49B4` | `700 #263B8E` |
+| Jade      | `50 #E8F6EF` | texto `600 #127543`                 | `700 #0F6238` |
+| Bermellón | `50 #FDECEB` | texto `600 #C22B24`                 | `700 #9B211B` |
+| Ámbar     | `50 #FDF4E4` | texto `600 #8F5B12`                 | `700 #7A4E0F` |
 
 Nota sobre el ámbar: el amarillo puro no alcanza 4,5:1 sobre blanco a ningún nivel que
 siga leyéndose como amarillo. El token de texto es por tanto un **ámbar tostado**
@@ -87,20 +87,20 @@ como texto.
 Los componentes referencian **solo** esta capa. Es lo que convierte el modo oscuro en un
 cambio de paleta en vez de una variante por elemento.
 
-| Token | Papel |
-| --- | --- |
-| `canvas` | Fondo de la aplicación |
-| `surface` / `surface-raised` | Card, panel |
-| `surface-sunken` | Campo de entrada, celda editable |
-| `surface-hover` / `surface-active` | Retroalimentación de interacción |
-| `surface-accent` / `-positive` / `-negative` / `-warning` | Fondos teñidos de estado |
-| `text-primary` / `-secondary` / `-tertiary` / `-disabled` | Cuatro niveles, ni uno más |
-| `text-accent` / `-positive` / `-negative` / `-warning` | Texto con significado |
-| `border-subtle` / `-default` | Divisores **decorativos** |
-| `border-strong` | Límite de control — el único que cumple 1.4.11 |
-| `border-focus` | Anillo de foco |
-| `accent` / `-hover` / `-active` | Relleno de acción |
-| `overlay` | Velo tras un modal |
+| Token                                                     | Papel                                          |
+| --------------------------------------------------------- | ---------------------------------------------- |
+| `canvas`                                                  | Fondo de la aplicación                         |
+| `surface` / `surface-raised`                              | Card, panel                                    |
+| `surface-sunken`                                          | Campo de entrada, celda editable               |
+| `surface-hover` / `surface-active`                        | Retroalimentación de interacción               |
+| `surface-accent` / `-positive` / `-negative` / `-warning` | Fondos teñidos de estado                       |
+| `text-primary` / `-secondary` / `-tertiary` / `-disabled` | Cuatro niveles, ni uno más                     |
+| `text-accent` / `-positive` / `-negative` / `-warning`    | Texto con significado                          |
+| `border-subtle` / `-default`                              | Divisores **decorativos**                      |
+| `border-strong`                                           | Límite de control — el único que cumple 1.4.11 |
+| `border-focus`                                            | Anillo de foco                                 |
+| `accent` / `-hover` / `-active`                           | Relleno de acción                              |
+| `overlay`                                                 | Velo tras un modal                             |
 
 ### Los tres bordes, y por qué son tres
 
@@ -118,20 +118,20 @@ Usar `border-default` en un input es un fallo de accesibilidad, no una preferenc
 
 Extracto; tabla completa en [`REPORT.md`](../../qa/contrast/REPORT.md).
 
-| Par | Ratio | Mínimo |
-| --- | ---: | ---: |
-| `text-primary` sobre `surface` | **17,48:1** | 4,5 |
-| `text-secondary` sobre `surface` | **6,39:1** | 4,5 |
-| `text-tertiary` sobre `surface` | **5,31:1** | 4,5 |
-| `text-tertiary` sobre `surface-sunken` | **4,64:1** | 4,5 |
-| `text-accent` sobre `surface` | **7,68:1** | 4,5 |
-| `text-positive` sobre `surface-positive` | **5,17:1** | 4,5 |
-| `text-negative` sobre `surface-negative` | **5,01:1** | 4,5 |
-| `text-warning` sobre `surface-warning` | **5,24:1** | 4,5 |
-| `text-on-accent` sobre `accent` | **5,67:1** | 4,5 |
-| `border-strong` sobre `surface-sunken` | **3,22:1** | 3,0 |
-| `border-focus` sobre `canvas` | **5,32:1** | 3,0 |
-| `text-disabled` sobre `surface` | 2,58:1 | exento |
+| Par                                      |       Ratio | Mínimo |
+| ---------------------------------------- | ----------: | -----: |
+| `text-primary` sobre `surface`           | **17,48:1** |    4,5 |
+| `text-secondary` sobre `surface`         |  **6,39:1** |    4,5 |
+| `text-tertiary` sobre `surface`          |  **5,31:1** |    4,5 |
+| `text-tertiary` sobre `surface-sunken`   |  **4,64:1** |    4,5 |
+| `text-accent` sobre `surface`            |  **7,68:1** |    4,5 |
+| `text-positive` sobre `surface-positive` |  **5,17:1** |    4,5 |
+| `text-negative` sobre `surface-negative` |  **5,01:1** |    4,5 |
+| `text-warning` sobre `surface-warning`   |  **5,24:1** |    4,5 |
+| `text-on-accent` sobre `accent`          |  **5,67:1** |    4,5 |
+| `border-strong` sobre `surface-sunken`   |  **3,22:1** |    3,0 |
+| `border-focus` sobre `canvas`            |  **5,32:1** |    3,0 |
+| `text-disabled` sobre `surface`          |      2,58:1 | exento |
 
 **Seis pares fallaron la primera medición** y obligaron a corregir tokens: el texto
 terciario, el positivo sobre su propio fondo teñido, el ámbar de aviso (fallaba por mucho:

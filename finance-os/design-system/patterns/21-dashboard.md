@@ -59,12 +59,12 @@ son dos dashboards.
 
 Reparto orientativo de la primera pantalla:
 
-| Zona | % del alto |
-| --- | ---: |
-| Header + contexto | 10 % |
-| KPIs | 20 % |
-| Contenido principal | **55 %** |
-| Inicio del apoyo | 15 % |
+| Zona                | % del alto |
+| ------------------- | ---------: |
+| Header + contexto   |       10 % |
+| KPIs                |       20 % |
+| Contenido principal |   **55 %** |
+| Inicio del apoyo    |       15 % |
 
 ### 3.3 Máximo cuatro KPIs
 
@@ -84,26 +84,26 @@ falsas, y nadie se da cuenta hasta el comité.
 
 ## 4. Densidad de información
 
-| Elemento | Máximo por dashboard |
-| --- | ---: |
-| KPIs | 4 |
-| Gráficos | 3 |
-| Tablas | 2 |
-| Alertas visibles | 1 (agrupada) |
-| Colores distintos en uso | 5 |
+| Elemento                 | Máximo por dashboard |
+| ------------------------ | -------------------: |
+| KPIs                     |                    4 |
+| Gráficos                 |                    3 |
+| Tablas                   |                    2 |
+| Alertas visibles         |         1 (agrupada) |
+| Colores distintos en uso |                    5 |
 
 No son sugerencias: son el límite por encima del cual la pantalla deja de contestar en cinco
 segundos. Si el contenido no cabe, la solución es **otra pantalla**, no más densidad.
 
 ## 5. Estados del dashboard
 
-| Estado | Comportamiento |
-| --- | --- |
-| Cargando | [Skeleton](30-skeletons.md) con la estructura exacta, no un spinner central |
-| Vacío | [Estado vacío](28-estados-vacios.md) explicando qué falta para poblarlo |
-| Parcial | Lo disponible se muestra; lo que falta, con su propio skeleton o `—` |
-| Error parcial | La card afectada muestra su error; **el resto sigue funcionando** |
-| Desactualizado | Aviso global + marca de tiempo en el pie |
+| Estado         | Comportamiento                                                              |
+| -------------- | --------------------------------------------------------------------------- |
+| Cargando       | [Skeleton](30-skeletons.md) con la estructura exacta, no un spinner central |
+| Vacío          | [Estado vacío](28-estados-vacios.md) explicando qué falta para poblarlo     |
+| Parcial        | Lo disponible se muestra; lo que falta, con su propio skeleton o `—`        |
+| Error parcial  | La card afectada muestra su error; **el resto sigue funcionando**           |
+| Desactualizado | Aviso global + marca de tiempo en el pie                                    |
 
 **El fallo parcial no tumba la pantalla.** Si el proveedor de tipos de cambio no responde,
 las cifras en moneda local siguen siendo correctas y se muestran. Un dashboard que se pone

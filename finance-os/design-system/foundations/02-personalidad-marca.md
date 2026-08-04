@@ -18,13 +18,13 @@ pretende ser más importante que el trabajo**.
 Cinco, con su límite. El límite importa tanto como el atributo: define dónde deja de ser
 una virtud.
 
-| Atributo         | Significa                                        | Y su límite                                    |
-| ---------------- | ------------------------------------------------ | ---------------------------------------------- |
-| **Preciso**      | Cada cifra con su unidad, su fecha y su fuente   | Sin convertirse en un volcado de metadatos     |
-| **Sereno**       | Nada parpadea, nada urge sin motivo              | Sin ser indiferente cuando algo va mal         |
-| **Culto**        | Vocabulario financiero correcto, sin traducir mal| Sin jerga que excluya al que aprende           |
-| **Discreto**     | La herramienta no se celebra a sí misma          | Sin ser fría cuando el usuario acierta         |
-| **Íntegro**      | Dice lo que no sabe                              | Sin sembrar dudas sobre lo que sí sabe         |
+| Atributo     | Significa                                         | Y su límite                                |
+| ------------ | ------------------------------------------------- | ------------------------------------------ |
+| **Preciso**  | Cada cifra con su unidad, su fecha y su fuente    | Sin convertirse en un volcado de metadatos |
+| **Sereno**   | Nada parpadea, nada urge sin motivo               | Sin ser indiferente cuando algo va mal     |
+| **Culto**    | Vocabulario financiero correcto, sin traducir mal | Sin jerga que excluya al que aprende       |
+| **Discreto** | La herramienta no se celebra a sí misma           | Sin ser fría cuando el usuario acierta     |
+| **Íntegro**  | Dice lo que no sabe                               | Sin sembrar dudas sobre lo que sí sabe     |
 
 ## 3. Espectro de personalidad
 
@@ -56,28 +56,28 @@ apelmazada ni el dashboard con tres cifras en 27 pulgadas.
 
 ### 4.2 El tono se mueve con el riesgo
 
-| Situación                | Tono          | Ejemplo                                                     |
-| ------------------------ | ------------- | ----------------------------------------------------------- |
-| Todo normal              | Callado       | *(no hay mensaje — el sistema no anuncia la normalidad)*     |
-| Confirmación             | Breve         | "Guardado · 14:32"                                          |
-| Dato imperfecto          | Explícito     | "Tipo de cambio del 31/07. El de hoy no está disponible."    |
-| Acción destructiva       | Literal       | "Se eliminarán 1.284 asientos. No se puede deshacer."        |
-| Fallo del sistema        | Sin adornos   | "No se pudo conectar con el origen. Reintentar."             |
+| Situación          | Tono        | Ejemplo                                                   |
+| ------------------ | ----------- | --------------------------------------------------------- |
+| Todo normal        | Callado     | _(no hay mensaje — el sistema no anuncia la normalidad)_  |
+| Confirmación       | Breve       | "Guardado · 14:32"                                        |
+| Dato imperfecto    | Explícito   | "Tipo de cambio del 31/07. El de hoy no está disponible." |
+| Acción destructiva | Literal     | "Se eliminarán 1.284 asientos. No se puede deshacer."     |
+| Fallo del sistema  | Sin adornos | "No se pudo conectar con el origen. Reintentar."          |
 
 ### 4.3 Antes y después
 
-| ❌                                            | ✅                                              |
-| --------------------------------------------- | ----------------------------------------------- |
-| "¡Genial! 🎉 Tus datos se guardaron"          | "Guardado · 14:32"                              |
-| "Ups, algo salió mal"                         | "No se pudo conectar con el origen. Reintentar."|
-| "Tu salud financiera mejoró"                  | "Margen bruto +2,4 pp respecto a junio"         |
-| "¿Seguro que quieres continuar?"              | "Se eliminarán 1.284 asientos. No se puede deshacer." |
-| "No hay datos disponibles en este momento"    | "Sin movimientos entre el 1 y el 31 de julio."  |
+| ❌                                         | ✅                                                    |
+| ------------------------------------------ | ----------------------------------------------------- |
+| "¡Genial! 🎉 Tus datos se guardaron"       | "Guardado · 14:32"                                    |
+| "Ups, algo salió mal"                      | "No se pudo conectar con el origen. Reintentar."      |
+| "Tu salud financiera mejoró"               | "Margen bruto +2,4 pp respecto a junio"               |
+| "¿Seguro que quieres continuar?"           | "Se eliminarán 1.284 asientos. No se puede deshacer." |
+| "No hay datos disponibles en este momento" | "Sin movimientos entre el 1 y el 31 de julio."        |
 
 ## 5. Nombre y logotipo
 
-**Escritura:** `Finance OS` — dos palabras, `OS` en mayúsculas. Nunca *FinanceOS*, nunca
-*finance os*, nunca *Finance O.S.*
+**Escritura:** `Finance OS` — dos palabras, `OS` en mayúsculas. Nunca _FinanceOS_, nunca
+_finance os_, nunca _Finance O.S._
 
 **Marca denominativa:** el nombre compuesto en la familia de interfaz, peso 600, tracking
 −0,02 em. No hay una tipografía exclusiva de marca: usar la misma familia que la interfaz es

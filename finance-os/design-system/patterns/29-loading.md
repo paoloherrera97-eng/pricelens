@@ -9,14 +9,14 @@
 
 Qué mostrar depende **solo** de cuánto va a tardar:
 
-| Duración | Qué se muestra |
-| --- | --- |
-| **< 100 ms** | Nada. Mostrar algo produce un parpadeo peor que la espera |
-| **100–300 ms** | Nada visual; el control pasa a `aria-busy` |
-| **300 ms – 1 s** | [Skeleton](30-skeletons.md) del contenido |
-| **1 – 5 s** | Skeleton + texto de estado ("Cargando movimientos…") |
-| **5 – 30 s** | Barra de progreso determinada + lo hecho / lo que falta |
-| **> 30 s** | Proceso en segundo plano: se libera la interfaz y se avisa al terminar |
+| Duración         | Qué se muestra                                                         |
+| ---------------- | ---------------------------------------------------------------------- |
+| **< 100 ms**     | Nada. Mostrar algo produce un parpadeo peor que la espera              |
+| **100–300 ms**   | Nada visual; el control pasa a `aria-busy`                             |
+| **300 ms – 1 s** | [Skeleton](30-skeletons.md) del contenido                              |
+| **1 – 5 s**      | Skeleton + texto de estado ("Cargando movimientos…")                   |
+| **5 – 30 s**     | Barra de progreso determinada + lo hecho / lo que falta                |
+| **> 30 s**       | Proceso en segundo plano: se libera la interfaz y se avisa al terminar |
 
 **El error clásico es mostrar un spinner para 200 ms.** Aparece, y desaparece antes de que el
 ojo lo procese: el resultado percibido es un parpadeo, que se lee como fallo, no como

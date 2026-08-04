@@ -102,15 +102,15 @@ porque en la práctica la tentación es la contraria.
 
 ## Antipatrones prohibidos
 
-| Antipatrón                                       | Por qué                                                     |
-| ------------------------------------------------ | ------------------------------------------------------------ |
-| Números que hacen *count-up*                     | Durante la animación se muestra una cifra falsa               |
-| Scroll infinito en tablas financieras            | Impide saber cuántos registros hay: no se puede cuadrar       |
-| Colores de estado sin icono ni texto             | Excluye a ~8 % de los usuarios varones                        |
-| Tooltip como único portador de información       | No existe en táctil ni al imprimir                            |
-| Autoguardado silencioso sin marca de tiempo      | El usuario no sabe qué versión está mirando                   |
-| Redondeo variable entre vistas                   | Dos pantallas con cifras distintas destruyen la confianza     |
-| Diálogo de confirmación para acciones reversibles| Entrena a confirmar sin leer, y con ello anula el diálogo real|
+| Antipatrón                                        | Por qué                                                        |
+| ------------------------------------------------- | -------------------------------------------------------------- |
+| Números que hacen _count-up_                      | Durante la animación se muestra una cifra falsa                |
+| Scroll infinito en tablas financieras             | Impide saber cuántos registros hay: no se puede cuadrar        |
+| Colores de estado sin icono ni texto              | Excluye a ~8 % de los usuarios varones                         |
+| Tooltip como único portador de información        | No existe en táctil ni al imprimir                             |
+| Autoguardado silencioso sin marca de tiempo       | El usuario no sabe qué versión está mirando                    |
+| Redondeo variable entre vistas                    | Dos pantallas con cifras distintas destruyen la confianza      |
+| Diálogo de confirmación para acciones reversibles | Entrena a confirmar sin leer, y con ello anula el diálogo real |
 
 ---
 

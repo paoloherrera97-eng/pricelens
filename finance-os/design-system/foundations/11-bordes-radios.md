@@ -7,11 +7,11 @@
 Repetido desde [05 · Color](05-color.md#los-tres-bordes-y-por-qué-son-tres) porque es donde
 más sistemas de diseño se equivocan:
 
-| Token | Hex | Contraste sobre `surface` | Papel |
-| --- | --- | ---: | --- |
-| `border-subtle` | `#E4E8EE` | 1,23:1 | Divisor entre filas, dentro de una card |
-| `border-default` | `#D8DDE5` | 1,36:1 | Divisor entre secciones, contorno de card |
-| `border-strong` | `#7C8695` | **3,68:1** | **Límite de control** — input, select, checkbox |
+| Token            | Hex       | Contraste sobre `surface` | Papel                                           |
+| ---------------- | --------- | ------------------------: | ----------------------------------------------- |
+| `border-subtle`  | `#E4E8EE` |                    1,23:1 | Divisor entre filas, dentro de una card         |
+| `border-default` | `#D8DDE5` |                    1,36:1 | Divisor entre secciones, contorno de card       |
+| `border-strong`  | `#7C8695` |                **3,68:1** | **Límite de control** — input, select, checkbox |
 
 Los dos primeros **son decorativos** y no pueden identificar un control: no llegan al 3:1
 que exige la SC 1.4.11. Solo `border-strong` puede decir "esto es un campo en el que se
@@ -22,11 +22,11 @@ usuarios con baja visión.
 
 ## 2. Grosores
 
-| Grosor | Uso |
-| --- | --- |
-| **1 px** (0,75 pt) | Todo. El grosor por defecto del sistema |
-| **2 px** | Solo el anillo de foco y el indicador de pestaña activa |
-| 1,5 px, 3 px, 4 px | **No existen** |
+| Grosor             | Uso                                                     |
+| ------------------ | ------------------------------------------------------- |
+| **1 px** (0,75 pt) | Todo. El grosor por defecto del sistema                 |
+| **2 px**           | Solo el anillo de foco y el indicador de pestaña activa |
+| 1,5 px, 3 px, 4 px | **No existen**                                          |
 
 Un borde de 1 px en pantallas @2x se renderiza a medio píxel físico y se ve más fino de lo
 esperado: es exactamente el efecto buscado. No se compensa subiéndolo a 2 px.
@@ -61,14 +61,14 @@ de parecer una hoja de cálculo y empiece a parecer un producto.
 
 ## 4. Radios
 
-| Token | px | Uso |
-| --- | ---: | --- |
-| `radius-none` | 0 | **Toda la retícula tabular**, celdas, filas |
-| `radius-sm` | 4 | Badges, chips, casillas |
-| `radius-md` | 6 | Inputs, selects, botones |
-| `radius-lg` | 8 | Cards, popovers, menús |
-| `radius-xl` | 12 | Modales, paneles laterales |
-| `radius-2xl` | 16 | Contenedores de página completa (raro) |
+| Token         |   px | Uso                                             |
+| ------------- | ---: | ----------------------------------------------- |
+| `radius-none` |    0 | **Toda la retícula tabular**, celdas, filas     |
+| `radius-sm`   |    4 | Badges, chips, casillas                         |
+| `radius-md`   |    6 | Inputs, selects, botones                        |
+| `radius-lg`   |    8 | Cards, popovers, menús                          |
+| `radius-xl`   |   12 | Modales, paneles laterales                      |
+| `radius-2xl`  |   16 | Contenedores de página completa (raro)          |
 | `radius-full` | 9999 | Avatares e indicadores circulares. **Nada más** |
 
 ### Las dos reglas del radio

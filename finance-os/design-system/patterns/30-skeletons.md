@@ -7,13 +7,13 @@
 
 ## 1. Por qué skeleton y no spinner
 
-| | Spinner | Skeleton |
-| --- | --- | --- |
-| Informa de la forma | No | **Sí** |
-| Reserva el espacio | No | **Sí** |
-| Evita el salto de layout | No | **Sí** |
-| Espera percibida | Más larga | Más corta |
-| Requiere conocer la forma | No | Sí |
+|                           | Spinner   | Skeleton  |
+| ------------------------- | --------- | --------- |
+| Informa de la forma       | No        | **Sí**    |
+| Reserva el espacio        | No        | **Sí**    |
+| Evita el salto de layout  | No        | **Sí**    |
+| Espera percibida          | Más larga | Más corta |
+| Requiere conocer la forma | No        | Sí        |
 
 El skeleton gana siempre que se sepa qué va a llegar — que en un producto con estructura fija
 es casi siempre. El spinner queda para lo verdaderamente desconocido.
@@ -36,17 +36,17 @@ es ruido visual. Todos comparten el mismo reloj.
 
 ## 3. Formas
 
-| Contenido | Skeleton |
-| --- | --- |
-| Línea de texto | Rectángulo del alto de la línea (16/20/24), radio 4 |
-| Párrafo | 3 líneas; la última al **60 % de ancho** |
-| Título | Rectángulo del alto del título, 40 % de ancho |
-| Cifra de KPI | Rectángulo 32 px de alto, 60 % de ancho |
-| Badge | Rectángulo 20 × 80 px, radio 4 |
-| Avatar | Círculo del tamaño real |
-| Fila de tabla | Rectángulos por columna, **con los anchos reales de las columnas** |
-| Gráfico | Rectángulo del área de trazado, **con los ejes ya dibujados** |
-| Card | Estructura interna completa: título, contenido, pie |
+| Contenido      | Skeleton                                                           |
+| -------------- | ------------------------------------------------------------------ |
+| Línea de texto | Rectángulo del alto de la línea (16/20/24), radio 4                |
+| Párrafo        | 3 líneas; la última al **60 % de ancho**                           |
+| Título         | Rectángulo del alto del título, 40 % de ancho                      |
+| Cifra de KPI   | Rectángulo 32 px de alto, 60 % de ancho                            |
+| Badge          | Rectángulo 20 × 80 px, radio 4                                     |
+| Avatar         | Círculo del tamaño real                                            |
+| Fila de tabla  | Rectángulos por columna, **con los anchos reales de las columnas** |
+| Gráfico        | Rectángulo del área de trazado, **con los ejes ya dibujados**      |
+| Card           | Estructura interna completa: título, contenido, pie                |
 
 Dos detalles que separan un skeleton bueno de uno decorativo:
 

@@ -37,7 +37,7 @@ finance-os/
 
 Un hex, un tamaño o una duración se define **una vez** en
 `tokens/finance-os.tokens.json` y se compila hacia cada plataforma. La documentación
-explica *por qué* ese valor es ese y no otro, y cita el token — nunca lo redefine.
+explica _por qué_ ese valor es ese y no otro, y cita el token — nunca lo redefine.
 
 Cuando la documentación y los tokens no coinciden, **ganan los tokens** y la
 documentación está en falta.
@@ -58,13 +58,13 @@ diseño cuyo verificador se rompe cuando caduca un lockfile deja de verificarse.
 
 ## Estado
 
-| Área              | Estado                        |
-| ----------------- | ----------------------------- |
-| Línea Base        | Congelada                     |
-| Design System     | **v1.0 — completo**           |
-| Tokens            | v1.0 — compilados y auditados |
-| Wireframes        | No iniciado (siguiente fase)  |
-| Implementación    | No iniciado                   |
+| Área           | Estado                        |
+| -------------- | ----------------------------- |
+| Línea Base     | Congelada                     |
+| Design System  | **v1.0 — completo**           |
+| Tokens         | v1.0 — compilados y auditados |
+| Wireframes     | No iniciado (siguiente fase)  |
+| Implementación | No iniciado                   |
 
 ## Qué NO hay aquí todavía
 

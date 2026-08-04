@@ -19,14 +19,14 @@ umbrales ya estaban decididos.
 
 ## 2. Breakpoints (web)
 
-| Nombre | Desde | Sidebar | Rejilla | Densidad |
-| --- | ---: | --- | ---: | --- |
-| `xs` | 0 | Oculto, superpuesto | 4 col | `relaxed` |
-| `sm` | 640 | Oculto, superpuesto | 4 col | `relaxed` |
-| `md` | 768 | Colapsado (64 px) | 8 col | `default` |
-| `lg` | 1024 | Colapsado (64 px) | 12 col | `default` |
-| `xl` | 1280 | Expandido (240 px) | 12 col | `default` |
-| `2xl` | 1536 | Expandido | 12 col, máx. 1440 | `default` |
+| Nombre | Desde | Sidebar             |           Rejilla | Densidad  |
+| ------ | ----: | ------------------- | ----------------: | --------- |
+| `xs`   |     0 | Oculto, superpuesto |             4 col | `relaxed` |
+| `sm`   |   640 | Oculto, superpuesto |             4 col | `relaxed` |
+| `md`   |   768 | Colapsado (64 px)   |             8 col | `default` |
+| `lg`   |  1024 | Colapsado (64 px)   |            12 col | `default` |
+| `xl`   |  1280 | Expandido (240 px)  |            12 col | `default` |
+| `2xl`  |  1536 | Expandido           | 12 col, máx. 1440 | `default` |
 
 Solo hacia arriba (`min-width`), nunca `max-width`: cada breakpoint **añade**, no corrige.
 
@@ -45,12 +45,12 @@ Solo hacia arriba (`min-width`), nunca `max-width`: cada breakpoint **añade**, 
 Cada columna declara su prioridad, y la prioridad forma parte del diseño de la tabla, no de
 la implementación:
 
-| Prioridad | Ejemplo | Se oculta… |
-| ---: | --- | --- |
-| **1** | Concepto, importe principal | Nunca |
-| **2** | Variación, periodo comparado | Por debajo de `md` |
-| **3** | Metadatos, estado, fecha | Por debajo de `lg` |
-| **4** | Auditoría, usuario, origen | Solo bajo petición |
+| Prioridad | Ejemplo                      | Se oculta…         |
+| --------: | ---------------------------- | ------------------ |
+|     **1** | Concepto, importe principal  | Nunca              |
+|     **2** | Variación, periodo comparado | Por debajo de `md` |
+|     **3** | Metadatos, estado, fecha     | Por debajo de `lg` |
+|     **4** | Auditoría, usuario, origen   | Solo bajo petición |
 
 Lo que se oculta sigue accesible en el detalle de la fila. **Ocultar no es perder.**
 
@@ -80,16 +80,16 @@ Sidebar expandido → colapsado (iconos) → superpuesto con velo → barra infe
 
 ## 4. Lo que NO cambia nunca
 
-| Invariante | Por qué |
-| --- | --- |
-| Tamaño del texto de datos (14 px) | Reducirlo hace ilegible lo importante |
-| Tamaño de la cifra de KPI | Es lo que la hace principal |
-| Alineación de números a la derecha | Es lo que permite compararlos |
-| Cifras tabulares | Igual |
-| Contraste | La accesibilidad no depende del ancho |
-| Objetivo táctil mínimo | Crece en táctil, nunca decrece |
-| Rejilla de 8 px | Es la misma en todas partes |
-| Precisión decimal | Redondear distinto según pantalla produce cifras contradictorias |
+| Invariante                         | Por qué                                                          |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| Tamaño del texto de datos (14 px)  | Reducirlo hace ilegible lo importante                            |
+| Tamaño de la cifra de KPI          | Es lo que la hace principal                                      |
+| Alineación de números a la derecha | Es lo que permite compararlos                                    |
+| Cifras tabulares                   | Igual                                                            |
+| Contraste                          | La accesibilidad no depende del ancho                            |
+| Objetivo táctil mínimo             | Crece en táctil, nunca decrece                                   |
+| Rejilla de 8 px                    | Es la misma en todas partes                                      |
+| Precisión decimal                  | Redondear distinto según pantalla produce cifras contradictorias |
 
 La última es la más importante y la más fácil de romper: si el móvil muestra `2,8 M` y el
 escritorio `2.847.392,00 €`, dos personas mirando el mismo dato en dispositivos distintos
@@ -110,12 +110,12 @@ verán números distintos, y una de las dos lo dirá en voz alta en una reunión
 Excel no reajusta nada. Su equivalente son **cuatro contextos de salida fijos**, y se diseña
 para los cuatro desde el principio:
 
-| Contexto | Ancho útil | Decisiones |
-| --- | ---: | --- |
-| **Pantalla 1920** | ~1.700 px | Esqueleto completo B–L |
-| **Pantalla 1366** | ~1.140 px | Esqueleto completo. **Es el objetivo de diseño** |
-| **A4 apaisado** | 1.052 px @96 dpi | Área de impresión B:L, ajustar a 1 página de ancho |
-| **A4 vertical** | 744 px @96 dpi | Solo columnas de prioridad 1–2 |
+| Contexto          |       Ancho útil | Decisiones                                         |
+| ----------------- | ---------------: | -------------------------------------------------- |
+| **Pantalla 1920** |        ~1.700 px | Esqueleto completo B–L                             |
+| **Pantalla 1366** |        ~1.140 px | Esqueleto completo. **Es el objetivo de diseño**   |
+| **A4 apaisado**   | 1.052 px @96 dpi | Área de impresión B:L, ajustar a 1 página de ancho |
+| **A4 vertical**   |   744 px @96 dpi | Solo columnas de prioridad 1–2                     |
 
 El esqueleto de columnas de [08 · Grid](../foundations/08-grid.md#3-excel-el-esqueleto-de-columnas)
 (≈ 1.140 px) está dimensionado para el segundo y el tercero a la vez: **un libro diseñado a

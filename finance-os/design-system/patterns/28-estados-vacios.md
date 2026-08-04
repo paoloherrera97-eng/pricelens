@@ -7,13 +7,13 @@
 
 ## 1. Los cinco vacíos
 
-| Vacío | Causa | Qué necesita el usuario |
-| --- | --- | --- |
-| **Primer uso** | Aún no se ha configurado nada | Saber cómo empezar |
-| **Sin resultados** | Los filtros no devuelven nada | Saber qué filtro quitar |
+| Vacío              | Causa                                      | Qué necesita el usuario         |
+| ------------------ | ------------------------------------------ | ------------------------------- |
+| **Primer uso**     | Aún no se ha configurado nada              | Saber cómo empezar              |
+| **Sin resultados** | Los filtros no devuelven nada              | Saber qué filtro quitar         |
 | **Vacío legítimo** | No hubo movimientos. **Es un dato válido** | Confirmación de que es correcto |
-| **Sin permiso** | Hay datos, pero no para este usuario | Saber a quién pedirlo |
-| **Error de carga** | Fallo técnico | Reintentar |
+| **Sin permiso**    | Hay datos, pero no para este usuario       | Saber a quién pedirlo           |
+| **Error de carga** | Fallo técnico                              | Reintentar                      |
 
 **El vacío legítimo es el que casi todos los productos tratan mal.** "No hay movimientos en
 julio" puede ser exactamente la respuesta correcta y valiosa: significa que no hubo
@@ -37,23 +37,23 @@ en un aparente fallo.
 └────────────────────────────────────────────────────┘
 ```
 
-| Elemento | Regla |
-| --- | --- |
-| **Icono** | **No hay.** Ver § 4 |
-| Título | Una frase que dice **qué pasa**, con el contexto concreto |
-| Descripción | Una o dos líneas: la causa. Nunca más |
-| Acción | Solo si hay una salida clara. Nunca dos |
-| Alineación | Centrada horizontalmente, en el bloque que estaría ocupado |
+| Elemento    | Regla                                                      |
+| ----------- | ---------------------------------------------------------- |
+| **Icono**   | **No hay.** Ver § 4                                        |
+| Título      | Una frase que dice **qué pasa**, con el contexto concreto  |
+| Descripción | Una o dos líneas: la causa. Nunca más                      |
+| Acción      | Solo si hay una salida clara. Nunca dos                    |
+| Alineación  | Centrada horizontalmente, en el bloque que estaría ocupado |
 
 ## 3. Los cinco, escritos
 
-| Vacío | Título | Descripción | Acción |
-| --- | --- | --- | --- |
-| Primer uso | "Conecta tu primer origen de datos" | "Finance OS lee tus movimientos desde tu ERP o desde un archivo." | `Conectar origen` |
-| Sin resultados | "Ningún asiento coincide con los filtros" | "3 filtros activos: periodo, cuenta y estado." | `Quitar filtros` |
-| Vacío legítimo | "Sin movimientos en julio 2025" | "La cuenta 4300 no registró operaciones entre el 1 y el 31 de julio." | `Cambiar periodo` |
-| Sin permiso | "No tienes acceso a esta entidad" | "Solicita acceso a Grupo Ejemplo · Consolidado a tu administrador." | `Solicitar acceso` |
-| Error de carga | "No se pudieron cargar los movimientos" | "El origen no respondió. Los datos mostrados pueden ser anteriores." | `Reintentar` |
+| Vacío          | Título                                    | Descripción                                                           | Acción             |
+| -------------- | ----------------------------------------- | --------------------------------------------------------------------- | ------------------ |
+| Primer uso     | "Conecta tu primer origen de datos"       | "Finance OS lee tus movimientos desde tu ERP o desde un archivo."     | `Conectar origen`  |
+| Sin resultados | "Ningún asiento coincide con los filtros" | "3 filtros activos: periodo, cuenta y estado."                        | `Quitar filtros`   |
+| Vacío legítimo | "Sin movimientos en julio 2025"           | "La cuenta 4300 no registró operaciones entre el 1 y el 31 de julio." | `Cambiar periodo`  |
+| Sin permiso    | "No tienes acceso a esta entidad"         | "Solicita acceso a Grupo Ejemplo · Consolidado a tu administrador."   | `Solicitar acceso` |
+| Error de carga | "No se pudieron cargar los movimientos"   | "El origen no respondió. Los datos mostrados pueden ser anteriores."  | `Reintentar`       |
 
 Observación transversal: **todos mencionan el contexto real** —la cuenta, el periodo, el
 número de filtros—. Un estado vacío genérico obliga al usuario a reconstruir por su cuenta

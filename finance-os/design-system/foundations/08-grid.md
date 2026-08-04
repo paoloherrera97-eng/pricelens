@@ -10,14 +10,14 @@
 12 porque se divide en 2, 3, 4 y 6 — todas las particiones que un dashboard financiero
 necesita (mitades para comparativas, tercios para KPIs, cuartos para métricas secundarias).
 
-| Breakpoint | Columnas | Canal | Margen | Ancho máximo |
-| --- | ---: | ---: | ---: | ---: |
-| `2xl` ≥ 1536 | 12 | 24 px | 48 px | 1440 px |
-| `xl` ≥ 1280 | 12 | 24 px | 48 px | 1440 px |
-| `lg` ≥ 1024 | 12 | 24 px | 32 px | fluido |
-| `md` ≥ 768 | 8 | 16 px | 24 px | fluido |
-| `sm` ≥ 640 | 4 | 16 px | 16 px | fluido |
-| `< 640` | 4 | 16 px | 16 px | fluido |
+| Breakpoint   | Columnas | Canal | Margen | Ancho máximo |
+| ------------ | -------: | ----: | -----: | -----------: |
+| `2xl` ≥ 1536 |       12 | 24 px |  48 px |      1440 px |
+| `xl` ≥ 1280  |       12 | 24 px |  48 px |      1440 px |
+| `lg` ≥ 1024  |       12 | 24 px |  32 px |       fluido |
+| `md` ≥ 768   |        8 | 16 px |  24 px |       fluido |
+| `sm` ≥ 640   |        4 | 16 px |  16 px |       fluido |
+| `< 640`      |        4 | 16 px |  16 px |       fluido |
 
 **El canal es siempre un token de espaciado** (`space-5` = 24 px, `space-4` = 16 px). No hay
 canales de 20 px ni de 30 px.
@@ -26,12 +26,12 @@ canales de 20 px ni de 30 px.
 
 Cuatro, y cubren el 95 % de los casos. Inventar un quinto exige justificarlo:
 
-| Reparto | Columnas | Uso |
-| --- | --- | --- |
-| **Completo** | 12 | Tabla, gráfico ancho |
-| **Mitades** | 6 + 6 | Comparativa entre dos periodos o dos entidades |
-| **Tercios** | 4 + 4 + 4 | Fila de tres KPIs |
-| **Principal + apoyo** | 8 + 4 | Contenido con panel de contexto a la derecha |
+| Reparto               | Columnas  | Uso                                            |
+| --------------------- | --------- | ---------------------------------------------- |
+| **Completo**          | 12        | Tabla, gráfico ancho                           |
+| **Mitades**           | 6 + 6     | Comparativa entre dos periodos o dos entidades |
+| **Tercios**           | 4 + 4 + 4 | Fila de tres KPIs                              |
+| **Principal + apoyo** | 8 + 4     | Contenido con panel de contexto a la derecha   |
 
 La fila de **cuatro KPIs** usa 3+3+3+3. Cinco o más KPIs en fila no existen en el sistema: a
 partir de cuatro, ninguno es principal, y [un KPI que no es principal no es un
@@ -54,15 +54,15 @@ parecer un producto.
 
 **El esqueleto es fijo para todo el libro:**
 
-| Columna | Ancho (car.) | Ancho ≈ px | Papel |
-| --- | ---: | ---: | --- |
-| `A` | 2,5 | 24 | Margen izquierdo. **Siempre vacía** |
-| `B` | 32 | 229 | Etiqueta / concepto / descripción |
-| `C` | 2 | 19 | Canal |
-| `D`–`I` | 14 | 103 | Columnas de datos (6 disponibles) |
-| `J` | 2 | 19 | Canal |
-| `K` | 14 | 103 | Total / variación |
-| `L` | 2,5 | 24 | Margen derecho. **Siempre vacía** |
+| Columna | Ancho (car.) | Ancho ≈ px | Papel                               |
+| ------- | -----------: | ---------: | ----------------------------------- |
+| `A`     |          2,5 |         24 | Margen izquierdo. **Siempre vacía** |
+| `B`     |           32 |        229 | Etiqueta / concepto / descripción   |
+| `C`     |            2 |         19 | Canal                               |
+| `D`–`I` |           14 |        103 | Columnas de datos (6 disponibles)   |
+| `J`     |            2 |         19 | Canal                               |
+| `K`     |           14 |        103 | Total / variación                   |
+| `L`     |          2,5 |         24 | Margen derecho. **Siempre vacía**   |
 
 Total ≈ 1.140 px: cabe en una pantalla de 1366 px, que sigue siendo el portátil corporativo
 más común, y en A4 apaisado al 100 % de escala.
@@ -96,12 +96,12 @@ libro reescribe el esqueleto entero.
 
 El esqueleto de Excel es la traducción del reparto de 12 columnas, no un diseño paralelo:
 
-| Reparto web | Equivalente en Excel |
-| --- | --- |
-| Completo (12) | `B`–`K` |
-| Mitades (6+6) | `B`–`F` \| `G`–`K` |
-| Tercios (4+4+4) | `B`–`D` \| `E`–`G` \| `H`–`K` |
-| Principal + apoyo (8+4) | `B`–`I` \| `K` |
+| Reparto web             | Equivalente en Excel          |
+| ----------------------- | ----------------------------- |
+| Completo (12)           | `B`–`K`                       |
+| Mitades (6+6)           | `B`–`F` \| `G`–`K`            |
+| Tercios (4+4+4)         | `B`–`D` \| `E`–`G` \| `H`–`K` |
+| Principal + apoyo (8+4) | `B`–`I` \| `K`                |
 
 Un dashboard diseñado sobre la rejilla web se transcribe a Excel sin rediseñarse. Ese es el
 único objetivo de esta sección.

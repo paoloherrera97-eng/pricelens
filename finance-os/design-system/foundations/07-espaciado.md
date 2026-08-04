@@ -7,28 +7,28 @@
 
 ## 1. La unidad base: 8 px, y por qué exactamente 8
 
-| Razón | Detalle |
-| --- | --- |
-| **Divisibilidad** | 8 = 2·2·2. Se parte en 4 y en 2 sin decimales en ningún factor de escala |
-| **Densidad de pantalla** | Encaja en @1x, @1.5x, @2x y @3x sin subpíxeles |
-| **Y la decisiva: Excel** | **8 px = 6 pt exactos** a 96 dpi |
+| Razón                    | Detalle                                                                  |
+| ------------------------ | ------------------------------------------------------------------------ |
+| **Divisibilidad**        | 8 = 2·2·2. Se parte en 4 y en 2 sin decimales en ningún factor de escala |
+| **Densidad de pantalla** | Encaja en @1x, @1.5x, @2x y @3x sin subpíxeles                           |
+| **Y la decisiva: Excel** | **8 px = 6 pt exactos** a 96 dpi                                         |
 
 La tercera es la que zanja el debate. Excel mide en puntos, no en píxeles. Con una base de
 8 px, **toda la escala de espaciado convierte a números enteros de punto**:
 
-| Token | px | pt |
-| --- | ---: | ---: |
-| `space-1` | 4 | 3 |
-| `space-2` | 8 | 6 |
-| `space-3` | 12 | 9 |
-| `space-4` | 16 | 12 |
-| `space-5` | 24 | 18 |
-| `space-6` | 32 | 24 |
-| `space-7` | 40 | 30 |
-| `space-8` | 48 | 36 |
-| `space-9` | 64 | 48 |
-| `space-10` | 80 | 60 |
-| `space-11` | 96 | 72 |
+| Token      |  px |  pt |
+| ---------- | --: | --: |
+| `space-1`  |   4 |   3 |
+| `space-2`  |   8 |   6 |
+| `space-3`  |  12 |   9 |
+| `space-4`  |  16 |  12 |
+| `space-5`  |  24 |  18 |
+| `space-6`  |  32 |  24 |
+| `space-7`  |  40 |  30 |
+| `space-8`  |  48 |  36 |
+| `space-9`  |  64 |  48 |
+| `space-10` |  80 |  60 |
+| `space-11` |  96 |  72 |
 
 Ni un solo decimal. La rejilla web y la rejilla de Excel **son la misma rejilla expresada en
 dos unidades**, no dos rejillas que se parecen. Con una base de 10 px, `space-3` habría sido
@@ -41,16 +41,16 @@ separación icono-texto, padding vertical de un badge. Nunca entre componentes.
 
 El espacio codifica pertenencia. Estos son los valores, y su uso es prescriptivo:
 
-| Distancia | Significa | Ejemplo |
-| ---: | --- | --- |
-| **4 px** | Son la misma cosa | Icono y su etiqueta |
-| **8 px** | Están íntimamente relacionados | Etiqueta y su campo |
-| **12 px** | Pertenecen al mismo grupo | Dos campos de un formulario |
-| **16 px** | Mismo bloque | Padding interior de una card compacta |
-| **24 px** | Bloques distintos, misma sección | Dos cards en una fila |
-| **32 px** | Secciones distintas | KPIs y la tabla de debajo |
-| **48 px** | Regiones distintas | Encabezado y contenido |
-| **64 px+** | Silencio deliberado | Margen superior de una pantalla de resumen |
+|  Distancia | Significa                        | Ejemplo                                    |
+| ---------: | -------------------------------- | ------------------------------------------ |
+|   **4 px** | Son la misma cosa                | Icono y su etiqueta                        |
+|   **8 px** | Están íntimamente relacionados   | Etiqueta y su campo                        |
+|  **12 px** | Pertenecen al mismo grupo        | Dos campos de un formulario                |
+|  **16 px** | Mismo bloque                     | Padding interior de una card compacta      |
+|  **24 px** | Bloques distintos, misma sección | Dos cards en una fila                      |
+|  **32 px** | Secciones distintas              | KPIs y la tabla de debajo                  |
+|  **48 px** | Regiones distintas               | Encabezado y contenido                     |
+| **64 px+** | Silencio deliberado              | Margen superior de una pantalla de resumen |
 
 **La regla de la proximidad manda sobre la estética.** Si dos elementos relacionados están a
 24 px y dos no relacionados a 16 px, la pantalla se lee al revés de como está pensada, por
@@ -75,11 +75,11 @@ dashboard.
 
 Alturas de fila y de control, sincronizadas por densidad:
 
-| Densidad | Fila de tabla | Control | Cuándo |
-| --- | ---: | ---: | --- |
-| `compact` | 28 px / 21 pt | 28 px | Conciliar, revisar volumen |
-| `default` | 36 px / 27 pt | 36 px | Trabajo normal |
-| `relaxed` | 44 px / 33 pt | 44 px | Presentación, táctil |
+| Densidad  | Fila de tabla | Control | Cuándo                     |
+| --------- | ------------: | ------: | -------------------------- |
+| `compact` | 28 px / 21 pt |   28 px | Conciliar, revisar volumen |
+| `default` | 36 px / 27 pt |   36 px | Trabajo normal             |
+| `relaxed` | 44 px / 33 pt |   44 px | Presentación, táctil       |
 
 Que la fila y el control midan lo mismo no es casualidad: permite poner un `select` dentro de
 una celda sin que la fila cambie de alto, que es de donde salen la mitad de los saltos de
@@ -87,13 +87,13 @@ layout en las tablas editables.
 
 ## 5. Márgenes de página
 
-| Contexto | Margen lateral | Máximo de contenido |
-| --- | ---: | ---: |
-| Web ≥ 1280 px | 48 px | 1440 px |
-| Web 1024–1279 px | 32 px | fluido |
-| Web 768–1023 px | 24 px | fluido |
-| Web < 768 px | 16 px | fluido |
-| Excel | Columna A fija, 24 px / 18 pt | Hasta la última columna del esqueleto |
+| Contexto         |                Margen lateral |                   Máximo de contenido |
+| ---------------- | ----------------------------: | ------------------------------------: |
+| Web ≥ 1280 px    |                         48 px |                               1440 px |
+| Web 1024–1279 px |                         32 px |                                fluido |
+| Web 768–1023 px  |                         24 px |                                fluido |
+| Web < 768 px     |                         16 px |                                fluido |
+| Excel            | Columna A fija, 24 px / 18 pt | Hasta la última columna del esqueleto |
 
 El máximo de 1440 px no es un capricho: una tabla financiera más ancha obliga a mover la
 cabeza para seguir una fila, y a partir de ahí empiezan los errores de línea cruzada. Por

@@ -7,12 +7,12 @@
 
 ## 1. Los cuatro niveles
 
-| Nivel | Cuándo | Color | Descartable |
-| --- | --- | --- | :---: |
-| **Información** | Contexto útil que no exige acción | Acento | Sí |
-| **Aviso** | Algo que puede afectar a una decisión | Ámbar | Sí |
-| **Error** | Algo falló o impide continuar | Bermellón | **No** |
-| **Éxito** | Confirmación de una acción completada | Jade | Auto (5 s) |
+| Nivel           | Cuándo                                | Color     | Descartable |
+| --------------- | ------------------------------------- | --------- | :---------: |
+| **Información** | Contexto útil que no exige acción     | Acento    |     Sí      |
+| **Aviso**       | Algo que puede afectar a una decisión | Ámbar     |     Sí      |
+| **Error**       | Algo falló o impide continuar         | Bermellón |   **No**    |
+| **Éxito**       | Confirmación de una acción completada | Jade      | Auto (5 s)  |
 
 ## 2. Anatomía
 
@@ -27,13 +27,13 @@
    fondo surface-warning · borde izquierdo 3px text-warning · radio 6 · padding 16
 ```
 
-| Elemento | Especificación |
-| --- | --- |
-| Icono | 20 px, en el color del nivel, arriba a la izquierda |
-| Título | `h4` 16 px / 600 / `text-primary` — **el qué**, en una línea |
-| Cuerpo | `body` 14 / `text-secondary` — **la causa y la salida** |
-| Acciones | Botones terciarios, máximo 2 |
-| Cerrar | `×` 16 px arriba a la derecha, salvo en errores |
+| Elemento      | Especificación                                               |
+| ------------- | ------------------------------------------------------------ |
+| Icono         | 20 px, en el color del nivel, arriba a la izquierda          |
+| Título        | `h4` 16 px / 600 / `text-primary` — **el qué**, en una línea |
+| Cuerpo        | `body` 14 / `text-secondary` — **la causa y la salida**      |
+| Acciones      | Botones terciarios, máximo 2                                 |
+| Cerrar        | `×` 16 px arriba a la derecha, salvo en errores              |
 | Barra lateral | 3 px en el color del nivel — sobrevive a la escala de grises |
 
 **El fondo teñido no basta.** Los cuatro fondos (`surface-warning`, `-negative`, `-accent`,
@@ -42,12 +42,12 @@ impresos. Icono + barra lateral + palabra hacen el trabajo real; el fondo solo a
 
 ## 3. Colocación
 
-| Tipo | Dónde | Comportamiento |
-| --- | --- | --- |
-| **Global** | Bajo el header, ancho completo | Persiste hasta resolverse |
-| **De sección** | Dentro de la card afectada | Persiste |
-| **En línea** | Bajo el campo | Ligada a la validación |
-| **Toast** | Abajo a la derecha | 5 s, o hasta descartar |
+| Tipo           | Dónde                          | Comportamiento            |
+| -------------- | ------------------------------ | ------------------------- |
+| **Global**     | Bajo el header, ancho completo | Persiste hasta resolverse |
+| **De sección** | Dentro de la card afectada     | Persiste                  |
+| **En línea**   | Bajo el campo                  | Ligada a la validación    |
+| **Toast**      | Abajo a la derecha             | 5 s, o hasta descartar    |
 
 **El toast solo para confirmaciones.** Un error nunca es un toast: desaparece antes de que
 el usuario lo lea y no deja rastro. Los errores persisten hasta que alguien hace algo.
@@ -69,12 +69,12 @@ el usuario lo lea y no deja rastro. Los errores persisten hasta que alguien hace
 
 Las cuatro que este producto necesita nombrar explícitamente:
 
-| Caso | Nivel | Mensaje modelo |
-| --- | --- | --- |
-| Datos desactualizados | Aviso | "Última sincronización: 31/07 18:04. Las cifras pueden no reflejar movimientos posteriores." |
-| Cifras estimadas | Aviso | "3 de 12 partidas son estimaciones. Ver cuáles." |
-| Descuadre | Error | "El activo no cuadra con pasivo + patrimonio. Diferencia: 1.284,00 €." |
-| Periodo cerrado | Información | "Julio 2025 está cerrado. Los asientos son de solo lectura." |
+| Caso                  | Nivel       | Mensaje modelo                                                                               |
+| --------------------- | ----------- | -------------------------------------------------------------------------------------------- |
+| Datos desactualizados | Aviso       | "Última sincronización: 31/07 18:04. Las cifras pueden no reflejar movimientos posteriores." |
+| Cifras estimadas      | Aviso       | "3 de 12 partidas son estimaciones. Ver cuáles."                                             |
+| Descuadre             | Error       | "El activo no cuadra con pasivo + patrimonio. Diferencia: 1.284,00 €."                       |
+| Periodo cerrado       | Información | "Julio 2025 está cerrado. Los asientos son de solo lectura."                                 |
 
 El descuadre es un error, no un aviso: **un balance que no cuadra invalida todo lo que hay
 encima**, y descartarlo no debe ser posible.

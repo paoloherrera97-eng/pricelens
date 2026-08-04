@@ -38,11 +38,11 @@ svg/chevron-up.svg
   → …
 ```
 
-| Tamaño | Trazo | Densidades |
-| ---: | ---: | --- |
-| 24 px | 1,5 px | @1x @2x @3x |
-| 20 px | 1,5 px | @1x @2x @3x |
-| 16 px | **1,25 px** | @1x @2x @3x |
+| Tamaño |       Trazo | Densidades  |
+| -----: | ----------: | ----------- |
+|  24 px |      1,5 px | @1x @2x @3x |
+|  20 px |      1,5 px | @1x @2x @3x |
+|  16 px | **1,25 px** | @1x @2x @3x |
 
 El ajuste de trazo a 16 px es óptico, no matemático: con 1,5 px se cierran las contraformas y
 el icono se convierte en una mancha.
@@ -52,14 +52,14 @@ el icono se convierte en una mancha.
 Los seis del sistema, tomados de
 [`../../tokens/build/finance-os.excel.json`](../../tokens/build/finance-os.excel.json):
 
-| Nombre | Hex |
-| --- | --- |
+| Nombre      | Hex                          |
+| ----------- | ---------------------------- |
 | `secondary` | `#55606F` — **el más usado** |
-| `primary` | `#151A21` |
-| `accent` | `#2F49B4` |
-| `positive` | `#127543` |
-| `negative` | `#C22B24` |
-| `warning` | `#8F5B12` |
+| `primary`   | `#151A21`                    |
+| `accent`    | `#2F49B4`                    |
+| `positive`  | `#127543`                    |
+| `negative`  | `#C22B24`                    |
+| `warning`   | `#8F5B12`                    |
 
 En web **no se exporta por color**: el SVG hereda `currentColor`.
 

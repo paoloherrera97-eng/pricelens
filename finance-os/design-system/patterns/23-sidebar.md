@@ -27,15 +27,15 @@
    240px · fondo canvas · borde derecho border-subtle
 ```
 
-| Propiedad | Valor |
-| --- | --- |
-| Ancho expandido | **240 px** |
-| Ancho colapsado | **64 px** (solo iconos) |
-| Fondo | `canvas` `#F6F8FA` |
-| Separación con el contenido | `border-subtle` 1 px |
-| Alto de elemento | 36 px (`default`) |
-| Padding horizontal | 12 px |
-| Icono | 20 px, `text-secondary`, a 12 px del texto |
+| Propiedad                   | Valor                                      |
+| --------------------------- | ------------------------------------------ |
+| Ancho expandido             | **240 px**                                 |
+| Ancho colapsado             | **64 px** (solo iconos)                    |
+| Fondo                       | `canvas` `#F6F8FA`                         |
+| Separación con el contenido | `border-subtle` 1 px                       |
+| Alto de elemento            | 36 px (`default`)                          |
+| Padding horizontal          | 12 px                                      |
+| Icono                       | 20 px, `text-secondary`, a 12 px del texto |
 
 **Fondo `canvas` y no `surface`.** La navegación es el fondo sobre el que ocurre el trabajo,
 no un objeto elevado sobre él. Con el sidebar en gris y el contenido en cards blancas, la
@@ -47,13 +47,13 @@ antemano.
 
 ## 2. Elementos
 
-| Estado | Fondo | Texto | Icono |
-| --- | --- | --- | --- |
-| default | — | `text-secondary` | `text-secondary` |
-| hover | `surface-hover` | `text-primary` | `text-primary` |
-| **activo** | `surface-accent` + barra `accent` 2 px izquierda | `text-accent`, peso 500 | `text-accent` |
-| padre de activo | — | `text-primary`, peso 500 | `text-primary` |
-| disabled | — | `text-disabled` | `text-disabled` |
+| Estado          | Fondo                                            | Texto                    | Icono            |
+| --------------- | ------------------------------------------------ | ------------------------ | ---------------- |
+| default         | —                                                | `text-secondary`         | `text-secondary` |
+| hover           | `surface-hover`                                  | `text-primary`           | `text-primary`   |
+| **activo**      | `surface-accent` + barra `accent` 2 px izquierda | `text-accent`, peso 500  | `text-accent`    |
+| padre de activo | —                                                | `text-primary`, peso 500 | `text-primary`   |
+| disabled        | —                                                | `text-disabled`          | `text-disabled`  |
 
 Radio `radius-md` 6 px, con 8 px de margen lateral para que el resalte no toque el borde.
 
@@ -104,9 +104,9 @@ A 64 px, solo iconos, con la etiqueta en tooltip a la derecha tras 400 ms.
 
 Excel no tiene sidebar. Hay dos opciones honestas, y la elección no es de gusto:
 
-| Opción | Cuándo | Coste |
-| --- | --- | --- |
-| **Hoja "Inicio" con índice** | Libro para compartir | Ninguno. **Preferida** |
+| Opción                         | Cuándo                 | Coste                          |
+| ------------------------------ | ---------------------- | ------------------------------ |
+| **Hoja "Inicio" con índice**   | Libro para compartir   | Ninguno. **Preferida**         |
 | **Columna de navegación fija** | Libro de uso intensivo | Ocupa ancho en todas las hojas |
 
 ### Opción preferida — hoja Inicio

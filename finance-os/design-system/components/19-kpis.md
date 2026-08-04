@@ -16,14 +16,14 @@ INGRESOS NETOS                    ← overline 11 / 600 / +0,06em / text-seconda
 Tres líneas y **ninguna caja**. Separaciones: etiqueta→cifra **8 px**, cifra→comparación
 **4 px**.
 
-| Elemento | Token | Obligatorio |
-| --- | --- | :---: |
-| Etiqueta | `overline` 11 px, `text-secondary` | Sí |
-| Valor | `metric-lg` 32 px, `text-primary`, tabular | Sí |
-| Variación | `caption` 12 px, cursor + signo + color | No |
-| Comparación | `caption` 12 px, `text-tertiary` | Sí, **si hay variación** |
-| Sparkline | 60 × 20 px, `accent`, sin ejes | No |
-| Marca de estimación | Badge `Est.` | Sí, si aplica |
+| Elemento            | Token                                      |       Obligatorio        |
+| ------------------- | ------------------------------------------ | :----------------------: |
+| Etiqueta            | `overline` 11 px, `text-secondary`         |            Sí            |
+| Valor               | `metric-lg` 32 px, `text-primary`, tabular |            Sí            |
+| Variación           | `caption` 12 px, cursor + signo + color    |            No            |
+| Comparación         | `caption` 12 px, `text-tertiary`           | Sí, **si hay variación** |
+| Sparkline           | 60 × 20 px, `accent`, sin ejes             |            No            |
+| Marca de estimación | Badge `Est.`                               |      Sí, si aplica       |
 
 ## 2. Las reglas duras
 
@@ -63,38 +63,38 @@ jerarquía —uno principal grande, el resto secundarios— o una tabla.
 
 ## 3. Jerarquía de KPIs
 
-| Nivel | Valor | Etiqueta | Uso |
-| --- | --- | --- | --- |
-| **Principal** | `display` 40 px | `overline` 11 px | Una por pantalla. La cifra de la vista |
-| **Estándar** | `metric-lg` 32 px | `overline` 11 px | Fila de 3–4 |
-| **Secundario** | `metric-md` 24 px | `caption` 12 px | Dentro de una card, apoyo |
-| **En línea** | `metric-sm` 14 px | `caption` 12 px | Dentro de una tabla o un pie |
+| Nivel          | Valor             | Etiqueta         | Uso                                    |
+| -------------- | ----------------- | ---------------- | -------------------------------------- |
+| **Principal**  | `display` 40 px   | `overline` 11 px | Una por pantalla. La cifra de la vista |
+| **Estándar**   | `metric-lg` 32 px | `overline` 11 px | Fila de 3–4                            |
+| **Secundario** | `metric-md` 24 px | `caption` 12 px  | Dentro de una card, apoyo              |
+| **En línea**   | `metric-sm` 14 px | `caption` 12 px  | Dentro de una tabla o un pie           |
 
 ## 4. Variantes
 
-| Variante | Qué añade |
-| --- | --- |
-| **Simple** | Etiqueta + valor |
-| **Con variación** | + cursor, porcentaje y base |
-| **Con tendencia** | + sparkline de 12 periodos, sin ejes ni puntos |
-| **Con objetivo** | + barra de progreso de 4 px y `72 % del objetivo` |
-| **Comparativo** | Dos valores lado a lado con la diferencia debajo |
+| Variante          | Qué añade                                         |
+| ----------------- | ------------------------------------------------- |
+| **Simple**        | Etiqueta + valor                                  |
+| **Con variación** | + cursor, porcentaje y base                       |
+| **Con tendencia** | + sparkline de 12 periodos, sin ejes ni puntos    |
+| **Con objetivo**  | + barra de progreso de 4 px y `72 % del objetivo` |
+| **Comparativo**   | Dos valores lado a lado con la diferencia debajo  |
 
 El sparkline **no tiene ejes, ni cuadrícula, ni puntos, ni tooltip**. Comunica forma, no
 valores. Si hace falta leer valores, es un [gráfico](20-graficos.md), no un sparkline.
 
 ## 5. Estados
 
-| Estado | Aspecto |
-| --- | --- |
-| Cargando | [Skeleton](../patterns/30-skeletons.md) con la forma exacta de las tres líneas |
-| Sin dato | Valor `—` en `text-tertiary` + `caption` con el motivo |
-| Estimado | Badge `Est.` a la derecha del valor |
-| Desactualizado | Valor en `text-secondary` + marca de tiempo en el pie |
-| Interactivo | Toda la card desciende al detalle; hover a elevación 2 |
+| Estado         | Aspecto                                                                        |
+| -------------- | ------------------------------------------------------------------------------ |
+| Cargando       | [Skeleton](../patterns/30-skeletons.md) con la forma exacta de las tres líneas |
+| Sin dato       | Valor `—` en `text-tertiary` + `caption` con el motivo                         |
+| Estimado       | Badge `Est.` a la derecha del valor                                            |
+| Desactualizado | Valor en `text-secondary` + marca de tiempo en el pie                          |
+| Interactivo    | Toda la card desciende al detalle; hover a elevación 2                         |
 
 **El valor nunca se anima.** Ni contador ascendente, ni fundido al cambiar. Durante una
-animación de *count-up* la pantalla muestra cifras que no son ciertas, y quien mire en ese
+animación de _count-up_ la pantalla muestra cifras que no son ciertas, y quien mire en ese
 instante lee un número falso. En un producto financiero es inaceptable, por bonito que quede.
 
 ## 6. Accesibilidad

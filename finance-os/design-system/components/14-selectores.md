@@ -7,13 +7,13 @@
 
 ## 1. Cuál usar
 
-| Opciones | Selección única | Selección múltiple |
-| ---: | --- | --- |
-| 2 | **Switch** (si es on/off) o **Radio** | Checkbox |
-| 3–5 | **Segmented control** | Grupo de checkbox |
-| 6–15 | **Select** | **Multi-select** |
-| 15+ | **Combobox** (con búsqueda) | **Combobox múltiple** |
-| Jerárquicas | **Tree select** | **Tree select** múltiple |
+|    Opciones | Selección única                       | Selección múltiple       |
+| ----------: | ------------------------------------- | ------------------------ |
+|           2 | **Switch** (si es on/off) o **Radio** | Checkbox                 |
+|         3–5 | **Segmented control**                 | Grupo de checkbox        |
+|        6–15 | **Select**                            | **Multi-select**         |
+|         15+ | **Combobox** (con búsqueda)           | **Combobox múltiple**    |
+| Jerárquicas | **Tree select**                       | **Tree select** múltiple |
 
 **Regla:** a partir de 15 opciones, la búsqueda deja de ser una comodidad y pasa a ser
 obligatoria. El plan contable, los centros de coste y las cuentas bancarias siempre pasan de
@@ -38,13 +38,13 @@ Etiqueta                          body-strong 14
 
 ### Opciones
 
-| Estado | Aspecto |
-| --- | --- |
-| default | `text-primary` sobre `surface`, alto 36 px, padding 12 px |
-| hover | fondo `surface-hover` |
-| selected | fondo `surface-accent`, texto `text-accent`, `check` de 16 px a la derecha |
-| disabled | `text-disabled`, sin hover |
-| agrupadas | encabezado `overline` en `text-secondary`, no seleccionable |
+| Estado    | Aspecto                                                                    |
+| --------- | -------------------------------------------------------------------------- |
+| default   | `text-primary` sobre `surface`, alto 36 px, padding 12 px                  |
+| hover     | fondo `surface-hover`                                                      |
+| selected  | fondo `surface-accent`, texto `text-accent`, `check` de 16 px a la derecha |
+| disabled  | `text-disabled`, sin hover                                                 |
+| agrupadas | encabezado `overline` en `text-secondary`, no seleccionable                |
 
 El elemento seleccionado lleva **check además del fondo**: el fondo teñido solo es un
 significado por color.
@@ -82,15 +82,15 @@ desiguales se lee como una jerarquía que no existe.
 
 ## 5. Checkbox y radio
 
-| | Checkbox | Radio |
-| --- | --- | --- |
-| Forma | Cuadrado, `radius-sm` 4 px | Círculo |
-| Tamaño | 16 × 16 px | 16 × 16 px |
-| Área de clic | 24 × 24 px mínimo, **incluye la etiqueta** | igual |
-| Sin marcar | Borde `border-strong` 1 px, fondo `surface` | igual |
-| Marcado | Fondo `accent`, check blanco 12 px | Punto blanco de 6 px sobre `accent` |
-| Indeterminado | Fondo `accent`, guion blanco | No existe |
-| Separación etiqueta | 8 px | 8 px |
+|                     | Checkbox                                    | Radio                               |
+| ------------------- | ------------------------------------------- | ----------------------------------- |
+| Forma               | Cuadrado, `radius-sm` 4 px                  | Círculo                             |
+| Tamaño              | 16 × 16 px                                  | 16 × 16 px                          |
+| Área de clic        | 24 × 24 px mínimo, **incluye la etiqueta**  | igual                               |
+| Sin marcar          | Borde `border-strong` 1 px, fondo `surface` | igual                               |
+| Marcado             | Fondo `accent`, check blanco 12 px          | Punto blanco de 6 px sobre `accent` |
+| Indeterminado       | Fondo `accent`, guion blanco                | No existe                           |
+| Separación etiqueta | 8 px                                        | 8 px                                |
 
 Cuadrado para múltiple y círculo para única es una convención de cuarenta años. No se
 reinventa.
@@ -127,14 +127,14 @@ porque el switch se lee como el valor de un ajuste, no como una opción de una l
 
 ## 8. Excel
 
-| Componente | Implementación |
-| --- | --- |
-| **Select** | Validación de datos → Lista, con rango con nombre como origen |
-| **Combobox** | Control de formulario *Cuadro combinado* (permite búsqueda por prefijo) |
-| **Segmented** | Fila de formas con macro; la activa cambia a relleno `FFFFFF` + borde |
-| **Checkbox** | Casilla de verificación (control de formulario) vinculada a celda |
-| **Radio** | Botón de opción dentro de un *Cuadro de grupo* — **el grupo es obligatorio** |
-| **Switch** | No existe. **Se usa checkbox.** Simularlo con formas no aporta nada |
+| Componente    | Implementación                                                               |
+| ------------- | ---------------------------------------------------------------------------- |
+| **Select**    | Validación de datos → Lista, con rango con nombre como origen                |
+| **Combobox**  | Control de formulario _Cuadro combinado_ (permite búsqueda por prefijo)      |
+| **Segmented** | Fila de formas con macro; la activa cambia a relleno `FFFFFF` + borde        |
+| **Checkbox**  | Casilla de verificación (control de formulario) vinculada a celda            |
+| **Radio**     | Botón de opción dentro de un _Cuadro de grupo_ — **el grupo es obligatorio** |
+| **Switch**    | No existe. **Se usa checkbox.** Simularlo con formas no aporta nada          |
 
 ```
 Lista de validación:  Origen = rango con nombre (nunca lista escrita a mano:

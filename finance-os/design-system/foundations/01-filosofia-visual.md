@@ -17,14 +17,14 @@ hay del orden de 300 a 3.000 números. Cada gramo de decoración se multiplica p
 
 Lo que se hereda de las referencias:
 
-| Referencia           | Lo que se toma                                                          |
-| -------------------- | ----------------------------------------------------------------------- |
-| **Linear**           | Densidad sin agobio. Que quepa mucho y no parezca mucho.                |
-| **Stripe Dashboard** | El dato financiero como protagonista tipográfico, no como celda de tabla|
-| **Notion**           | Superficies tranquilas y jerarquía por espacio, no por caja             |
-| **Vercel**           | Autoridad del monocromo. El color es un acento, no un tema.             |
-| **Arc**              | Que un producto serio pueda tener temperatura                           |
-| **Apple**            | Que la tipografía cargue la jerarquía sola                              |
+| Referencia           | Lo que se toma                                                           |
+| -------------------- | ------------------------------------------------------------------------ |
+| **Linear**           | Densidad sin agobio. Que quepa mucho y no parezca mucho.                 |
+| **Stripe Dashboard** | El dato financiero como protagonista tipográfico, no como celda de tabla |
+| **Notion**           | Superficies tranquilas y jerarquía por espacio, no por caja              |
+| **Vercel**           | Autoridad del monocromo. El color es un acento, no un tema.              |
+| **Arc**              | Que un producto serio pueda tener temperatura                            |
+| **Apple**            | Que la tipografía cargue la jerarquía sola                               |
 
 De ninguna se toma su decoración. Se toma su **disciplina**.
 
@@ -60,12 +60,12 @@ funciona si el resto está callado.
 
 Todo número pertenece a una de cuatro categorías, y la categoría **siempre es visible**:
 
-| Categoría      | Cómo se ve                                             |
-| -------------- | ------------------------------------------------------ |
-| Real           | Texto primario, sin adorno                             |
-| Estimado       | Texto primario + badge ámbar `Est.`                    |
-| Calculado      | Texto primario + icono de fórmula al enfocar la celda  |
-| Desactualizado | Texto secundario + marca de tiempo en el pie           |
+| Categoría      | Cómo se ve                                            |
+| -------------- | ----------------------------------------------------- |
+| Real           | Texto primario, sin adorno                            |
+| Estimado       | Texto primario + badge ámbar `Est.`                   |
+| Calculado      | Texto primario + icono de fórmula al enfocar la celda |
+| Desactualizado | Texto secundario + marca de tiempo en el pie          |
 
 Un producto financiero que presenta una estimación con el mismo aspecto que un dato real
 está mintiendo, aunque sea sin querer.

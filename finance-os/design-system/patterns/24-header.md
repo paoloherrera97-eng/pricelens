@@ -15,11 +15,11 @@
    64px (una línea) / 80px (con subtítulo) · fondo surface · borde inferior
 ```
 
-| Zona | Contenido | Alineación |
-| --- | --- | --- |
-| **Izquierda** | Título de página (`h2` 24 px) + subtítulo de contexto (`caption`) | Izquierda |
-| **Centro** | Vacío. Deliberadamente | — |
-| **Derecha** | Selectores de contexto → menú `⋯` → acción principal | Derecha |
+| Zona          | Contenido                                                         | Alineación |
+| ------------- | ----------------------------------------------------------------- | ---------- |
+| **Izquierda** | Título de página (`h2` 24 px) + subtítulo de contexto (`caption`) | Izquierda  |
+| **Centro**    | Vacío. Deliberadamente                                            | —          |
+| **Derecha**   | Selectores de contexto → menú `⋯` → acción principal              | Derecha    |
 
 El centro se queda vacío. Un buscador central roba el espacio del título y compite con
 `Cmd+K`, que ya hace ese trabajo mejor.
@@ -28,12 +28,12 @@ El centro se queda vacío. Un buscador central roba el espacio del título y com
 
 Es la parte importante de este componente.
 
-| Selector | Obligatorio | Nota |
-| --- | :---: | --- |
-| **Periodo** | Sí | Siempre visible. El dato financiero sin periodo no significa nada |
-| **Entidad** | Si hay más de una | Sociedad, unidad de negocio, centro de coste |
-| **Moneda** | Si hay más de una | Con indicación del tipo de cambio aplicado |
-| **Escenario** | Si aplica | Real · Presupuesto · Previsión |
+| Selector      |    Obligatorio    | Nota                                                              |
+| ------------- | :---------------: | ----------------------------------------------------------------- |
+| **Periodo**   |        Sí         | Siempre visible. El dato financiero sin periodo no significa nada |
+| **Entidad**   | Si hay más de una | Sociedad, unidad de negocio, centro de coste                      |
+| **Moneda**    | Si hay más de una | Con indicación del tipo de cambio aplicado                        |
+| **Escenario** |     Si aplica     | Real · Presupuesto · Previsión                                    |
 
 Reglas:
 
@@ -61,10 +61,10 @@ principal.**
 
 El header **se queda fijo**, siempre. Y se comprime:
 
-| Posición | Alto | Contenido |
-| --- | ---: | --- |
-| Arriba | 80 px | Título + subtítulo + selectores + acciones |
-| Desplazado > 80 px | 56 px | Título + selectores + acción principal |
+| Posición           |  Alto | Contenido                                  |
+| ------------------ | ----: | ------------------------------------------ |
+| Arriba             | 80 px | Título + subtítulo + selectores + acciones |
+| Desplazado > 80 px | 56 px | Título + selectores + acción principal     |
 
 El subtítulo y las acciones secundarias desaparecen; **el contexto nunca**. Si al desplazarse
 se pierde de vista el periodo, se pierde la capacidad de interpretar la tabla que se está

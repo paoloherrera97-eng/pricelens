@@ -3,7 +3,7 @@
 **Fuente única de verdad de todos los valores del sistema.**
 
 Un hex, un tamaño, una duración o un radio se define **una vez** aquí y se compila hacia cada
-plataforma. La documentación de `../design-system/` explica *por qué* cada valor es ese; no lo
+plataforma. La documentación de `../design-system/` explica _por qué_ cada valor es ese; no lo
 redefine.
 
 Cuando la documentación y estos archivos no coinciden, **ganan los tokens**.
@@ -12,11 +12,11 @@ Cuando la documentación y estos archivos no coinciden, **ganan los tokens**.
 
 ## Archivos
 
-| Archivo | Qué es |
-| --- | --- |
-| `finance-os.tokens.json` | **La fuente.** Lo único que se edita a mano |
-| `build-tokens.mjs` | Compilador. Sin dependencias |
-| `build/finance-os.css` | Generado — variables CSS para la web (claro + oscuro) |
+| Archivo                       | Qué es                                                         |
+| ----------------------------- | -------------------------------------------------------------- |
+| `finance-os.tokens.json`      | **La fuente.** Lo único que se edita a mano                    |
+| `build-tokens.mjs`            | Compilador. Sin dependencias                                   |
+| `build/finance-os.css`        | Generado — variables CSS para la web (claro + oscuro)          |
 | `build/finance-os.excel.json` | Generado — tema de Office, estilos de celda, alturas en puntos |
 
 ```bash
@@ -31,11 +31,11 @@ Nada de `build/` se edita a mano: se regenera en cada compilación.
 primitive   →   semantic   →   component
 ```
 
-| Capa | Ejemplo | Regla |
-| --- | --- | --- |
-| **Primitiva** | `indigo.500` = `#3B5BDB` | Valor crudo, sin significado. **Nunca se usa en un componente** |
-| **Semántica** | `accent` → `{primitive.indigo.500}` | Describe un papel. Resuelve distinto en claro y oscuro |
-| **De componente** | El botón primario usa `accent` | Siempre apunta a la capa semántica |
+| Capa              | Ejemplo                             | Regla                                                           |
+| ----------------- | ----------------------------------- | --------------------------------------------------------------- |
+| **Primitiva**     | `indigo.500` = `#3B5BDB`            | Valor crudo, sin significado. **Nunca se usa en un componente** |
+| **Semántica**     | `accent` → `{primitive.indigo.500}` | Describe un papel. Resuelve distinto en claro y oscuro          |
+| **De componente** | El botón primario usa `accent`      | Siempre apunta a la capa semántica                              |
 
 Esta separación es lo que convierte el modo oscuro en un cambio de paleta en lugar de una
 variante por elemento, y lo que permite remapear la

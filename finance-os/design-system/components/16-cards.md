@@ -32,13 +32,13 @@ encierro deja de significar nada y solo queda el ruido de los bordes.
    fondo surface · radio 8 · elevación 1 · padding 24
 ```
 
-| Propiedad | Valor |
-| --- | --- |
-| Fondo | `surface` `#FFFFFF` |
-| Radio | `radius-lg` 8 px |
-| Elevación | Nivel 1 |
-| Padding | 24 px (`space-5`); 16 px en variante compacta |
-| Separación entre cards | 24 px |
+| Propiedad              | Valor                                         |
+| ---------------------- | --------------------------------------------- |
+| Fondo                  | `surface` `#FFFFFF`                           |
+| Radio                  | `radius-lg` 8 px                              |
+| Elevación              | Nivel 1                                       |
+| Padding                | 24 px (`space-5`); 16 px en variante compacta |
+| Separación entre cards | 24 px                                         |
 
 **El encabezado no tiene fondo propio.** Un encabezado con fondo gris dentro de una card
 crea un segundo nivel de superficie que no significa nada y roba peso al contenido. La
@@ -46,14 +46,14 @@ jerarquía la da la tipografía.
 
 ## 3. Variantes
 
-| Variante | Diferencia | Uso |
-| --- | --- | --- |
-| **Estándar** | La descrita | Contenedor general |
-| **Compacta** | Padding 16 px, título `h4` | Rejillas de muchas cards |
-| **KPI** | Sin título; la etiqueta es `overline` | Ver [19 · KPIs](19-kpis.md) |
-| **Sin relleno** | Padding 0 | La que contiene una tabla — el padding lo pone la tabla |
-| **Interactiva** | Toda la card es clicable | Sube a elevación 2 en hover |
-| **Con estado** | Barra de 4 px arriba en el color del estado | Alertas persistentes |
+| Variante        | Diferencia                                  | Uso                                                     |
+| --------------- | ------------------------------------------- | ------------------------------------------------------- |
+| **Estándar**    | La descrita                                 | Contenedor general                                      |
+| **Compacta**    | Padding 16 px, título `h4`                  | Rejillas de muchas cards                                |
+| **KPI**         | Sin título; la etiqueta es `overline`       | Ver [19 · KPIs](19-kpis.md)                             |
+| **Sin relleno** | Padding 0                                   | La que contiene una tabla — el padding lo pone la tabla |
+| **Interactiva** | Toda la card es clicable                    | Sube a elevación 2 en hover                             |
+| **Con estado**  | Barra de 4 px arriba en el color del estado | Alertas persistentes                                    |
 
 **La card que contiene una tabla no tiene padding.** La tabla llega hasta el borde y su
 propio padding de celda hace el trabajo; si se suman los dos, la tabla queda flotando dentro

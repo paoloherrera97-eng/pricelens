@@ -12,12 +12,12 @@ anuncia un lector de pantalla.
 
 Cuatro variantes, y el número que puede haber de cada una por pantalla:
 
-| Variante | Papel | Máximo por vista |
-| --- | --- | :---: |
-| **Primario** | La acción principal de la pantalla | **1** |
-| **Secundario** | Acciones importantes alternativas | 2–3 |
-| **Terciario** | Acciones frecuentes de bajo peso | sin límite |
-| **Destructivo** | Elimina o revierte de forma irreversible | 1 |
+| Variante        | Papel                                    | Máximo por vista |
+| --------------- | ---------------------------------------- | :--------------: |
+| **Primario**    | La acción principal de la pantalla       |      **1**       |
+| **Secundario**  | Acciones importantes alternativas        |       2–3        |
+| **Terciario**   | Acciones frecuentes de bajo peso         |    sin límite    |
+| **Destructivo** | Elimina o revierte de forma irreversible |        1         |
 
 **Un botón primario por pantalla.** Dos primarios son cero primarios: el usuario tiene que
 leer ambos para decidir, que es justo el trabajo que el color venía a ahorrarle.
@@ -39,24 +39,24 @@ leer ambos para decidir, que es justo el trabajo que el color venía a ahorrarle
 
 ## 4. Tamaños
 
-| Tamaño | Alto | Padding H | Tipografía | Icono | Uso |
-| --- | ---: | ---: | --- | ---: | --- |
-| `sm` | 28 px | 12 px | `caption` 12 | 16 | Barras de herramientas de tabla, densidad compact |
-| `md` | 36 px | 16 px | `body` 14 | 16 | **Por defecto** |
-| `lg` | 44 px | 24 px | `body` 14 | 20 | Acción principal de un formulario, táctil |
+| Tamaño |  Alto | Padding H | Tipografía   | Icono | Uso                                               |
+| ------ | ----: | --------: | ------------ | ----: | ------------------------------------------------- |
+| `sm`   | 28 px |     12 px | `caption` 12 |    16 | Barras de herramientas de tabla, densidad compact |
+| `md`   | 36 px |     16 px | `body` 14    |    16 | **Por defecto**                                   |
+| `lg`   | 44 px |     24 px | `body` 14    |    20 | Acción principal de un formulario, táctil         |
 
 ## 5. Estilos y estados
 
 ### Primario
 
-| Estado | Fondo | Texto | Contraste |
-| --- | --- | --- | ---: |
-| default | `accent` `#3B5BDB` | `#FFFFFF` | **5,67:1** |
-| hover | `accent-hover` `#2F49B4` | `#FFFFFF` | **7,68:1** |
-| active | `accent-active` `#263B8E` | `#FFFFFF` | 10,01:1 |
-| focus | default + anillo 2 px `border-focus`, offset 2 px | | |
-| disabled | `surface-sunken` | `text-disabled` | 2,58:1 (exento) |
-| loading | fondo de default, spinner 16 px + etiqueta **intacta** | | |
+| Estado   | Fondo                                                  | Texto           |       Contraste |
+| -------- | ------------------------------------------------------ | --------------- | --------------: |
+| default  | `accent` `#3B5BDB`                                     | `#FFFFFF`       |      **5,67:1** |
+| hover    | `accent-hover` `#2F49B4`                               | `#FFFFFF`       |      **7,68:1** |
+| active   | `accent-active` `#263B8E`                              | `#FFFFFF`       |         10,01:1 |
+| focus    | default + anillo 2 px `border-focus`, offset 2 px      |                 |                 |
+| disabled | `surface-sunken`                                       | `text-disabled` | 2,58:1 (exento) |
+| loading  | fondo de default, spinner 16 px + etiqueta **intacta** |                 |                 |
 
 ### Secundario
 

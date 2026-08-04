@@ -15,13 +15,13 @@
 
 Para todo lo demás:
 
-| Necesidad | Componente |
-| --- | --- |
-| Ver detalle sin perder el sitio | **Panel lateral** |
-| Editar un registro | Panel lateral, o edición en línea |
-| Elegir entre opciones | [Menú](27-menus.md) o [select](../components/14-selectores.md) |
-| Información complementaria | Popover |
-| Confirmar algo reversible | **Nada** — se hace y se ofrece deshacer |
+| Necesidad                       | Componente                                                     |
+| ------------------------------- | -------------------------------------------------------------- |
+| Ver detalle sin perder el sitio | **Panel lateral**                                              |
+| Editar un registro              | Panel lateral, o edición en línea                              |
+| Elegir entre opciones           | [Menú](27-menus.md) o [select](../components/14-selectores.md) |
+| Información complementaria      | Popover                                                        |
+| Confirmar algo reversible       | **Nada** — se hace y se ofrece deshacer                        |
 
 La última merece énfasis: **confirmar acciones reversibles entrena a confirmar sin leer**, y
 con ello anula el diálogo de la acción que sí era irreversible. Un "¿Seguro?" gratuito hoy es
@@ -46,14 +46,14 @@ un asiento eliminado sin querer dentro de seis meses.
    fondo surface · radio 12 · elevación 3 · velo overlay 32 %
 ```
 
-| Propiedad | Valor |
-| --- | --- |
-| Anchos | 400 px (confirmación) · 560 px (formulario) · 800 px (tarea) |
-| Radio | `radius-xl` 12 px |
-| Elevación | Nivel 3 |
-| Velo | `overlay` — `rgb(21 26 33 / 0.32)` |
-| Padding | 24 px |
-| Posición | Centrado horizontal · 15 % del alto desde arriba |
+| Propiedad   | Valor                                                        |
+| ----------- | ------------------------------------------------------------ |
+| Anchos      | 400 px (confirmación) · 560 px (formulario) · 800 px (tarea) |
+| Radio       | `radius-xl` 12 px                                            |
+| Elevación   | Nivel 3                                                      |
+| Velo        | `overlay` — `rgb(21 26 33 / 0.32)`                           |
+| Padding     | 24 px                                                        |
+| Posición    | Centrado horizontal · 15 % del alto desde arriba             |
 | Alto máximo | 80 % de la ventana; el cuerpo se desplaza, cabecera y pie no |
 
 Posición al 15 % y no centrado vertical: un modal centrado en una pantalla alta queda
@@ -81,16 +81,16 @@ El caso más importante del producto. Reglas:
 
 ## 4. Comportamiento
 
-| Aspecto | Regla |
-| --- | --- |
-| Apertura | 180 ms: fundido del velo + escala 0,98 → 1 del panel |
-| Cierre | 120 ms, sin escala |
-| `Esc` | Cierra siempre, salvo si hay cambios sin guardar (entonces pregunta) |
-| Clic en el velo | Cierra, salvo en formularios con cambios |
-| Foco | **Atrapado** dentro del modal mientras esté abierto |
-| Al cerrar | El foco vuelve al elemento que lo abrió |
-| Desplazamiento de fondo | Bloqueado |
-| Modal sobre modal | **Prohibido.** Si hace falta, la tarea es una página |
+| Aspecto                 | Regla                                                                |
+| ----------------------- | -------------------------------------------------------------------- |
+| Apertura                | 180 ms: fundido del velo + escala 0,98 → 1 del panel                 |
+| Cierre                  | 120 ms, sin escala                                                   |
+| `Esc`                   | Cierra siempre, salvo si hay cambios sin guardar (entonces pregunta) |
+| Clic en el velo         | Cierra, salvo en formularios con cambios                             |
+| Foco                    | **Atrapado** dentro del modal mientras esté abierto                  |
+| Al cerrar               | El foco vuelve al elemento que lo abrió                              |
+| Desplazamiento de fondo | Bloqueado                                                            |
+| Modal sobre modal       | **Prohibido.** Si hace falta, la tarea es una página                 |
 
 ## 5. Panel lateral
 
@@ -121,11 +121,11 @@ necesita revisar 40 asientos seguidos, y con un modal sería 40 aperturas y 40 c
 
 Excel tiene tres mecanismos, en orden de preferencia:
 
-| Mecanismo | Cuándo | Nota |
-| --- | --- | --- |
-| **Mensaje de validación de datos** | Prevenir una entrada errónea | Nativo, sin macro. **Primera opción** |
-| **`MsgBox` de VBA** | Confirmar una acción destructiva | Nativo, accesible, con teclado |
-| **UserForm** | Tarea con varios campos | Última opción: hay que diseñarlo entero |
+| Mecanismo                          | Cuándo                           | Nota                                    |
+| ---------------------------------- | -------------------------------- | --------------------------------------- |
+| **Mensaje de validación de datos** | Prevenir una entrada errónea     | Nativo, sin macro. **Primera opción**   |
+| **`MsgBox` de VBA**                | Confirmar una acción destructiva | Nativo, accesible, con teclado          |
+| **UserForm**                       | Tarea con varios campos          | Última opción: hay que diseñarlo entero |
 
 ```
 Confirmación destructiva (VBA):

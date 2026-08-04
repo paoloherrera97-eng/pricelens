@@ -14,11 +14,11 @@ Nivel 2 — Sección    Pestañas       Resumen · Movimientos · Conciliación
 Nivel 3 — Detalle    Descenso       Un asiento, una cuenta, un documento
 ```
 
-| Nivel | Componente | Persistencia |
-| --- | --- | --- |
-| 1 | [Sidebar](23-sidebar.md) | Siempre visible |
-| 2 | Pestañas bajo el [header](24-header.md) | Visibles dentro del área |
-| 3 | Panel lateral, o página con migas | Contextual |
+| Nivel | Componente                              | Persistencia             |
+| ----- | --------------------------------------- | ------------------------ |
+| 1     | [Sidebar](23-sidebar.md)                | Siempre visible          |
+| 2     | Pestañas bajo el [header](24-header.md) | Visibles dentro del área |
+| 3     | Panel lateral, o página con migas       | Contextual               |
 
 ## 2. Las cuatro reglas
 
@@ -62,14 +62,14 @@ Ingresos  ›  Cuenta 4300 · Clientes  ›  Factura F-2025-1284
 
 ## 4. Teclado
 
-| Atajo | Acción |
-| --- | --- |
-| `Cmd/Ctrl + K` | Paleta de comandos: ir a cualquier sitio, ejecutar cualquier acción |
-| `Cmd/Ctrl + 1…9` | Ir al área n del sidebar |
-| `G` luego `D` | Ir al Dashboard |
-| `[` / `]` | Periodo anterior / siguiente |
-| `Esc` | Cerrar panel, menú o modal |
-| `?` | Lista de atajos |
+| Atajo            | Acción                                                              |
+| ---------------- | ------------------------------------------------------------------- |
+| `Cmd/Ctrl + K`   | Paleta de comandos: ir a cualquier sitio, ejecutar cualquier acción |
+| `Cmd/Ctrl + 1…9` | Ir al área n del sidebar                                            |
+| `G` luego `D`    | Ir al Dashboard                                                     |
+| `[` / `]`        | Periodo anterior / siguiente                                        |
+| `Esc`            | Cerrar panel, menú o modal                                          |
+| `?`              | Lista de atajos                                                     |
 
 **La paleta de comandos es la navegación principal para el usuario experto.** El sidebar es
 para descubrir; la paleta es para trabajar. Un usuario que viene de Excel espera no soltar el

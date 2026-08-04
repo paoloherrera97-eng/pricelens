@@ -25,10 +25,10 @@ Origen: ERP · Sincronizado 04/08/2025 09:14   Tipo de cambio BCE 03/08
    48px · fondo canvas · borde superior border-subtle · caption 12 / text-tertiary
 ```
 
-| Zona | Contenido |
-| --- | --- |
+| Zona      | Contenido                                                             |
+| --------- | --------------------------------------------------------------------- |
 | Izquierda | Origen del dato · marca de sincronización · tipos de cambio aplicados |
-| Derecha | Exportar · ver detalle de procedencia |
+| Derecha   | Exportar · ver detalle de procedencia                                 |
 
 Tipografía `caption` 12 px en `text-tertiary` (5,31:1 medido). Es información de respaldo:
 tiene que estar, tiene que poder leerse, y no tiene que competir.
@@ -45,12 +45,12 @@ queda congelado en una pestaña abierta desde ayer y miente; el absoluto no pued
 
 ### 3.2 Frescura con estado
 
-| Antigüedad | Aspecto |
-| --- | --- |
-| < 1 hora | `text-tertiary`, sin marca |
-| 1–24 horas | `text-tertiary` + icono `clock` |
-| > 24 horas | `text-warning` + icono `alert-triangle` |
-| Fallo de sincronización | `text-negative` + botón "Reintentar" |
+| Antigüedad              | Aspecto                                 |
+| ----------------------- | --------------------------------------- |
+| < 1 hora                | `text-tertiary`, sin marca              |
+| 1–24 horas              | `text-tertiary` + icono `clock`         |
+| > 24 horas              | `text-warning` + icono `alert-triangle` |
+| Fallo de sincronización | `text-negative` + botón "Reintentar"    |
 
 El umbral de 24 horas no es universal: se configura por origen. Un tipo de cambio de hace 20
 horas está desactualizado; un plan contable de hace 20 horas está perfectamente vigente.
@@ -67,12 +67,12 @@ fila de totales. La procedencia acompaña siempre a lo que se está mirando.
 
 ## 4. Variantes
 
-| Variante | Uso |
-| --- | --- |
-| **De vista** | El descrito. Toda pantalla de datos |
-| **De card** | Dentro de una card con origen propio: una línea, sin acciones |
-| **De exportación** | En PDF/impresión: origen, marca de tiempo, usuario, página *n* de *m* |
-| **De aplicación** | Solo en la pantalla de configuración: versión, licencia, soporte |
+| Variante           | Uso                                                                   |
+| ------------------ | --------------------------------------------------------------------- |
+| **De vista**       | El descrito. Toda pantalla de datos                                   |
+| **De card**        | Dentro de una card con origen propio: una línea, sin acciones         |
+| **De exportación** | En PDF/impresión: origen, marca de tiempo, usuario, página _n_ de _m_ |
+| **De aplicación**  | Solo en la pantalla de configuración: versión, licencia, soporte      |
 
 El pie de aplicación aparece **una sola vez en todo el producto**. Poner la versión y el
 aviso legal en cada pantalla es ruido permanente para una información que se consulta dos

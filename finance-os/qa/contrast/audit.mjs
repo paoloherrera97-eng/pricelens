@@ -146,7 +146,7 @@ for (const { name, rows, failures } of results) {
   for (const r of rows) {
     console.log(
       `  ${mark(r).padEnd(6)} ${String(r.ratio).padStart(6)}:1  ` +
-        `(min ${r.min || '—'})  ${r.fg} sobre ${r.bg}`
+        `(min ${r.min || '—'})  ${r.fg} sobre ${r.bg}`,
     );
   }
   console.log(`  → ${failures.length === 0 ? 'sin fallos' : `${failures.length} FALLO(S)`}`);
@@ -155,7 +155,9 @@ for (const { name, rows, failures } of results) {
 seriesResults.forEach((rows, i) => {
   const name = i === 0 ? 'light' : 'dark';
   const worst = Math.min(...rows.map((r) => r.ratio));
-  console.log(`\nSERIES ${name}: peor contraste sobre superficie ${worst}:1 (umbral 3,0 para marcas)`);
+  console.log(
+    `\nSERIES ${name}: peor contraste sobre superficie ${worst}:1 (umbral 3,0 para marcas)`,
+  );
 });
 
 const table = (rows) =>
@@ -165,7 +167,7 @@ const table = (rows) =>
     ...rows.map(
       (r) =>
         `| \`${r.fg}\` | \`${r.bg}\` | ${r.fgHex} / ${r.bgHex} | **${r.ratio.toFixed(2)}:1** | ` +
-        `${r.min || '—'} | ${mark(r)} | ${r.use} |`
+        `${r.min || '—'} | ${mark(r)} | ${r.use} |`,
     ),
   ].join('\n');
 

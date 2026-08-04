@@ -10,12 +10,12 @@
 Cuatro, porque cuatro es el número de relaciones espaciales que una interfaz puede comunicar
 sin que el usuario tenga que aprenderlas.
 
-| Nivel | Significa | Qué lo usa |
-| :---: | --- | --- |
-| **0** | Está en el plano de la página | Fondo, tabla, secciones |
-| **1** | Está agrupado, no flotando | Card, panel, fila en reposo |
+| Nivel | Significa                           | Qué lo usa                   |
+| :---: | ----------------------------------- | ---------------------------- |
+| **0** | Está en el plano de la página       | Fondo, tabla, secciones      |
+| **1** | Está agrupado, no flotando          | Card, panel, fila en reposo  |
 | **2** | Flota temporalmente, anclado a algo | Menú, popover, card en hover |
-| **3** | Flota sobre todo, bloqueando | Modal, panel lateral |
+| **3** | Flota sobre todo, bloqueando        | Modal, panel lateral         |
 
 No hay nivel 4. Si algo necesita estar por encima de un modal, el problema es el modal.
 
@@ -24,12 +24,12 @@ No hay nivel 4. Si algo necesita estar por encima de un modal, el problema es el
 Aquí está la decisión que hace que este sistema funcione en dos plataformas: **el nivel es
 semántico; su expresión depende del medio.**
 
-| Nivel | Web (claro) | Web (oscuro) | Excel |
-| :---: | --- | --- | --- |
-| **0** | sin sombra | sin sombra | sin borde, fondo `canvas` |
-| **1** | `0 1px 2px rgb(21 26 33 / .04)`, `0 0 0 1px rgb(21 26 33 / .04)` | superficie `900` | relleno `surface` + filete `border-subtle` 0,5 pt |
-| **2** | `0 2px 4px -1px / .06`, `0 4px 12px -2px / .08` | superficie `800` | relleno `surface` + filete `border-default` 0,75 pt |
-| **3** | `0 8px 16px -4px / .10`, `0 20px 40px -8px / .14` | superficie `750` + sombra de recorte | forma con sombra externa 4 pt al 12 % |
+| Nivel | Web (claro)                                                      | Web (oscuro)                         | Excel                                               |
+| :---: | ---------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------- |
+| **0** | sin sombra                                                       | sin sombra                           | sin borde, fondo `canvas`                           |
+| **1** | `0 1px 2px rgb(21 26 33 / .04)`, `0 0 0 1px rgb(21 26 33 / .04)` | superficie `900`                     | relleno `surface` + filete `border-subtle` 0,5 pt   |
+| **2** | `0 2px 4px -1px / .06`, `0 4px 12px -2px / .08`                  | superficie `800`                     | relleno `surface` + filete `border-default` 0,75 pt |
+| **3** | `0 8px 16px -4px / .10`, `0 20px 40px -8px / .14`                | superficie `750` + sombra de recorte | forma con sombra externa 4 pt al 12 %               |
 
 Excel no tiene sombras en celdas. En vez de renunciar a la jerarquía, **la elevación se
 expresa con superficie y filete** — que es lo que la sombra estaba comunicando de todos
@@ -45,8 +45,8 @@ Cada sombra web tiene dos capas, y no es adorno:
 
 ```css
 box-shadow:
-  0 2px 4px -1px rgb(21 26 33 / 0.06),   /* contacto: define el borde */
-  0 4px 12px -2px rgb(21 26 33 / 0.08);  /* difusión: define la altura */
+  0 2px 4px -1px rgb(21 26 33 / 0.06),
+  /* contacto: define el borde */ 0 4px 12px -2px rgb(21 26 33 / 0.08); /* difusión: define la altura */
 ```
 
 Una sombra de una sola capa se ve como una mancha; dos capas se ven como un objeto. La capa

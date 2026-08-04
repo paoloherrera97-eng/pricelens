@@ -12,14 +12,14 @@
 └──────────────┘   caption 12px / 500 · punto 6px
 ```
 
-| Propiedad | Valor |
-| --- | --- |
-| Alto | 20 px (`sm`) · 24 px (`md`) |
-| Padding horizontal | 8 px |
-| Radio | `radius-sm` 4 px |
-| Tipografía | `caption` 12 px, peso 500 |
-| Punto | 6 px, a 4 px del texto |
-| Texto | Frase, no MAYÚSCULAS |
+| Propiedad          | Valor                       |
+| ------------------ | --------------------------- |
+| Alto               | 20 px (`sm`) · 24 px (`md`) |
+| Padding horizontal | 8 px                        |
+| Radio              | `radius-sm` 4 px            |
+| Tipografía         | `caption` 12 px, peso 500   |
+| Punto              | 6 px, a 4 px del texto      |
+| Texto              | Frase, no MAYÚSCULAS        |
 
 **Radio 4 px y no pastilla.** La forma de pastilla (`radius-full`) es la convención de las
 etiquetas decorativas y de las notificaciones; el badge de estado de Finance OS es
@@ -28,13 +28,13 @@ sistema.
 
 ## 2. Variantes
 
-| Variante | Fondo | Texto | Contraste | Significado |
-| --- | --- | --- | ---: | --- |
-| **Neutro** | `surface-sunken` | `text-secondary` | 6,39:1 | Estado sin carga: "Borrador" |
-| **Positivo** | `surface-positive` | `text-positive` | **5,17:1** | Conciliado, aprobado, cerrado |
-| **Negativo** | `surface-negative` | `text-negative` | **5,01:1** | Rechazado, con discrepancia |
-| **Aviso** | `surface-warning` | `text-warning` | **5,24:1** | Estimado, pendiente, vence pronto |
-| **Acento** | `surface-accent` | `text-accent` | 6,87:1 | En curso, nuevo, activo |
+| Variante     | Fondo              | Texto            |  Contraste | Significado                       |
+| ------------ | ------------------ | ---------------- | ---------: | --------------------------------- |
+| **Neutro**   | `surface-sunken`   | `text-secondary` |     6,39:1 | Estado sin carga: "Borrador"      |
+| **Positivo** | `surface-positive` | `text-positive`  | **5,17:1** | Conciliado, aprobado, cerrado     |
+| **Negativo** | `surface-negative` | `text-negative`  | **5,01:1** | Rechazado, con discrepancia       |
+| **Aviso**    | `surface-warning`  | `text-warning`   | **5,24:1** | Estimado, pendiente, vence pronto |
+| **Acento**   | `surface-accent`   | `text-accent`    |     6,87:1 | En curso, nuevo, activo           |
 
 Cinco. No hay más, y no se añaden variantes de color para categorías: un badge morado para
 "tipo B" convierte el badge en una etiqueta decorativa y destruye la convención de estado.

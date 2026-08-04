@@ -28,11 +28,11 @@ Todo par de colores del sistema está medido con
 [`qa/contrast/audit.mjs`](../../qa/contrast/audit.mjs). El auditor falla con código 1 si algún
 par obligatorio incumple, lo que lo hace utilizable en integración continua.
 
-| Umbral | Aplicación |
-| ---: | --- |
-| 4,5:1 | Texto normal (SC 1.4.3) |
-| 3,0:1 | Texto grande, límites de control y componentes no textuales (SC 1.4.11) |
-| Exento | Texto deshabilitado, divisores decorativos |
+| Umbral | Aplicación                                                              |
+| -----: | ----------------------------------------------------------------------- |
+|  4,5:1 | Texto normal (SC 1.4.3)                                                 |
+|  3,0:1 | Texto grande, límites de control y componentes no textuales (SC 1.4.11) |
+| Exento | Texto deshabilitado, divisores decorativos                              |
 
 **Seis pares fallaron la primera medición.** Los cuatro tokens implicados se corrigieron; el
 registro está en [CHANGELOG.md](../CHANGELOG.md). Los cuatro se veían bien: por eso se mide.
@@ -41,14 +41,14 @@ registro está en [CHANGELOG.md](../CHANGELOG.md). Los cuatro se veían bien: po
 
 Toda información codificada en color lleva **al menos una** codificación adicional:
 
-| Información | Codificaciones |
-| --- | --- |
-| Polaridad de una variación | Color + signo aritmético + cursor ▲▼— |
-| Estado en un badge | Color + texto |
-| Nivel de una alerta | Color + icono + título |
+| Información                   | Codificaciones                           |
+| ----------------------------- | ---------------------------------------- |
+| Polaridad de una variación    | Color + signo aritmético + cursor ▲▼—    |
+| Estado en un badge            | Color + texto                            |
+| Nivel de una alerta           | Color + icono + título                   |
 | Elemento activo de navegación | Color + barra lateral + peso tipográfico |
-| Serie de un gráfico | Color + leyenda + etiqueta directa |
-| Celda en error | Color + icono + mensaje |
+| Serie de un gráfico           | Color + leyenda + etiqueta directa       |
+| Celda en error                | Color + icono + mensaje                  |
 
 Verificación práctica: **la prueba de la fotocopia**. Impreso en blanco y negro, no se pierde
 ninguna información.
@@ -86,14 +86,14 @@ ninguna información.
 
 Los que afectan directamente a este sistema:
 
-| Criterio | Cómo se cumple |
-| --- | --- |
-| **2.4.11 Foco no oculto (mínimo)** | El header fijo y la fila de totales fija no tapan el elemento enfocado: hay `scroll-margin` reservado |
-| **2.5.7 Movimientos de arrastre** | Reordenar columnas y filas tiene siempre alternativa por menú |
-| **2.5.8 Tamaño del objetivo (mínimo)** | 24 × 24 px como mínimo absoluto; el diseño usa 36 px o más |
-| **3.2.6 Ayuda consistente** | El acceso a la ayuda está en el mismo sitio en todas las pantallas |
-| **3.3.7 Entrada redundante** | Los datos ya introducidos se ofrecen precargados, no se piden dos veces |
-| **3.3.8 Autenticación accesible** | Sin puzles cognitivos; se admite pegar la contraseña y el gestor de credenciales |
+| Criterio                               | Cómo se cumple                                                                                        |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **2.4.11 Foco no oculto (mínimo)**     | El header fijo y la fila de totales fija no tapan el elemento enfocado: hay `scroll-margin` reservado |
+| **2.5.7 Movimientos de arrastre**      | Reordenar columnas y filas tiene siempre alternativa por menú                                         |
+| **2.5.8 Tamaño del objetivo (mínimo)** | 24 × 24 px como mínimo absoluto; el diseño usa 36 px o más                                            |
+| **3.2.6 Ayuda consistente**            | El acceso a la ayuda está en el mismo sitio en todas las pantallas                                    |
+| **3.3.7 Entrada redundante**           | Los datos ya introducidos se ofrecen precargados, no se piden dos veces                               |
+| **3.3.8 Autenticación accesible**      | Sin puzles cognitivos; se admite pegar la contraseña y el gestor de credenciales                      |
 
 **2.4.11 es el que más se rompe** en productos con encabezado fijo: al tabular, el elemento
 enfocado queda debajo de la barra. Con `scroll-margin-top` igual al alto del header
@@ -121,16 +121,16 @@ Lista completa en [`qa/checklists/`](../../qa/checklists/).
 
 Excel tiene sus propias reglas de accesibilidad, y algunas no tienen equivalente en web:
 
-| Requisito | Cómo |
-| --- | --- |
-| **Nombres de hoja descriptivos** | `Dashboard`, no `Hoja1` |
-| **Texto alternativo en formas y gráficos** | Clic derecho → Ver texto alternativo. Obligatorio en todos |
-| **Rangos con nombre** | Permiten navegar por el Cuadro de nombres sin ver la pantalla |
-| **Sin celdas combinadas** | Rompen la navegación con lector de pantalla — y también el filtrado |
-| **Encabezados de tabla reales** | Tabla de Excel (Ctrl+T) con "La tabla tiene encabezados" marcado |
-| **Orden de tabulación** | Definido por el orden de desbloqueo de celdas en la hoja protegida |
-| **Comprobador de accesibilidad** | Revisar → Comprobar accesibilidad. **Cero errores antes de publicar** |
-| **Sin información solo por color** | Igual que en web: siempre con texto o símbolo |
+| Requisito                                  | Cómo                                                                  |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| **Nombres de hoja descriptivos**           | `Dashboard`, no `Hoja1`                                               |
+| **Texto alternativo en formas y gráficos** | Clic derecho → Ver texto alternativo. Obligatorio en todos            |
+| **Rangos con nombre**                      | Permiten navegar por el Cuadro de nombres sin ver la pantalla         |
+| **Sin celdas combinadas**                  | Rompen la navegación con lector de pantalla — y también el filtrado   |
+| **Encabezados de tabla reales**            | Tabla de Excel (Ctrl+T) con "La tabla tiene encabezados" marcado      |
+| **Orden de tabulación**                    | Definido por el orden de desbloqueo de celdas en la hoja protegida    |
+| **Comprobador de accesibilidad**           | Revisar → Comprobar accesibilidad. **Cero errores antes de publicar** |
+| **Sin información solo por color**         | Igual que en web: siempre con texto o símbolo                         |
 
 La coincidencia entre "prohibido combinar celdas" por accesibilidad y por
 [funcionamiento](../foundations/07-espaciado.md#7-excel--concreto) no es casual: en Excel, casi

@@ -16,14 +16,14 @@ entrega posterior.
    no cambia: se abre un ADR en `../decisions/` que propone la enmienda, y la enmienda solo
    existe cuando está aprobada y fechada.
 3. **El silencio no es permiso.** Si el Design System necesita un dato que la Línea Base no
-   especifica, se documenta como *supuesto explícito* en el entregable, no como hecho.
+   especifica, se documenta como _supuesto explícito_ en el entregable, no como hecho.
 
 ## Relación con el Design System v1.0
 
 El Design System de esta fase define **identidad visual y comportamiento de interfaz**. No
 define funcionalidad, no define fórmulas y no define el modelo de datos. Donde el Design
 System ha tenido que suponer algo sobre el producto para poder decidir un patrón, lo dice
-en el propio documento bajo el encabezado *Supuesto*.
+en el propio documento bajo el encabezado _Supuesto_.
 
 Los supuestos de esta fase están recogidos en `../product/README.md` § Supuestos.
 

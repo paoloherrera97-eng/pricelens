@@ -30,19 +30,19 @@ Total ingresos           380.604,00  369.179,00  11.425,00    ▲ +3,1 %
 ════════════════════════════════════════════════════════════════════   doble (gran total)
 ```
 
-| Zona | Especificación |
-| --- | --- |
-| **Encabezado** | `overline` 11 px, 600, `text-secondary`, alineado como su columna. Fijo al desplazarse |
-| **Filete de cabecera** | `border-default` 1 px. El único borde horizontal del cuerpo |
-| **Fila** | Alto según densidad (28/36/44). Sin borde inferior |
-| **Alternancia** | `graphite-25 #FBFCFD`. **Solo a partir de 6 columnas** |
-| **Celda** | Padding horizontal 12 px, vertical centrado |
-| **Total** | Filete superior `border-strong`, texto peso 600 |
-| **Gran total** | Filete superior + **doble** inferior, peso 600 |
+| Zona                   | Especificación                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| **Encabezado**         | `overline` 11 px, 600, `text-secondary`, alineado como su columna. Fijo al desplazarse |
+| **Filete de cabecera** | `border-default` 1 px. El único borde horizontal del cuerpo                            |
+| **Fila**               | Alto según densidad (28/36/44). Sin borde inferior                                     |
+| **Alternancia**        | `graphite-25 #FBFCFD`. **Solo a partir de 6 columnas**                                 |
+| **Celda**              | Padding horizontal 12 px, vertical centrado                                            |
+| **Total**              | Filete superior `border-strong`, texto peso 600                                        |
+| **Gran total**         | Filete superior + **doble** inferior, peso 600                                         |
 
 ### Sobre el rayado
 
-El rayado de filas (*zebra*) es ruido cuando no hace falta y salvación cuando sí. La regla:
+El rayado de filas (_zebra_) es ruido cuando no hace falta y salvación cuando sí. La regla:
 **se activa a partir de 6 columnas**, que es donde el ojo empieza a perder la fila al recorrer
 la línea. Por debajo, el ritmo vertical basta y el rayado solo ensucia.
 
@@ -63,16 +63,16 @@ los datos.
 
 ## 4. Columnas
 
-| Tipo | Alineación | Ancho | Notas |
-| --- | --- | --- | --- |
-| Concepto / descripción | Izquierda | Flexible, mínimo 200 px | Truncado con `…` + tooltip |
-| Código de cuenta | Izquierda | Fijo, monoespaciada | |
-| Importe | **Derecha** | Fijo por el valor máximo | Tabulares |
-| Porcentaje | **Derecha** | 80 px | Un decimal |
-| Variación | **Derecha** | 120 px | Cursor + signo + color |
-| Fecha | Izquierda | 100 px | `DD/MM/AAAA` |
-| Estado | Izquierda | Por contenido | [Badge](17-badges.md) |
-| Acciones | Derecha | 48 px | Visibles al hacer hover **y al enfocar** |
+| Tipo                   | Alineación  | Ancho                    | Notas                                    |
+| ---------------------- | ----------- | ------------------------ | ---------------------------------------- |
+| Concepto / descripción | Izquierda   | Flexible, mínimo 200 px  | Truncado con `…` + tooltip               |
+| Código de cuenta       | Izquierda   | Fijo, monoespaciada      |                                          |
+| Importe                | **Derecha** | Fijo por el valor máximo | Tabulares                                |
+| Porcentaje             | **Derecha** | 80 px                    | Un decimal                               |
+| Variación              | **Derecha** | 120 px                   | Cursor + signo + color                   |
+| Fecha                  | Izquierda   | 100 px                   | `DD/MM/AAAA`                             |
+| Estado                 | Izquierda   | Por contenido            | [Badge](17-badges.md)                    |
+| Acciones               | Derecha     | 48 px                    | Visibles al hacer hover **y al enfocar** |
 
 **Primera columna fija** al desplazar en horizontal, con `border-default` a su derecha —el
 único borde vertical del sistema, y solo cuando hay desplazamiento lateral real. Sin él, al
@@ -80,16 +80,16 @@ desplazarse se pierde la identidad de la fila.
 
 ## 5. Estados de fila
 
-| Estado | Aspecto |
-| --- | --- |
-| default | Sin fondo |
-| hover | `surface-hover` en toda la fila |
-| selected | `surface-accent` + barra `accent` de 2 px a la izquierda |
-| focus | Anillo 2 px en la celda, no en la fila |
-| editada | Punto `accent` de 6 px en el margen izquierdo hasta guardar |
-| error | `surface-negative` + icono `alert-circle` en la primera celda |
-| deshabilitada | `text-disabled`, sin hover |
-| expandida | Fila hija con sangría de 24 px, fondo `surface-sunken` |
+| Estado        | Aspecto                                                       |
+| ------------- | ------------------------------------------------------------- |
+| default       | Sin fondo                                                     |
+| hover         | `surface-hover` en toda la fila                               |
+| selected      | `surface-accent` + barra `accent` de 2 px a la izquierda      |
+| focus         | Anillo 2 px en la celda, no en la fila                        |
+| editada       | Punto `accent` de 6 px en el margen izquierdo hasta guardar   |
+| error         | `surface-negative` + icono `alert-circle` en la primera celda |
+| deshabilitada | `text-disabled`, sin hover                                    |
+| expandida     | Fila hija con sangría de 24 px, fondo `surface-sunken`        |
 
 La barra izquierda en `selected` existe porque el fondo teñido solo es color; la barra
 sobrevive a la escala de grises.
@@ -112,11 +112,11 @@ sobrevive a la escala de grises.
 
 ## 7. Densidad
 
-| Densidad | Alto de fila | Padding | Cuándo |
-| --- | ---: | ---: | --- |
-| `compact` | 28 px | 8 px | Conciliar, revisar volumen |
-| `default` | 36 px | 12 px | Por defecto |
-| `relaxed` | 44 px | 16 px | Presentación, táctil |
+| Densidad  | Alto de fila | Padding | Cuándo                     |
+| --------- | -----------: | ------: | -------------------------- |
+| `compact` |        28 px |    8 px | Conciliar, revisar volumen |
+| `default` |        36 px |   12 px | Por defecto                |
+| `relaxed` |        44 px |   16 px | Presentación, táctil       |
 
 Preferencia del usuario y **persistente entre sesiones**.
 
@@ -155,14 +155,14 @@ Excel sus valores por defecto.
 
 Qué desactivar sin excepción:
 
-| Predeterminado de Excel | Por qué fuera |
-| --- | --- |
-| Líneas de división | Es la cuadrícula completa que el sistema prohíbe |
-| Estilos de tabla azules | No son los tokens |
-| Rojo del formato `[Red]` | Es el rojo de Excel, no `#C22B24` |
-| Conjuntos de iconos (semáforos) | Fuera del sistema de iconos |
-| Barras de datos con degradado | Si se usan barras, relleno sólido `accent` |
-| Autoajustar ancho de columna | Rompe el esqueleto de columnas |
+| Predeterminado de Excel         | Por qué fuera                                    |
+| ------------------------------- | ------------------------------------------------ |
+| Líneas de división              | Es la cuadrícula completa que el sistema prohíbe |
+| Estilos de tabla azules         | No son los tokens                                |
+| Rojo del formato `[Red]`        | Es el rojo de Excel, no `#C22B24`                |
+| Conjuntos de iconos (semáforos) | Fuera del sistema de iconos                      |
+| Barras de datos con degradado   | Si se usan barras, relleno sólido `accent`       |
+| Autoajustar ancho de columna    | Rompe el esqueleto de columnas                   |
 
 **Se usan tablas de Excel reales (Ctrl+T), no rangos.** Una tabla real da encabezados
 persistentes, referencias estructuradas y expansión automática de fórmulas. Un rango con

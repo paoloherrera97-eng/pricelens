@@ -12,12 +12,12 @@ ninguno.
 
 Cuatro niveles, y no más:
 
-| Nivel | Qué es                          | Herramienta                                   |
-| :---: | ------------------------------- | --------------------------------------------- |
-| **1** | La cifra o el objeto de la vista| Tamaño (`metric-lg`) + peso 600               |
-| **2** | Los que la explican             | `h3`/`h4` + espacio superior generoso         |
-| **3** | Los datos de apoyo              | `body` + texto secundario                     |
-| **4** | Metadatos, procedencia          | `caption` + texto terciario                   |
+| Nivel | Qué es                           | Herramienta                           |
+| :---: | -------------------------------- | ------------------------------------- |
+| **1** | La cifra o el objeto de la vista | Tamaño (`metric-lg`) + peso 600       |
+| **2** | Los que la explican              | `h3`/`h4` + espacio superior generoso |
+| **3** | Los datos de apoyo               | `body` + texto secundario             |
+| **4** | Metadatos, procedencia           | `caption` + texto terciario           |
 
 La jerarquía se construye con **tamaño y espacio**. El color no crea jerarquía: la
 confirma.
@@ -75,15 +75,15 @@ interactivo.
 
 Todo componente interactivo tiene los mismos siete estados, y se resuelven igual en todos:
 
-| Estado         | Resolución                                                    |
-| -------------- | ------------------------------------------------------------- |
-| `default`      | El estado documentado                                          |
-| `hover`        | Un escalón de superficie más oscuro (claro) / más claro (oscuro)|
-| `active`       | Dos escalones                                                  |
-| `focus`        | Anillo 2 px, se suma a cualquier otro estado                   |
-| `disabled`     | Texto `text-disabled`, sin sombra, cursor `not-allowed`, opacidad **sin cambiar** |
-| `loading`      | Contenido sustituido por indicador; **el tamaño no cambia**    |
-| `error`        | Borde `border-negative` + mensaje asociado; nunca solo el borde|
+| Estado     | Resolución                                                                        |
+| ---------- | --------------------------------------------------------------------------------- |
+| `default`  | El estado documentado                                                             |
+| `hover`    | Un escalón de superficie más oscuro (claro) / más claro (oscuro)                  |
+| `active`   | Dos escalones                                                                     |
+| `focus`    | Anillo 2 px, se suma a cualquier otro estado                                      |
+| `disabled` | Texto `text-disabled`, sin sombra, cursor `not-allowed`, opacidad **sin cambiar** |
+| `loading`  | Contenido sustituido por indicador; **el tamaño no cambia**                       |
+| `error`    | Borde `border-negative` + mensaje asociado; nunca solo el borde                   |
 
 Dos reglas transversales: **un componente nunca cambia de tamaño al cambiar de estado**
 (provoca saltos de layout), y `disabled` **no se resuelve con opacidad global** porque

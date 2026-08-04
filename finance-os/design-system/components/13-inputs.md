@@ -19,7 +19,7 @@ Distancias: etiqueta→campo **8 px**, campo→ayuda **4 px**, campo→siguiente
 
 ## 2. La etiqueta va siempre encima, y siempre existe
 
-Nunca dentro (*floating label*), nunca a la izquierda, nunca sustituida por el placeholder.
+Nunca dentro (_floating label_), nunca a la izquierda, nunca sustituida por el placeholder.
 
 - El placeholder como etiqueta **desaparece al escribir**: el usuario pierde la referencia
   justo cuando la necesita, y al revisar un formulario largo no puede saber qué es cada
@@ -34,26 +34,26 @@ respecto al valor inicial).
 
 ## 3. Tamaños
 
-| Tamaño | Alto | Tipografía | Uso |
-| --- | ---: | --- | --- |
-| `sm` | 28 px | `body` 14 | Filtros en línea, densidad compact |
-| `md` | 36 px | `body` 14 | **Por defecto** |
-| `lg` | 44 px | `body` 14 | Formularios principales, táctil |
+| Tamaño |  Alto | Tipografía | Uso                                |
+| ------ | ----: | ---------- | ---------------------------------- |
+| `sm`   | 28 px | `body` 14  | Filtros en línea, densidad compact |
+| `md`   | 36 px | `body` 14  | **Por defecto**                    |
+| `lg`   | 44 px | `body` 14  | Formularios principales, táctil    |
 
 El **texto es siempre de 14 px** en las tres. Reducirlo a 12 px en `sm` haría ilegibles las
 cifras, que es el contenido más importante. Lo que cambia es el alto, no el cuerpo.
 
 ## 4. Estados
 
-| Estado | Fondo | Borde | Texto |
-| --- | --- | --- | --- |
-| default | `surface-sunken` | `border-strong` | `text-primary` |
-| hover | `surface-sunken` | `border-strong` + oscurecido | `text-primary` |
-| focus | `surface` | `border-focus` 1 px + anillo 2 px | `text-primary` |
-| filled | `surface-sunken` | `border-strong` | `text-primary` |
-| error | `surface-negative` | `text-negative` 1 px | `text-primary` |
-| disabled | `surface-sunken` | `border-default` | `text-disabled` |
-| readonly | `transparent` | ninguno | `text-primary` |
+| Estado   | Fondo              | Borde                             | Texto           |
+| -------- | ------------------ | --------------------------------- | --------------- |
+| default  | `surface-sunken`   | `border-strong`                   | `text-primary`  |
+| hover    | `surface-sunken`   | `border-strong` + oscurecido      | `text-primary`  |
+| focus    | `surface`          | `border-focus` 1 px + anillo 2 px | `text-primary`  |
+| filled   | `surface-sunken`   | `border-strong`                   | `text-primary`  |
+| error    | `surface-negative` | `text-negative` 1 px              | `text-primary`  |
+| disabled | `surface-sunken`   | `border-default`                  | `text-disabled` |
+| readonly | `transparent`      | ninguno                           | `text-primary`  |
 
 **En foco el fondo se aclara a `surface`.** El campo activo es el único blanco de la
 pantalla: es una señal de posición fortísima en un formulario largo, y no cuesta nada.
@@ -66,18 +66,18 @@ bloqueado y sí conserva la caja.
 
 El componente crítico. Sus reglas:
 
-| Regla | Comportamiento |
-| --- | --- |
-| **Alineación** | Derecha, siempre. Comparable con la columna |
-| **Cifras** | Tabulares (`tabular-nums`, `slashed-zero`) |
-| **Formato al escribir** | Los separadores de miles se insertan mientras se teclea |
-| **Formato al salir** | Se normaliza a los decimales de la moneda: `1284` → `1.284,00` |
-| **El cursor no salta** | Al insertar un separador, la posición del cursor se conserva |
-| **Símbolo de moneda** | Sufijo fijo dentro del campo, `text-tertiary`, no editable |
-| **Signo** | `−` con `polarity.loss`; el usuario puede escribir `-` |
-| **Nunca se borra lo escrito** | Una entrada inválida se marca; no se descarta |
-| **Pegar es tolerante** | Acepta `1,284.00`, `1.284,00`, `1284`, `€1.284`, `(1.284)` |
-| **Teclado** | `inputmode="decimal"` |
+| Regla                         | Comportamiento                                                 |
+| ----------------------------- | -------------------------------------------------------------- |
+| **Alineación**                | Derecha, siempre. Comparable con la columna                    |
+| **Cifras**                    | Tabulares (`tabular-nums`, `slashed-zero`)                     |
+| **Formato al escribir**       | Los separadores de miles se insertan mientras se teclea        |
+| **Formato al salir**          | Se normaliza a los decimales de la moneda: `1284` → `1.284,00` |
+| **El cursor no salta**        | Al insertar un separador, la posición del cursor se conserva   |
+| **Símbolo de moneda**         | Sufijo fijo dentro del campo, `text-tertiary`, no editable     |
+| **Signo**                     | `−` con `polarity.loss`; el usuario puede escribir `-`         |
+| **Nunca se borra lo escrito** | Una entrada inválida se marca; no se descarta                  |
+| **Pegar es tolerante**        | Acepta `1,284.00`, `1.284,00`, `1284`, `€1.284`, `(1.284)`     |
+| **Teclado**                   | `inputmode="decimal"`                                          |
 
 **La tolerancia al pegado importa más de lo que parece:** el usuario de Finance OS copia
 importes desde otro Excel, desde un PDF y desde un correo, cada uno con su convención. Un
@@ -89,13 +89,13 @@ conserva. Vaciarlo obliga a reescribir y, peor, hace dudar de si el sistema guar
 
 ## 6. Otros tipos
 
-| Tipo | Especificidad |
-| --- | --- |
-| **Texto** | Alineación izquierda. Contador de caracteres solo si hay límite duro |
-| **Fecha** | Formato `DD/MM/AAAA`, entrada por teclado **además** del selector. Nunca solo calendario |
-| **Porcentaje** | Sufijo `%` fijo, alineación derecha, un decimal |
-| **Búsqueda** | Icono `search` a la izquierda, botón de limpiar a la derecha al haber texto |
-| **Área de texto** | Mínimo 3 filas, redimensionable en vertical, nunca en horizontal |
+| Tipo              | Especificidad                                                                            |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| **Texto**         | Alineación izquierda. Contador de caracteres solo si hay límite duro                     |
+| **Fecha**         | Formato `DD/MM/AAAA`, entrada por teclado **además** del selector. Nunca solo calendario |
+| **Porcentaje**    | Sufijo `%` fijo, alineación derecha, un decimal                                          |
+| **Búsqueda**      | Icono `search` a la izquierda, botón de limpiar a la derecha al haber texto              |
+| **Área de texto** | Mínimo 3 filas, redimensionable en vertical, nunca en horizontal                         |
 
 ## 7. Validación
 

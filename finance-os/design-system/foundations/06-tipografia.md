@@ -8,10 +8,10 @@
 
 ## 1. Dos pistas, una sola voz
 
-| Plataforma | Familia UI | Familia mono |
-| --- | --- | --- |
-| **Excel** | `Aptos`, con `Calibri` de reserva | `Consolas` |
-| **Web** | `Inter`, con `-apple-system` / `Segoe UI` de reserva | `JetBrains Mono` |
+| Plataforma | Familia UI                                           | Familia mono     |
+| ---------- | ---------------------------------------------------- | ---------------- |
+| **Excel**  | `Aptos`, con `Calibri` de reserva                    | `Consolas`       |
+| **Web**    | `Inter`, con `-apple-system` / `Segoe UI` de reserva | `JetBrains Mono` |
 
 ### Por qué Excel no lleva Inter
 
@@ -35,20 +35,20 @@ neutralidad. Es lo máximo alcanzable sin exigir una instalación, y es suficien
 Escala modular de razón ≈ 1,25 en los títulos, y **paso fijo en el texto de trabajo**, donde
 lo que importa es que 14 px y 12 px se distingan sin ambigüedad.
 
-| Token | px | pt (Excel) | Interlínea | Peso | Uso |
-| --- | ---: | ---: | ---: | ---: | --- |
-| `display` | 40 | 30 | 44 | 600 | La cifra única de una pantalla de resumen |
-| `h1` | 30 | 22 | 36 | 600 | Título de página |
-| `h2` | 24 | 18 | 32 | 600 | Sección |
-| `h3` | 20 | 15 | 28 | 600 | Subsección, título de card |
-| `h4` | 16 | 12 | 24 | 600 | Encabezado de grupo, etiqueta destacada |
-| `body` | 14 | 11 | 20 | 400 | Texto de trabajo — **el 80 % del producto** |
-| `body-strong` | 14 | 11 | 20 | 500 | Énfasis dentro del cuerpo |
-| `caption` | 12 | 9 | 16 | 400 | Metadatos, texto de eje, notas |
-| `overline` | 11 | 8 | 16 | 600 | Etiqueta de KPI, encabezado de columna |
-| `metric-lg` | 32 | 24 | 36 | 600 | Cifra de KPI principal |
-| `metric-md` | 24 | 18 | 28 | 600 | Cifra de KPI secundario |
-| `metric-sm` | 14 | 11 | 20 | 500 | Cifra en tabla |
+| Token         |  px | pt (Excel) | Interlínea | Peso | Uso                                         |
+| ------------- | --: | ---------: | ---------: | ---: | ------------------------------------------- |
+| `display`     |  40 |         30 |         44 |  600 | La cifra única de una pantalla de resumen   |
+| `h1`          |  30 |         22 |         36 |  600 | Título de página                            |
+| `h2`          |  24 |         18 |         32 |  600 | Sección                                     |
+| `h3`          |  20 |         15 |         28 |  600 | Subsección, título de card                  |
+| `h4`          |  16 |         12 |         24 |  600 | Encabezado de grupo, etiqueta destacada     |
+| `body`        |  14 |         11 |         20 |  400 | Texto de trabajo — **el 80 % del producto** |
+| `body-strong` |  14 |         11 |         20 |  500 | Énfasis dentro del cuerpo                   |
+| `caption`     |  12 |          9 |         16 |  400 | Metadatos, texto de eje, notas              |
+| `overline`    |  11 |          8 |         16 |  600 | Etiqueta de KPI, encabezado de columna      |
+| `metric-lg`   |  32 |         24 |         36 |  600 | Cifra de KPI principal                      |
+| `metric-md`   |  24 |         18 |         28 |  600 | Cifra de KPI secundario                     |
+| `metric-sm`   |  14 |         11 |         20 |  500 | Cifra en tabla                              |
 
 **Tres pesos y no más:** 400 regular, 500 medio, 600 semibold. No hay bold 700 — sobre
 grafito `#151A21` el 600 ya es rotundo, y el 700 en una tabla densa emborrona. No hay
@@ -91,16 +91,16 @@ ni `1.284`.
 
 ## 4. Reglas de composición
 
-| Regla | Valor | Razón |
-| --- | --- | --- |
-| Longitud de línea | 45–75 caracteres | Más allá, el ojo pierde el retorno |
-| Interlínea del cuerpo | 1,45 | Más apretado cansa; más suelto rompe el bloque |
-| Interlínea de títulos | 1,2 | La masa del título es la unidad, no la línea |
-| Tracking de títulos | −0,014 a −0,02 em | Compensa el espaciado óptico en cuerpos grandes |
-| Tracking de `overline` | +0,06 em | Las mayúsculas necesitan aire para no apelmazarse |
-| Tracking del cuerpo | 0 | Inter y Aptos ya están bien espaciadas a 14 px |
-| Mayúsculas | Solo `overline` | Un texto en mayúsculas es 15–20 % más lento de leer |
-| Viudas y huérfanas | Evitadas en títulos | `text-wrap: balance` en web |
+| Regla                  | Valor               | Razón                                               |
+| ---------------------- | ------------------- | --------------------------------------------------- |
+| Longitud de línea      | 45–75 caracteres    | Más allá, el ojo pierde el retorno                  |
+| Interlínea del cuerpo  | 1,45                | Más apretado cansa; más suelto rompe el bloque      |
+| Interlínea de títulos  | 1,2                 | La masa del título es la unidad, no la línea        |
+| Tracking de títulos    | −0,014 a −0,02 em   | Compensa el espaciado óptico en cuerpos grandes     |
+| Tracking de `overline` | +0,06 em            | Las mayúsculas necesitan aire para no apelmazarse   |
+| Tracking del cuerpo    | 0                   | Inter y Aptos ya están bien espaciadas a 14 px      |
+| Mayúsculas             | Solo `overline`     | Un texto en mayúsculas es 15–20 % más lento de leer |
+| Viudas y huérfanas     | Evitadas en títulos | `text-wrap: balance` en web                         |
 
 ## 5. Jerarquía sin color
 
@@ -122,19 +122,19 @@ Tres niveles en 68 px de alto, sin una sola caja y sin un solo borde.
 
 Es parte de la tipografía, no de la lógica de negocio: define cómo se ve una cifra.
 
-| Regla | Decisión |
-| --- | --- |
-| Separador de miles | Punto `1.284.392` (es-ES) — configurable por localización |
-| Separador decimal | Coma `,00` (es-ES) — configurable |
-| Decimales | Los que fije la moneda: 2 (EUR, USD), 0 (JPY, CLP), 3 (BHD) |
-| Símbolo de moneda | Detrás con espacio fino: `1.284,00 €`. Delante en USD: `$1,284.00` |
-| Negativos | Signo menos real `−` (U+2212), no guion. Nunca paréntesis por defecto |
-| Cero | `0,00`, nunca `-` ni celda vacía |
-| Sin dato | `—` (raya, U+2014) en `text-tertiary`. **Cero y "sin dato" no son lo mismo** |
-| Porcentajes | Un decimal `12,4 %`, espacio fino antes del `%` |
-| Puntos porcentuales | `pp`, no `%`, para diferencias entre porcentajes |
-| Abreviación | Solo en gráficos y KPI: `2,8 M`, `847 k`. **Nunca en una tabla** |
-| Redondeo | Idéntico en todas las vistas. Se redondea al presentar, jamás al calcular |
+| Regla               | Decisión                                                                     |
+| ------------------- | ---------------------------------------------------------------------------- |
+| Separador de miles  | Punto `1.284.392` (es-ES) — configurable por localización                    |
+| Separador decimal   | Coma `,00` (es-ES) — configurable                                            |
+| Decimales           | Los que fije la moneda: 2 (EUR, USD), 0 (JPY, CLP), 3 (BHD)                  |
+| Símbolo de moneda   | Detrás con espacio fino: `1.284,00 €`. Delante en USD: `$1,284.00`           |
+| Negativos           | Signo menos real `−` (U+2212), no guion. Nunca paréntesis por defecto        |
+| Cero                | `0,00`, nunca `-` ni celda vacía                                             |
+| Sin dato            | `—` (raya, U+2014) en `text-tertiary`. **Cero y "sin dato" no son lo mismo** |
+| Porcentajes         | Un decimal `12,4 %`, espacio fino antes del `%`                              |
+| Puntos porcentuales | `pp`, no `%`, para diferencias entre porcentajes                             |
+| Abreviación         | Solo en gráficos y KPI: `2,8 M`, `847 k`. **Nunca en una tabla**             |
+| Redondeo            | Idéntico en todas las vistas. Se redondea al presentar, jamás al calcular    |
 
 **La distinción entre `0,00` y `—` es innegociable.** "El importe es cero" y "no tenemos el
 importe" son afirmaciones distintas, y confundirlas en un estado financiero es un error

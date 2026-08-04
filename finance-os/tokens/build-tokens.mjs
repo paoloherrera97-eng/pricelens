@@ -156,14 +156,12 @@ const excel = {
   color: Object.fromEntries(
     Object.entries(light)
       .filter(([, v]) => typeof v === 'string' && v.startsWith('#'))
-      .map(([k, v]) => [k, v.slice(1)])
+      .map(([k, v]) => [k, v.slice(1)]),
   ),
   font: {
     family: tokens.typography.family.ui.excel,
     mono: tokens.typography.family.mono.excel,
-    sizePt: Object.fromEntries(
-      Object.entries(tokens.typography.scale).map(([k, v]) => [k, v.pt])
-    ),
+    sizePt: Object.fromEntries(Object.entries(tokens.typography.scale).map(([k, v]) => [k, v.pt])),
   },
   /* Excel mide en puntos: 1 px @96 dpi = 0,75 pt. La rejilla de 8 px es una rejilla de 6 pt. */
   rowHeightPt: {
