@@ -364,7 +364,12 @@ export function Converter() {
       <ShareControls url={shareUrl} title={t('shareTitle', { from, to })} />
 
       {freshness && (
-        <RateFreshness age={freshness.age} isStale={freshness.stale} isOffline={!isOnline} />
+        <RateFreshness
+          age={freshness.age}
+          isStale={freshness.stale}
+          isOffline={!isOnline}
+          isDegraded={rates.snapshot.degraded}
+        />
       )}
     </Card>
   );

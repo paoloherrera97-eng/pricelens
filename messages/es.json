@@ -23,6 +23,7 @@
   },
   "rates": {
     "updated": "Actualizado {relative}",
+    "lastAvailable": "Última cotización disponible · {relative}",
     "justNow": "hace un momento",
     "minutesAgo": "hace {count, plural, one {# minuto} other {# minutos}}",
     "hoursAgo": "hace {count, plural, one {# hora} other {# horas}}",

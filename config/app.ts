@@ -56,5 +56,7 @@ export const APP_CONFIG = {
     homeCurrency: 'pricelens.home-currency',
     favourites: 'pricelens.favourites',
     rateVariants: 'pricelens.rate-variants',
+    /** The last table actually received, so an outage costs freshness, not the app. */
+    lastRates: 'pricelens.last-rates',
   },
 } as const;

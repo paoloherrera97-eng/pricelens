@@ -314,6 +314,65 @@ describe('Converter — failure states', () => {
     ).toBeInTheDocument();
   });
 
+  it('sigue convirtiendo con la última tabla cuando el proveedor falla', async () => {
+    // Una tabla de esta mañana convierte una cuenta de restaurante
+    // perfectamente; una pantalla de reintento no convierte nada, y aparece
+    // justo cuando el viajero está fuera con una conexión que ya le falla.
+    window.localStorage.setItem(
+      APP_CONFIG.storageKeys.lastRates,
+      JSON.stringify({ ...SNAPSHOT, fetchedAt: new Date(Date.now() - 3_600_000).toISOString() }),
+    );
+    mockRates({}, false);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    expect(await screen.findByText(RATE_LINE)).toBeInTheDocument();
+    expect(screen.queryByText('No hemos podido obtener las tasas')).not.toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Importe'), '100');
+    await waitFor(async () => expect(await resultText()).toMatch(/92/));
+  });
+
+  it('dice que la cotización no es de ahora, en lugar de presentarla como fresca', async () => {
+    window.localStorage.setItem(APP_CONFIG.storageKeys.lastRates, JSON.stringify(SNAPSHOT));
+    mockRates({}, false);
+    render(<Converter />);
+
+    expect(await screen.findByText(/Última cotización disponible/)).toBeInTheDocument();
+    expect(screen.queryByText(/^Actualizado/)).not.toBeInTheDocument();
+  });
+
+  it('guarda cada tabla que llega, para la próxima vez', async () => {
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+
+    await waitFor(() =>
+      expect(window.localStorage.getItem(APP_CONFIG.storageKeys.lastRates)).toContain('"base"'),
+    );
+  });
+
+  it('muestra el estado vacío solo cuando nunca hubo datos', async () => {
+    // Sin nada guardado no hay nada honesto que enseñar: ADR-013 prohíbe
+    // inventarse una tasa para rellenar la pantalla.
+    mockRates({}, false);
+    render(<Converter />);
+
+    expect(await screen.findByText('No hemos podido obtener las tasas')).toBeInTheDocument();
+    expect(screen.queryByText(RATE_LINE)).not.toBeInTheDocument();
+  });
+
+  it('descarta una tabla guardada corrupta en vez de convertir con ella', async () => {
+    window.localStorage.setItem(
+      APP_CONFIG.storageKeys.lastRates,
+      JSON.stringify({ ...SNAPSHOT, rates: { USD: 1, EUR: 0 } }),
+    );
+    mockRates({}, false);
+    render(<Converter />);
+
+    expect(await screen.findByText('No hemos podido obtener las tasas')).toBeInTheDocument();
+  });
+
   it('says so plainly when a pair has no rate rather than showing zero (E12)', async () => {
     // A table missing the home currency entirely.
     mockRates({ ...SNAPSHOT, rates: { USD: 1, THB: 35 } });

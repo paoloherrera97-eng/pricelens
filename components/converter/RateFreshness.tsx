@@ -9,6 +9,8 @@ export interface RateFreshnessProps {
   age: RateAge | null;
   isStale: boolean;
   isOffline: boolean;
+  /** True when the table came from the last successful fetch, not from this one. */
+  isDegraded?: boolean;
 }
 
 /**
@@ -19,7 +21,7 @@ export interface RateFreshnessProps {
  * marks "working, but not fresh" — red would imply failure when the app is
  * fine, green would misrepresent stale data as live.
  */
-export function RateFreshness({ age, isStale, isOffline }: RateFreshnessProps) {
+export function RateFreshness({ age, isStale, isOffline, isDegraded = false }: RateFreshnessProps) {
   const t = useTranslations('rates');
   if (!age) return null;
 
@@ -32,25 +34,28 @@ export function RateFreshness({ age, isStale, isOffline }: RateFreshnessProps) {
           ? t('hoursAgo', { count: age.count })
           : t('daysAgo', { count: age.count });
 
-  const isDegraded = isStale || isOffline;
+  const isWarning = isStale || isOffline || isDegraded;
 
   return (
     <p
       className={cn(
         'flex items-center justify-center gap-1 text-xs font-medium',
-        isDegraded ? 'text-warning-600' : 'text-fg-muted',
+        isWarning ? 'text-warning-600' : 'text-fg-muted',
       )}
     >
       <span
         aria-hidden="true"
         className={cn(
           'inline-block size-1 rounded-full',
-          isDegraded ? 'bg-warning-600' : 'bg-success-600',
+          isWarning ? 'bg-warning-600' : 'bg-success-600',
         )}
       />
       <span>
         {isOffline ? `${t('offline')} · ` : ''}
-        {t('updated', { relative })}
+        {/* Cuando la tabla viene de la última descarga que sí funcionó, decirlo
+            reemplaza al «Actualizado hace X» en lugar de acompañarlo: la hora
+            sigue siendo cierta, pero «actualizado» ya no lo es. */}
+        {isDegraded ? t('lastAvailable', { relative }) : t('updated', { relative })}
         {isStale ? ` · ${t('stale')}` : ''}
       </span>
     </p>
