@@ -34,10 +34,19 @@ function mockRates(response: unknown, ok = true) {
   return fetchMock;
 }
 
-/** The big number, read from the live region. */
+/**
+ * The big number, read from the element that renders it.
+ *
+ * Not from the live region: that carries the settled announcement, which by
+ * design lags the visible value while the user is still typing.
+ */
 async function resultText(): Promise<string> {
-  const region = document.querySelector('[aria-live="polite"]')!;
-  return region.textContent ?? '';
+  return document.querySelector('.fit-container')?.textContent ?? '';
+}
+
+/** What a screen reader is told. */
+function announcementText(): string {
+  return document.querySelector('[aria-live="polite"]')?.textContent ?? '';
 }
 
 beforeEach(() => {
@@ -109,6 +118,71 @@ describe('Converter — conversion', () => {
     mockRates(SNAPSHOT);
     render(<Converter />);
     expect(await screen.findByText(/1 EUR = 1,08696 USD/)).toBeInTheDocument();
+  });
+
+  it('anuncia el resultado una sola vez, no una por tecla', async () => {
+    // Un lector de pantalla encola cada cambio de una región viva y se
+    // interrumpe a sí mismo: cinco dígitos producían cinco fragmentos en vez
+    // de una respuesta.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const input = await screen.findByLabelText('Importe');
+    const seen = new Set<string>();
+    for (const key of '12500') {
+      await user.type(input, key);
+      seen.add(announcementText());
+    }
+    // Mientras se escribe, la región no va cambiando bajo el lector.
+    expect(seen.size).toBeLessThanOrEqual(1);
+
+    // Y cuando se para, dice la frase entera, una vez.
+    // (es-ES separa el símbolo con un espacio duro, de ahí el `\s`.)
+    await waitFor(() => expect(announcementText()).toMatch(/equivale a/));
+    expect(announcementText()).toMatch(/12\.500,00\sUS\$ equivale a 11\.500,00\s€/);
+  });
+
+  it('no dice el número dos veces', async () => {
+    // El valor visible vivía dentro de la región: se anunciaba primero suelto
+    // y otra vez dentro de la frase.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '100');
+    await waitFor(() => expect(announcementText()).toMatch(/equivale a/));
+
+    expect(document.querySelector('.fit-container p')).toHaveAttribute('aria-hidden', 'true');
+    expect(announcementText().match(/92,00/g)).toHaveLength(1);
+  });
+
+  it('calla mientras no hay importe', async () => {
+    // Anunciar el marcador diría «0,00 US$ equivale a 0,00 €», una conversión
+    // que nadie ha pedido.
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
+    expect(announcementText()).toBe('');
+  });
+
+  it('anuncia el resultado desde un solo sitio', async () => {
+    // Dos regiones diciendo el mismo número compiten por el turno de habla.
+    // La de `ShareControls` es otra cosa —confirma que se copió el enlace— y
+    // no debe entrar en esta cuenta.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '100');
+    await waitFor(() => expect(announcementText()).toMatch(/equivale a/));
+
+    const saying = [...document.querySelectorAll('[aria-live]')].filter((region) =>
+      /equivale a/.test(region.textContent ?? ''),
+    );
+    expect(saying).toHaveLength(1);
   });
 
   it('shows when the rates were last updated', async () => {
