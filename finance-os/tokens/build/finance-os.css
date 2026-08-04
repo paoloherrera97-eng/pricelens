@@ -1,0 +1,209 @@
+/**
+ * Finance OS v1.0 — tokens de diseño.
+ * GENERADO por finance-os/tokens/build-tokens.mjs. No editar a mano.
+ *
+ * Los componentes referencian SIEMPRE la capa semántica (--fos-surface, --fos-text-primary…),
+ * nunca la primitiva. Eso es lo que convierte el modo oscuro en un cambio de paleta
+ * en lugar de una variante por elemento.
+ */
+
+:root {
+  color-scheme: light;
+
+  --fos-canvas: #F6F8FA;
+  --fos-surface: #FFFFFF;
+  --fos-surface-raised: #FFFFFF;
+  --fos-surface-sunken: #EDF0F4;
+  --fos-surface-hover: #EDF0F4;
+  --fos-surface-active: #E4E8EE;
+  --fos-surface-accent: #EEF2FE;
+  --fos-surface-positive: #E8F6EF;
+  --fos-surface-negative: #FDECEB;
+  --fos-surface-warning: #FDF4E4;
+  --fos-text-primary: #151A21;
+  --fos-text-secondary: #55606F;
+  --fos-text-tertiary: #636C7A;
+  --fos-text-disabled: #98A2B1;
+  --fos-text-on-accent: #FFFFFF;
+  --fos-text-accent: #2F49B4;
+  --fos-text-positive: #127543;
+  --fos-text-negative: #C22B24;
+  --fos-text-warning: #8F5B12;
+  --fos-border-subtle: #E4E8EE;
+  --fos-border-default: #D8DDE5;
+  --fos-border-strong: #7C8695;
+  --fos-border-accent: #3B5BDB;
+  --fos-border-focus: #3B5BDB;
+  --fos-accent: #3B5BDB;
+  --fos-accent-hover: #2F49B4;
+  --fos-accent-active: #263B8E;
+  --fos-overlay: rgb(21 26 33 / 0.32);
+  --fos-series-1: #3B5BDB;
+  --fos-series-2: #E07A1F;
+  --fos-series-3: #0E9F8A;
+  --fos-series-4: #A8801A;
+  --fos-series-5: #D2699E;
+  --fos-series-6: #2E8B4E;
+  --fos-series-7: #6D4AA8;
+  --fos-series-8: #D64B4B;
+
+  /* Tipografía */
+  --fos-font-ui: Inter, -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --fos-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  --fos-numerals-tabular: 'tnum' 1, 'lnum' 1, 'zero' 1;
+  --fos-text-display: 2.5rem;
+  --fos-leading-display: 2.75rem;
+  --fos-text-h1: 1.875rem;
+  --fos-leading-h1: 2.25rem;
+  --fos-text-h2: 1.5rem;
+  --fos-leading-h2: 2rem;
+  --fos-text-h3: 1.25rem;
+  --fos-leading-h3: 1.75rem;
+  --fos-text-h4: 1rem;
+  --fos-leading-h4: 1.5rem;
+  --fos-text-body: 0.875rem;
+  --fos-leading-body: 1.25rem;
+  --fos-text-body-strong: 0.875rem;
+  --fos-leading-body-strong: 1.25rem;
+  --fos-text-caption: 0.75rem;
+  --fos-leading-caption: 1rem;
+  --fos-text-overline: 0.6875rem;
+  --fos-leading-overline: 1rem;
+  --fos-text-metric-lg: 2rem;
+  --fos-leading-metric-lg: 2.25rem;
+  --fos-text-metric-md: 1.5rem;
+  --fos-leading-metric-md: 1.75rem;
+  --fos-text-metric-sm: 0.875rem;
+  --fos-leading-metric-sm: 1.25rem;
+
+  /* Espaciado — rejilla de 8 px */
+  --fos-space-0: 0rem;
+  --fos-space-1: 0.25rem;
+  --fos-space-2: 0.5rem;
+  --fos-space-3: 0.75rem;
+  --fos-space-4: 1rem;
+  --fos-space-5: 1.5rem;
+  --fos-space-6: 2rem;
+  --fos-space-7: 2.5rem;
+  --fos-space-8: 3rem;
+  --fos-space-9: 4rem;
+  --fos-space-10: 5rem;
+  --fos-space-11: 6rem;
+
+  /* Radios */
+  --fos-radius-none: 0px;
+  --fos-radius-sm: 4px;
+  --fos-radius-md: 6px;
+  --fos-radius-lg: 8px;
+  --fos-radius-xl: 12px;
+  --fos-radius-2xl: 16px;
+  --fos-radius-full: 9999px;
+
+  /* Elevación */
+  --fos-elevation-0: none;
+  --fos-elevation-1: 0 1px 2px rgb(21 26 33 / 0.04), 0 0 0 1px rgb(21 26 33 / 0.04);
+  --fos-elevation-2: 0 2px 4px -1px rgb(21 26 33 / 0.06), 0 4px 12px -2px rgb(21 26 33 / 0.08);
+  --fos-elevation-3: 0 8px 16px -4px rgb(21 26 33 / 0.10), 0 20px 40px -8px rgb(21 26 33 / 0.14);
+
+  /* Movimiento */
+  --fos-duration-fast: 120ms;
+  --fos-duration-base: 180ms;
+  --fos-duration-slow: 240ms;
+  --fos-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --fos-ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --fos-ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+}
+
+/* El modo oscuro solo existe en web. Excel es siempre claro. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+
+  --fos-canvas: #0C1016;
+  --fos-surface: #151A21;
+  --fos-surface-raised: #212834;
+  --fos-surface-sunken: #0C1016;
+  --fos-surface-hover: #212834;
+  --fos-surface-active: #2E3643;
+  --fos-surface-accent: #1B2440;
+  --fos-surface-positive: #0C2A1C;
+  --fos-surface-negative: #331312;
+  --fos-surface-warning: #2E2109;
+  --fos-text-primary: #F6F8FA;
+  --fos-text-secondary: #A9B3C1;
+  --fos-text-tertiary: #8A94A3;
+  --fos-text-disabled: #55606F;
+  --fos-text-on-accent: #FFFFFF;
+  --fos-text-accent: #93A9F2;
+  --fos-text-positive: #5FBE8C;
+  --fos-text-negative: #F08A85;
+  --fos-text-warning: #E2B24E;
+  --fos-border-subtle: #212834;
+  --fos-border-default: #2E3643;
+  --fos-border-strong: #5E6878;
+  --fos-border-accent: #6480E6;
+  --fos-border-focus: #93A9F2;
+  --fos-accent: #3B5BDB;
+  --fos-accent-hover: #4A68DF;
+  --fos-accent-active: #3B5BDB;
+  --fos-overlay: rgb(0 0 0 / 0.60);
+  --fos-series-1: #5C7CE8;
+  --fos-series-2: #CE7526;
+  --fos-series-3: #14A18C;
+  --fos-series-4: #AE8A22;
+  --fos-series-5: #CB6693;
+  --fos-series-6: #327F49;
+  --fos-series-7: #8A66C8;
+  --fos-series-8: #E25C5C;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --fos-canvas: #0C1016;
+  --fos-surface: #151A21;
+  --fos-surface-raised: #212834;
+  --fos-surface-sunken: #0C1016;
+  --fos-surface-hover: #212834;
+  --fos-surface-active: #2E3643;
+  --fos-surface-accent: #1B2440;
+  --fos-surface-positive: #0C2A1C;
+  --fos-surface-negative: #331312;
+  --fos-surface-warning: #2E2109;
+  --fos-text-primary: #F6F8FA;
+  --fos-text-secondary: #A9B3C1;
+  --fos-text-tertiary: #8A94A3;
+  --fos-text-disabled: #55606F;
+  --fos-text-on-accent: #FFFFFF;
+  --fos-text-accent: #93A9F2;
+  --fos-text-positive: #5FBE8C;
+  --fos-text-negative: #F08A85;
+  --fos-text-warning: #E2B24E;
+  --fos-border-subtle: #212834;
+  --fos-border-default: #2E3643;
+  --fos-border-strong: #5E6878;
+  --fos-border-accent: #6480E6;
+  --fos-border-focus: #93A9F2;
+  --fos-accent: #3B5BDB;
+  --fos-accent-hover: #4A68DF;
+  --fos-accent-active: #3B5BDB;
+  --fos-overlay: rgb(0 0 0 / 0.60);
+  --fos-series-1: #5C7CE8;
+  --fos-series-2: #CE7526;
+  --fos-series-3: #14A18C;
+  --fos-series-4: #AE8A22;
+  --fos-series-5: #CB6693;
+  --fos-series-6: #327F49;
+  --fos-series-7: #8A66C8;
+  --fos-series-8: #E25C5C;
+}
+
+/* Una cifra que se anima es una cifra en la que se desconfía. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fos-duration-fast: 0ms;
+    --fos-duration-base: 0ms;
+    --fos-duration-slow: 0ms;
+  }
+}

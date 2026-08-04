@@ -1,0 +1,76 @@
+{
+  "$generated": "finance-os/tokens/build-tokens.mjs — no editar a mano",
+  "$note": "Excel es siempre claro. Los colores van en RGB hex sin almohadilla, tal como los espera el XML de theme1.xml y la propiedad Interior.Color de VBA (que además invierte a BGR).",
+  "theme": {
+    "lt1": "FFFFFF",
+    "dk1": "151A21",
+    "lt2": "F6F8FA",
+    "dk2": "55606F",
+    "accent1": "3B5BDB",
+    "accent2": "E07A1F",
+    "accent3": "0E9F8A",
+    "accent4": "A8801A",
+    "accent5": "D2699E",
+    "accent6": "2E8B4E",
+    "hlink": "2F49B4",
+    "folHlink": "263B8E"
+  },
+  "color": {
+    "canvas": "F6F8FA",
+    "surface": "FFFFFF",
+    "surface-raised": "FFFFFF",
+    "surface-sunken": "EDF0F4",
+    "surface-hover": "EDF0F4",
+    "surface-active": "E4E8EE",
+    "surface-accent": "EEF2FE",
+    "surface-positive": "E8F6EF",
+    "surface-negative": "FDECEB",
+    "surface-warning": "FDF4E4",
+    "text-primary": "151A21",
+    "text-secondary": "55606F",
+    "text-tertiary": "636C7A",
+    "text-disabled": "98A2B1",
+    "text-on-accent": "FFFFFF",
+    "text-accent": "2F49B4",
+    "text-positive": "127543",
+    "text-negative": "C22B24",
+    "text-warning": "8F5B12",
+    "border-subtle": "E4E8EE",
+    "border-default": "D8DDE5",
+    "border-strong": "7C8695",
+    "border-accent": "3B5BDB",
+    "border-focus": "3B5BDB",
+    "accent": "3B5BDB",
+    "accent-hover": "2F49B4",
+    "accent-active": "263B8E"
+  },
+  "font": {
+    "family": "Aptos, Calibri, 'Segoe UI', sans-serif",
+    "mono": "Consolas, 'Courier New', monospace",
+    "sizePt": {
+      "display": 30,
+      "h1": 22,
+      "h2": 18,
+      "h3": 15,
+      "h4": 12,
+      "body": 11,
+      "body-strong": 11,
+      "caption": 9,
+      "overline": 8,
+      "metric-lg": 24,
+      "metric-md": 18,
+      "metric-sm": 11
+    }
+  },
+  "rowHeightPt": {
+    "compact": 21,
+    "default": 27,
+    "relaxed": 33,
+    "spacer": 6,
+    "sectionGap": 18
+  },
+  "borderWeightPt": {
+    "hairline": 0.75,
+    "medium": 1.5
+  }
+}

@@ -1,0 +1,324 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "$description": "Finance OS v1.0 — fuente única de verdad de los tokens de diseño. Todo lo demás (CSS, tema de Excel, documentación) se genera o se verifica contra este archivo.",
+  "$meta": {
+    "product": "Finance OS",
+    "version": "1.0.0",
+    "layers": [
+      "primitive — valores crudos, sin significado; nunca se usan directamente en un componente",
+      "semantic — roles (superficie, texto, borde, polaridad); resuelven distinto en claro y oscuro",
+      "component — decisiones por componente; siempre apuntan a un token semántico"
+    ],
+    "canonicalMode": "light",
+    "notes": "El modo oscuro es exclusivo de la plataforma web. Excel es siempre claro (ver design-system/foundations/05-color.md §7)."
+  },
+
+  "primitive": {
+    "graphite": {
+      "0": "#FFFFFF",
+      "25": "#FBFCFD",
+      "50": "#F6F8FA",
+      "100": "#EDF0F4",
+      "150": "#E4E8EE",
+      "200": "#D8DDE5",
+      "300": "#C2C9D4",
+      "400": "#98A2B1",
+      "450": "#7C8695",
+      "500": "#636C7A",
+      "600": "#55606F",
+      "700": "#3D4654",
+      "750": "#2E3643",
+      "800": "#212834",
+      "900": "#151A21",
+      "950": "#0C1016"
+    },
+    "indigo": {
+      "50": "#EEF2FE",
+      "100": "#DDE5FD",
+      "200": "#C0CEFA",
+      "300": "#93A9F2",
+      "400": "#6480E6",
+      "450": "#4A68DF",
+      "500": "#3B5BDB",
+      "600": "#2F49B4",
+      "700": "#263B8E",
+      "800": "#1E2E6C",
+      "900": "#17224C"
+    },
+    "jade": {
+      "50": "#E8F6EF",
+      "100": "#CDEBDD",
+      "300": "#5FBE8C",
+      "500": "#1E9A5B",
+      "600": "#127543",
+      "700": "#0F6238",
+      "900": "#08341E"
+    },
+    "vermilion": {
+      "50": "#FDECEB",
+      "100": "#FAD7D5",
+      "300": "#F08A85",
+      "500": "#DB3B33",
+      "600": "#C22B24",
+      "700": "#9B211B",
+      "900": "#4E100D"
+    },
+    "amber": {
+      "50": "#FDF4E4",
+      "100": "#FAE7C2",
+      "300": "#E2B24E",
+      "500": "#B7791F",
+      "600": "#8F5B12",
+      "700": "#7A4E0F",
+      "900": "#3D2707"
+    },
+    "series": {
+      "$description": "Paleta categórica de 8 series. Orden fijo — el orden ES el mecanismo de seguridad para daltonismo, no una preferencia estética. Validada con Machado-Oliveira-Fernandes 2009 (severidad 1.0). Ver design-system/components/20-graficos.md.",
+      "light": {
+        "1": "#3B5BDB",
+        "2": "#E07A1F",
+        "3": "#0E9F8A",
+        "4": "#A8801A",
+        "5": "#D2699E",
+        "6": "#2E8B4E",
+        "7": "#6D4AA8",
+        "8": "#D64B4B"
+      },
+      "dark": {
+        "1": "#5C7CE8",
+        "2": "#CE7526",
+        "3": "#14A18C",
+        "4": "#AE8A22",
+        "5": "#CB6693",
+        "6": "#327F49",
+        "7": "#8A66C8",
+        "8": "#E25C5C"
+      }
+    },
+    "sequential": {
+      "$description": "Rampa secuencial de un solo tono (índigo) para magnitud continua: mapas de calor de varianza, matrices de concentración.",
+      "100": "#DDE5FD",
+      "200": "#C0CEFA",
+      "300": "#93A9F2",
+      "400": "#6480E6",
+      "500": "#3B5BDB",
+      "600": "#2F49B4",
+      "700": "#263B8E"
+    },
+    "diverging": {
+      "$description": "Rampa divergente para polaridad respecto de una línea base (real vs. presupuesto). Punto medio gris neutro — nunca un tono.",
+      "negative": ["#9B211B", "#C22B24", "#DB3B33", "#F08A85", "#FAD7D5"],
+      "neutral": "#EDF0F4",
+      "positive": ["#CDEBDD", "#5FBE8C", "#1E9A5B", "#15804A", "#0F6238"]
+    }
+  },
+
+  "semantic": {
+    "light": {
+      "canvas": "{primitive.graphite.50}",
+      "surface": "{primitive.graphite.0}",
+      "surface-raised": "{primitive.graphite.0}",
+      "surface-sunken": "{primitive.graphite.100}",
+      "surface-hover": "{primitive.graphite.100}",
+      "surface-active": "{primitive.graphite.150}",
+      "surface-accent": "{primitive.indigo.50}",
+      "surface-positive": "{primitive.jade.50}",
+      "surface-negative": "{primitive.vermilion.50}",
+      "surface-warning": "{primitive.amber.50}",
+
+      "text-primary": "{primitive.graphite.900}",
+      "text-secondary": "{primitive.graphite.600}",
+      "text-tertiary": "{primitive.graphite.500}",
+      "text-disabled": "{primitive.graphite.400}",
+      "text-on-accent": "{primitive.graphite.0}",
+      "text-accent": "{primitive.indigo.600}",
+      "text-positive": "{primitive.jade.600}",
+      "text-negative": "{primitive.vermilion.600}",
+      "text-warning": "{primitive.amber.600}",
+
+      "border-subtle": "{primitive.graphite.150}",
+      "border-default": "{primitive.graphite.200}",
+      "border-strong": "{primitive.graphite.450}",
+      "border-accent": "{primitive.indigo.500}",
+      "border-focus": "{primitive.indigo.500}",
+
+      "accent": "{primitive.indigo.500}",
+      "accent-hover": "{primitive.indigo.600}",
+      "accent-active": "{primitive.indigo.700}",
+
+      "overlay": "rgb(21 26 33 / 0.32)"
+    },
+    "dark": {
+      "canvas": "{primitive.graphite.950}",
+      "surface": "{primitive.graphite.900}",
+      "surface-raised": "{primitive.graphite.800}",
+      "surface-sunken": "{primitive.graphite.950}",
+      "surface-hover": "{primitive.graphite.800}",
+      "surface-active": "{primitive.graphite.750}",
+      "surface-accent": "#1B2440",
+      "surface-positive": "#0C2A1C",
+      "surface-negative": "#331312",
+      "surface-warning": "#2E2109",
+
+      "text-primary": "{primitive.graphite.50}",
+      "text-secondary": "#A9B3C1",
+      "text-tertiary": "#8A94A3",
+      "text-disabled": "{primitive.graphite.600}",
+      "text-on-accent": "{primitive.graphite.0}",
+      "text-accent": "#93A9F2",
+      "text-positive": "#5FBE8C",
+      "text-negative": "#F08A85",
+      "text-warning": "#E2B24E",
+
+      "border-subtle": "{primitive.graphite.800}",
+      "border-default": "{primitive.graphite.750}",
+      "border-strong": "#5E6878",
+      "border-accent": "#6480E6",
+      "border-focus": "#93A9F2",
+
+      "accent": "{primitive.indigo.500}",
+      "accent-hover": "{primitive.indigo.450}",
+      "accent-active": "{primitive.indigo.500}",
+
+      "overlay": "rgb(0 0 0 / 0.60)"
+    }
+  },
+
+  "polarity": {
+    "$description": "Capa remapeable. En mercados donde el rojo significa subida (JP, CN, KR, TW) se intercambian los dos primeros valores sin tocar ningún componente. El color NUNCA es el único portador del signo: siempre acompaña al signo aritmético y a un cursor ▲/▼.",
+    "gain": "text-positive",
+    "loss": "text-negative",
+    "flat": "text-tertiary",
+    "convention": "western"
+  },
+
+  "space": {
+    "$description": "Escala de 8 px. Múltiplos exactos de 6 pt, la unidad nativa de Excel (1 px @96 dpi = 0,75 pt).",
+    "0": { "px": 0, "pt": 0 },
+    "1": { "px": 4, "pt": 3 },
+    "2": { "px": 8, "pt": 6 },
+    "3": { "px": 12, "pt": 9 },
+    "4": { "px": 16, "pt": 12 },
+    "5": { "px": 24, "pt": 18 },
+    "6": { "px": 32, "pt": 24 },
+    "7": { "px": 40, "pt": 30 },
+    "8": { "px": 48, "pt": 36 },
+    "9": { "px": 64, "pt": 48 },
+    "10": { "px": 80, "pt": 60 },
+    "11": { "px": 96, "pt": 72 }
+  },
+
+  "typography": {
+    "family": {
+      "ui": {
+        "web": "Inter, -apple-system, 'Segoe UI', system-ui, sans-serif",
+        "excel": "Aptos, Calibri, 'Segoe UI', sans-serif",
+        "$note": "Excel no puede depender de una fuente instalada: si falta, las columnas se reajustan y el diseño se rompe en silencio. Aptos es la fuente por defecto de Microsoft 365; Calibri cubre las versiones anteriores."
+      },
+      "mono": {
+        "web": "'JetBrains Mono', 'SF Mono', Consolas, monospace",
+        "excel": "Consolas, 'Courier New', monospace"
+      }
+    },
+    "scale": {
+      "display": { "px": 40, "pt": 30, "lh": 44, "weight": 600, "tracking": "-0.02em" },
+      "h1": { "px": 30, "pt": 22, "lh": 36, "weight": 600, "tracking": "-0.018em" },
+      "h2": { "px": 24, "pt": 18, "lh": 32, "weight": 600, "tracking": "-0.014em" },
+      "h3": { "px": 20, "pt": 15, "lh": 28, "weight": 600, "tracking": "-0.01em" },
+      "h4": { "px": 16, "pt": 12, "lh": 24, "weight": 600, "tracking": "-0.006em" },
+      "body": { "px": 14, "pt": 11, "lh": 20, "weight": 400, "tracking": "0" },
+      "body-strong": { "px": 14, "pt": 11, "lh": 20, "weight": 500, "tracking": "0" },
+      "caption": { "px": 12, "pt": 9, "lh": 16, "weight": 400, "tracking": "0.004em" },
+      "overline": { "px": 11, "pt": 8, "lh": 16, "weight": 600, "tracking": "0.06em", "case": "uppercase" },
+      "metric-lg": { "px": 32, "pt": 24, "lh": 36, "weight": 600, "tracking": "-0.02em", "numerals": "tabular" },
+      "metric-md": { "px": 24, "pt": 18, "lh": 28, "weight": 600, "tracking": "-0.014em", "numerals": "tabular" },
+      "metric-sm": { "px": 14, "pt": 11, "lh": 20, "weight": 500, "tracking": "0", "numerals": "tabular" }
+    },
+    "features": {
+      "$description": "Toda cifra que pueda alinearse en columna usa versalitas tabulares y cero rasgado.",
+      "tabular": "'tnum' 1, 'lnum' 1, 'zero' 1",
+      "prose": "'kern' 1, 'liga' 1"
+    }
+  },
+
+  "radius": {
+    "none": 0,
+    "sm": 4,
+    "md": 6,
+    "lg": 8,
+    "xl": 12,
+    "2xl": 16,
+    "full": 9999,
+    "$excel": "Las celdas de Excel no admiten radio. El radio solo aplica a formas (botones dibujados como shapes) y a la web. Toda la retícula tabular es de esquina viva por definición, en ambas plataformas."
+  },
+
+  "elevation": {
+    "$description": "La elevación tiene dos expresiones. En web es sombra; en Excel, donde no existe la sombra, es un escalón de superficie más un filete de 0,5 pt. El nivel semántico es el mismo en ambas.",
+    "0": {
+      "web": "none",
+      "excel": "sin borde; superficie = canvas",
+      "use": "Fondo de la aplicación"
+    },
+    "1": {
+      "web": "0 1px 2px rgb(21 26 33 / 0.04), 0 0 0 1px rgb(21 26 33 / 0.04)",
+      "excel": "relleno surface + filete border-subtle 0,5 pt",
+      "use": "Card, fila de tabla en reposo"
+    },
+    "2": {
+      "web": "0 2px 4px -1px rgb(21 26 33 / 0.06), 0 4px 12px -2px rgb(21 26 33 / 0.08)",
+      "excel": "relleno surface + filete border-default 0,75 pt",
+      "use": "Menú desplegable, popover, card en hover"
+    },
+    "3": {
+      "web": "0 8px 16px -4px rgb(21 26 33 / 0.10), 0 20px 40px -8px rgb(21 26 33 / 0.14)",
+      "excel": "forma con sombra externa 4 pt al 12 %",
+      "use": "Modal, panel lateral"
+    },
+    "$dark": "En oscuro la sombra deja de leerse: la elevación pasa a ser el escalón de superficie (900 → 800 → 750), y la sombra se conserva solo como refuerzo del recorte."
+  },
+
+  "motion": {
+    "$description": "El movimiento confirma causa y efecto; nunca decora. En una interfaz financiera, una cifra que se anima al cambiar es una cifra en la que se desconfía.",
+    "duration": {
+      "instant": 0,
+      "fast": 120,
+      "base": 180,
+      "slow": 240,
+      "deliberate": 320
+    },
+    "easing": {
+      "standard": "cubic-bezier(0.2, 0, 0, 1)",
+      "enter": "cubic-bezier(0.05, 0.7, 0.1, 1)",
+      "exit": "cubic-bezier(0.3, 0, 0.8, 0.15)"
+    },
+    "rules": [
+      "El anillo de foco aparece en 0 ms. Nunca se anima.",
+      "Las cifras no hacen count-up. El valor mostrado es siempre el valor real.",
+      "prefers-reduced-motion: reduce → toda duración pasa a 0 ms salvo el fundido de opacidad."
+    ]
+  },
+
+  "size": {
+    "control-sm": { "px": 28, "pt": 21 },
+    "control-md": { "px": 36, "pt": 27 },
+    "control-lg": { "px": 44, "pt": 33 },
+    "target-min": { "px": 24, "pt": 18, "$note": "WCAG 2.2 AA (2.5.8). El objetivo de diseño es 44 px salvo en retícula densa." },
+    "row-compact": { "px": 28, "pt": 21 },
+    "row-default": { "px": 36, "pt": 27 },
+    "row-relaxed": { "px": 44, "pt": 33 },
+    "icon-sm": { "px": 16, "pt": 12 },
+    "icon-md": { "px": 20, "pt": 15 },
+    "icon-lg": { "px": 24, "pt": 18 },
+    "border-hairline": { "px": 1, "pt": 0.75 },
+    "focus-ring": { "px": 2, "offset": 2 }
+  },
+
+  "breakpoint": {
+    "$description": "Solo web. Excel se rige por el ancho de canvas de impresión (ver design-system/platform/31-responsive.md).",
+    "sm": 640,
+    "md": 768,
+    "lg": 1024,
+    "xl": 1280,
+    "2xl": 1536
+  }
+}
