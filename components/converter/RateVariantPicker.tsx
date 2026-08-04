@@ -98,7 +98,18 @@ export function RateVariantPicker({
           una cotización sin texto debe quedarse sin línea, no romper la
           pantalla. */}
       {t.has(`hint.${selectedId}`) && (
-        <p aria-hidden="true" className="text-fg-muted mt-0.5 text-xs">
+        <p
+          // Re-mounting on each choice replays the 120ms fade, so the sentence
+          // reads as an answer to the tap rather than as text that silently
+          // swapped underneath it.
+          key={selectedId}
+          aria-hidden="true"
+          // `min-h` is two lines' worth. These sentences are one line or two
+          // depending on the option and the width — measured — and without a
+          // reserve the whole screen would shift 17px on every tap, which is
+          // the jitter the result card already reserves height to avoid.
+          className="animate-fade text-fg-muted mt-0.5 min-h-[2.8em] text-xs"
+        >
           {t(`hint.${selectedId}`)}
         </p>
       )}

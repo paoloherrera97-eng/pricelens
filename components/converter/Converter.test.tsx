@@ -883,14 +883,36 @@ describe('Converter — tipo de cambio en Argentina', () => {
     render(<Converter />);
     await argentina(user);
 
-    expect(await screen.findByText('Efectivo, el que usan los viajeros')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Cambio en efectivo utilizado habitualmente por los viajeros.'),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole('radio', { name: /Tarjeta/ }));
-    expect(await screen.findByText('Al pagar con tarjeta')).toBeInTheDocument();
-    expect(screen.queryByText('Efectivo, el que usan los viajeros')).not.toBeInTheDocument();
+    expect(await screen.findByText('Tipo aplicado al pagar con tarjeta.')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Cambio en efectivo utilizado habitualmente por los viajeros.'),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('radio', { name: /Oficial/ }));
-    expect(await screen.findByText('El oficial del banco central')).toBeInTheDocument();
+    expect(await screen.findByText('Tipo de cambio oficial del país.')).toBeInTheDocument();
+  });
+
+  it('reserva la altura de la explicación, para que cambiar de opción no mueva nada', async () => {
+    // Las frases ocupan una o dos líneas según la opción y el ancho. Sin
+    // reserva, cada toque desplazaría todo lo de abajo — el mismo temblor que
+    // la tarjeta del resultado ya evita reservando alto.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const hint = await screen.findByText(/Cambio en efectivo/);
+    expect(hint.className).toMatch(/min-h-/);
+
+    await user.click(screen.getByRole('radio', { name: /Oficial/ }));
+    expect(await screen.findByText(/Tipo de cambio oficial del país/)).toHaveClass(
+      ...hint.className.split(' '),
+    );
   });
 
   it('no repite la explicación a un lector de pantalla', async () => {
@@ -901,7 +923,9 @@ describe('Converter — tipo de cambio en Argentina', () => {
     render(<Converter />);
     await argentina(user);
 
-    const hint = await screen.findByText('Efectivo, el que usan los viajeros');
+    const hint = await screen.findByText(
+      'Cambio en efectivo utilizado habitualmente por los viajeros.',
+    );
     expect(hint).toHaveAttribute('aria-hidden', 'true');
   });
 
