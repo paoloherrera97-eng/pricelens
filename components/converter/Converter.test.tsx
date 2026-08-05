@@ -760,6 +760,25 @@ describe('Converter — share', () => {
 
     await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
     expect(share.mock.calls[0]?.[0]?.url).toContain('country=US');
+    // El título salía como «converter.shareTitle»: se pedía al espacio
+    // `converter` una clave que vive en `share`, y next-intl devuelve la ruta
+    // de la clave cuando no la encuentra. Un fallo silencioso que solo se ve
+    // en la hoja nativa, que es justo donde nadie mira al probar.
+    expect(share.mock.calls[0]?.[0]?.title).toBe('PriceLens — USD a EUR');
+  });
+
+  it('no deja ninguna clave de traducción sin resolver en pantalla', async () => {
+    // La forma general del fallo anterior: next-intl devuelve la ruta de la
+    // clave en lugar de lanzar, así que una clave mal pedida se ve como texto
+    // plausible y pasa desapercibida.
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    const namespaces = ['converter', 'rates', 'errors', 'share', 'favourites', 'rateVariants'];
+    for (const namespace of namespaces) {
+      expect(document.body.textContent).not.toContain(`${namespace}.`);
+    }
   });
 
   it('copies to the clipboard when there is no share sheet', async () => {

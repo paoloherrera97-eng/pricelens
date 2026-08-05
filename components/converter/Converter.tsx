@@ -69,6 +69,9 @@ export function Converter() {
   const tRates = useTranslations('rates');
   const tError = useTranslations('errors');
   const tVariants = useTranslations('rateVariants');
+  // El título de la hoja de compartir vive en `share`, junto al resto de textos
+  // de ese control — no en `converter`, que es donde se pedía.
+  const tShare = useTranslations('share');
   const rates = useRates();
   const isOnline = useOnlineStatus();
 
@@ -360,7 +363,7 @@ export function Converter() {
         />
       )}
 
-      <ShareControls url={shareUrl} title={t('shareTitle', { from, to })} />
+      <ShareControls url={shareUrl} title={tShare('shareTitle', { from, to })} />
 
       {freshness && (
         <RateFreshness
