@@ -181,10 +181,11 @@ describe('convert', () => {
 
 describe('formatCurrency', () => {
   it('uses zero decimals for zero-decimal currencies (E4)', () => {
-    // The bug a hardcoded toFixed(2) would produce: "¥1.340,00".
     const out = formatCurrency(1340, 'JPY', ES);
-    expect(out).toContain('1340');
-    expect(out).not.toMatch(/[.,]\d\d/);
+    // Grouped, but with no minor units at all — the bug a hardcoded
+    // toFixed(2) would produce is "¥1.340,00".
+    expect(out).toContain('1.340');
+    expect(out).not.toMatch(/,\d\d/);
   });
 
   it('uses three decimals for three-decimal currencies (E5)', () => {

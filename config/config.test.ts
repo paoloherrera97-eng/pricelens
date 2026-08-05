@@ -91,7 +91,7 @@ describe('feature flags', () => {
     // Guards against a future version being switched on by accident.
     expect(FEATURES.ocr).toBe(false);
     expect(FEATURES.ai).toBe(false);
-    expect(FEATURES.history).toBe(false);
+    expect(FEATURES.accounts).toBe(false);
     expect(FEATURES.darkMode).toBe(false);
   });
 });

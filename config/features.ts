@@ -31,6 +31,11 @@ export const FEATURES = {
    * currency, which is exactly the behaviour before this flag existed.
    */
   rateVariants: true,
+  /**
+   * Keep the last conversions so they can be reopened (ADR-019). Local only —
+   * no account, no sync. Off hides the button and records nothing.
+   */
+  history: true,
 
   // --- Deliberately off. Each has a roadmap entry. --------------------
   /** V2 — automatically surfaced recents, distinct from saved favourites. */
@@ -41,8 +46,8 @@ export const FEATURES = {
   ocr: false,
   /** V4 — local price context and AI assistance. */
   ai: false,
-  /** V5 — accounts, sync, and history. */
-  history: false,
+  /** V5 — accounts and cross-device sync. History itself ships above. */
+  accounts: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;

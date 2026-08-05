@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Button, Card, IconButton, Input } from '@/components/ui';
@@ -18,7 +18,9 @@ import {
 import { useAmountField } from '@/hooks/useAmountField';
 import { useDetectedHomeCurrency } from '@/hooks/useDetectedHomeCurrency';
 import { useFavourites } from '@/hooks/useFavourites';
+import { useHistory } from '@/hooks/useHistory';
 import { useRateVariant } from '@/hooks/useRateVariant';
+import { useSettledValue } from '@/hooks/useSettledValue';
 import { useSharedLink } from '@/hooks/useSharedLink';
 import { useShareUrl } from '@/hooks/useShareUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -33,6 +35,7 @@ import {
   readableRate,
 } from '@/lib/currency/format';
 import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
+import type { HistoryEntry } from '@/lib/history/history';
 import { applyVariant, resolveVariant, variantsFor } from '@/lib/rates/variants';
 import type { PartialShareState } from '@/lib/share/url';
 import { parseAmount } from '@/lib/currency/parse';
@@ -43,6 +46,7 @@ import { CountryPicker } from './CountryPicker';
 import { CurrencyPicker } from './CurrencyPicker';
 import { FavouriteList } from './FavouriteList';
 import { FavouriteToggle } from './FavouriteToggle';
+import { HistoryPanel } from './HistoryPanel';
 import { RateFreshness } from './RateFreshness';
 import { RateVariantPicker } from './RateVariantPicker';
 import { ShareControls } from './ShareControls';
@@ -52,6 +56,15 @@ const LOCALE = LOCALE_FORMATTING[DEFAULT_LOCALE];
 
 /** A stable no-op, so skipping detection does not itself churn the effect. */
 const NO_DETECTION = () => {};
+
+/**
+ * How long the amount must hold still before the conversion is recorded.
+ *
+ * The field converts on every keystroke, so recording eagerly would fill the
+ * history with the act of typing one number — "1", "12", "120". Waiting for the
+ * amount to settle records the price the traveler actually stopped on.
+ */
+const RECORD_AFTER_MS = 900;
 
 /** The country shown on a cold start, derived from the configured default. */
 const DEFAULT_COUNTRY = countryForCurrency(APP_CONFIG.defaultForeignCurrency)?.code ?? 'US';
@@ -72,6 +85,7 @@ export function Converter() {
   // El título de la hoja de compartir vive en `share`, junto al resto de textos
   // de ese control — no en `converter`, que es donde se pedía.
   const tShare = useTranslations('share');
+  const tHistory = useTranslations('history');
   const rates = useRates();
   const isOnline = useOnlineStatus();
 
@@ -131,6 +145,8 @@ export function Converter() {
     const shown = readableRate(rate, from, to);
 
     return {
+      rate,
+      result: converted,
       converted: formatCurrency(converted, to, LOCALE),
       // La variante se nombra en la propia línea de tasa. Sin eso el número
       // queda sin atribuir, que es justo el fallo que ADR-013 existe para
@@ -200,6 +216,51 @@ export function Converter() {
   );
 
   const handleToggleFavourite = useCallback(() => toggle(currentPair), [toggle, currentPair]);
+
+  // History is a record of what was shown, so it stores the rate and the result
+  // as they stood — re-converting an old entry at today's rate would make
+  // yesterday's dinner change price every time it was opened.
+  const { history, record, remove: removeEntry, clear: clearHistory } = useHistory();
+  const [isHistoryOpen, setHistoryOpen] = useState(false);
+  const settledAmount = useSettledValue(amountText, RECORD_AFTER_MS);
+  /** The last conversion written, so a re-render never writes it twice. */
+  const lastRecorded = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!FEATURES.history || !conversion) return;
+    // Still typing: the settled value has not caught up with the field yet.
+    if (settledAmount !== amountText || settledAmount.trim() === '') return;
+
+    const signature = `${countryCode}|${from}|${to}|${settledAmount}|${activeVariant?.id ?? ''}`;
+    if (lastRecorded.current === signature) return;
+    lastRecorded.current = signature;
+
+    record({
+      country: countryCode,
+      from,
+      to,
+      amount: settledAmount,
+      rate: conversion.rate,
+      result: conversion.result,
+      ...(activeVariant ? { variantId: activeVariant.id } : {}),
+    });
+  }, [settledAmount, amountText, conversion, countryCode, from, to, activeVariant, record]);
+
+  const handleReuse = useCallback(
+    (entry: HistoryEntry) => {
+      // Restores the inputs and lets the app convert afresh, so the number on
+      // screen is always today's. The stored result stays in the list, which is
+      // what makes it a record rather than a shortcut.
+      setCountryCode(entry.country);
+      setTo(entry.to);
+      setAmountText(amountField.format(entry.amount));
+      if (entry.variantId) select(entry.from, entry.variantId);
+      setHistoryOpen(false);
+      // Reopening the same conversion is a new moment worth timestamping.
+      lastRecorded.current = null;
+    },
+    [amountField, select, setTo],
+  );
 
   const handleSelectFavourite = useCallback(
     (favourite: Favourite) => {
@@ -363,7 +424,37 @@ export function Converter() {
         />
       )}
 
-      <ShareControls url={shareUrl} title={tShare('shareTitle', { from, to })} />
+      {/* Compartir y el historial comparten fila: los dos son acciones *sobre*
+          la conversión, no entradas de ella, y juntos cuestan una sola línea de
+          alto en lugar de dos. El botón sale solo cuando hay algo que abrir. */}
+      <div className="flex items-center justify-center gap-1">
+        <ShareControls url={shareUrl} title={tShare('shareTitle', { from, to })} />
+        {FEATURES.history && history.length > 0 && (
+          <Button
+            variant="ghost"
+            className="px-2 text-sm"
+            onClick={() => setHistoryOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isHistoryOpen}
+          >
+            {tHistory('open')}
+          </Button>
+        )}
+      </div>
+
+      {FEATURES.history && isHistoryOpen && (
+        <HistoryPanel
+          entries={history}
+          locale={LOCALE}
+          onReuse={handleReuse}
+          onRemove={removeEntry}
+          onClear={() => {
+            clearHistory();
+            setHistoryOpen(false);
+          }}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
 
       {freshness && (
         <RateFreshness
