@@ -338,7 +338,7 @@ describe('Converter — paste', () => {
     // The symbol is dropped, the value survives — no paste handler required.
     // The symbol is dropped and "1.890" reads as 1890 in the Spanish locale.
     expect(input).toHaveValue('1.890');
-    await waitFor(async () => expect(await resultText()).toMatch(/1738,80/));
+    await waitFor(async () => expect(await resultText()).toMatch(/1\.738,80/));
   });
 });
 
@@ -1034,5 +1034,227 @@ describe('Converter — tipo de cambio en Argentina', () => {
     await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
     expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('·');
+  });
+});
+
+describe('Converter — historial', () => {
+  const HISTORY_KEY = APP_CONFIG.storageKeys.history;
+
+  /** An entry as the app would have written it. */
+  function stored(overrides: Record<string, unknown> = {}) {
+    return {
+      at: '2026-08-05T10:00:00.000Z',
+      country: 'TH',
+      from: 'THB',
+      to: 'EUR',
+      amount: '1.890',
+      rate: 0.0263,
+      result: 49.71,
+      ...overrides,
+    };
+  }
+
+  function seed(entries: readonly Record<string, unknown>[]) {
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+  }
+
+  async function openHistory(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(await screen.findByRole('button', { name: 'Historial' }));
+    return screen.findByRole('dialog', { name: 'Últimas conversiones' });
+  }
+
+  it('no ofrece el botón hasta que hay algo que recordar', async () => {
+    // Un botón que abre una lista vacía enseña una función justo cuando el
+    // usuario intenta leer un precio.
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+
+    expect(screen.queryByRole('button', { name: 'Historial' })).not.toBeInTheDocument();
+  });
+
+  it('guarda la conversión cuando el importe deja de moverse', async () => {
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '1890');
+
+    await waitFor(
+      () => {
+        const raw = window.localStorage.getItem(HISTORY_KEY);
+        expect(raw).not.toBeNull();
+        expect(JSON.parse(raw!)).toHaveLength(1);
+      },
+      { timeout: 3000 },
+    );
+
+    const [entry] = JSON.parse(window.localStorage.getItem(HISTORY_KEY)!);
+    expect(entry).toMatchObject({ country: 'US', from: 'USD', to: 'EUR', amount: '1.890' });
+    expect(entry.rate).toBeCloseTo(0.92, 5);
+    expect(entry.result).toBeCloseTo(1738.8, 2);
+    expect(new Date(entry.at).getTime()).not.toBeNaN();
+  });
+
+  it('no guarda un registro por cada tecla', async () => {
+    // El campo convierte en cada pulsación: sin esperar a que el importe se
+    // asiente, «1», «18», «189» serían tres recuerdos de teclear un número.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '1890');
+    await waitFor(() => expect(window.localStorage.getItem(HISTORY_KEY)).not.toBeNull(), {
+      timeout: 3000,
+    });
+
+    expect(JSON.parse(window.localStorage.getItem(HISTORY_KEY)!)).toHaveLength(1);
+  });
+
+  it('no guarda nada con el campo vacío', async () => {
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
+
+    expect(window.localStorage.getItem(HISTORY_KEY)).toBeNull();
+  });
+
+  it('abre un diálogo accesible con lo más reciente primero', async () => {
+    seed([
+      stored({ at: '2026-08-05T09:00:00.000Z', amount: '500' }),
+      stored({ at: '2026-08-05T12:00:00.000Z', amount: '2.000' }),
+    ]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+
+    const rows = within(dialog).getAllByRole('listitem');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('2.000,00');
+  });
+
+  it('muestra fecha, importe, resultado y la tasa usada', async () => {
+    seed([stored()]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    const row = within(dialog).getAllByRole('listitem')[0]!;
+
+    expect(row).toHaveTextContent('1.890,00');
+    expect(row).toHaveTextContent('49,71');
+    // La tasa se muestra en la dirección legible, como en la pantalla.
+    expect(row.textContent).toMatch(/1 EUR = /);
+    expect(row.textContent).toMatch(/\d{1,2} \w+/);
+  });
+
+  it('nombra la cotización cuando la hubo', async () => {
+    seed([stored({ country: 'AR', from: 'ARS', variantId: 'blue' })]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    expect(within(dialog).getAllByRole('listitem')[0]).toHaveTextContent('Blue');
+  });
+
+  it('reutiliza una conversión y cierra el panel', async () => {
+    seed([stored({ country: 'TH', from: 'THB', to: 'JPY', amount: '1.890' })]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    await user.click(within(dialog).getAllByRole('listitem')[0]!.querySelector('button')!);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
+    expect(screen.getByRole('button', { name: /Tu moneda/ })).toHaveTextContent('JPY');
+    expect(screen.getByLabelText('Importe')).toHaveValue('1.890');
+  });
+
+  it('elimina una conversión sin tocar las demás', async () => {
+    seed([
+      stored({ at: '2026-08-05T12:00:00.000Z', amount: '2.000' }),
+      stored({ at: '2026-08-05T09:00:00.000Z', amount: '500' }),
+    ]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    await user.click(within(dialog).getAllByRole('button', { name: /Quitar/ })[0]!);
+
+    await waitFor(() => expect(within(dialog).getAllByRole('listitem')).toHaveLength(1));
+    expect(JSON.parse(window.localStorage.getItem(HISTORY_KEY)!)).toHaveLength(1);
+    expect(within(dialog).getAllByRole('listitem')[0]).toHaveTextContent('500');
+  });
+
+  it('borra todo el historial', async () => {
+    seed([stored(), stored({ at: '2026-08-05T09:00:00.000Z' })]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    await user.click(within(dialog).getByRole('button', { name: 'Borrar todo el historial' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(JSON.parse(window.localStorage.getItem(HISTORY_KEY)!)).toEqual([]);
+    expect(screen.queryByRole('button', { name: 'Historial' })).not.toBeInTheDocument();
+  });
+
+  it('se cierra con Escape y devuelve el foco al botón que lo abrió', async () => {
+    seed([stored()]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const opener = await screen.findByRole('button', { name: 'Historial' });
+    await user.click(opener);
+    await screen.findByRole('dialog');
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(opener).toHaveFocus();
+  });
+
+  it('descarta lo que ya no puede resolverse, en vez de pintar filas muertas', async () => {
+    seed([stored(), stored({ at: '2026-08-04T10:00:00.000Z', country: 'ZZ' })]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const dialog = await openHistory(user);
+    expect(within(dialog).getAllByRole('listitem')).toHaveLength(1);
+  });
+
+  it('sobrevive a un valor guardado corrupto', async () => {
+    window.localStorage.setItem(HISTORY_KEY, 'no es json');
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+
+    expect(await screen.findByLabelText('Importe')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Historial' })).not.toBeInTheDocument();
+  });
+
+  it('no altera la conversión en pantalla', async () => {
+    // El historial es un registro, no una entrada: abrirlo no puede cambiar el
+    // número que el usuario está mirando.
+    seed([stored({ country: 'AR', from: 'ARS', to: 'JPY' })]);
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '100');
+    const before = await resultText();
+
+    await openHistory(user);
+    expect(await resultText()).toBe(before);
   });
 });

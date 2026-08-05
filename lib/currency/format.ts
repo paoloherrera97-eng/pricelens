@@ -45,6 +45,11 @@ export function formatCurrency(value: number, code: CurrencyCode, locale: string
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: code,
+    // `always`, for the same reason the amount field needs it: Spanish CLDR
+    // sets minimumGroupingDigits to 2, so the default renders 1000 as
+    // "1000,00 €" and only groups from five figures. The field shows "1.890"
+    // while the result showed "1890,00 ฿" — one number, two ways, one screen.
+    useGrouping: 'always',
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value);

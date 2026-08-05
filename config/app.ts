@@ -58,5 +58,7 @@ export const APP_CONFIG = {
     rateVariants: 'pricelens.rate-variants',
     /** The last table actually received, so an outage costs freshness, not the app. */
     lastRates: 'pricelens.last-rates',
+    /** Recent conversions, newest first (ADR-019). */
+    history: 'pricelens.history',
   },
 } as const;

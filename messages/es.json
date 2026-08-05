@@ -76,5 +76,18 @@
       "card": "Tipo aplicado al pagar con tarjeta.",
       "official": "Tipo de cambio oficial del país."
     }
+  },
+  "history": {
+    "open": "Historial",
+    "title": "Últimas conversiones",
+    "close": "Cerrar el historial",
+    "empty": "Todavía no has hecho ninguna conversión.",
+    "remove": "Quitar {amount} del historial",
+    "clearAll": "Borrar todo el historial",
+    "variant": {
+      "blue": "Blue",
+      "card": "Tarjeta",
+      "official": "Oficial"
+    }
   }
 }
