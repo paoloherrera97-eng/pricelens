@@ -11,7 +11,7 @@ import {
   LOCALE_FORMATTING,
   countryForCurrency,
   getCountry,
-  getCurrency,
+  currencyMarker,
   isCurrencyCode,
   type CurrencyCode,
 } from '@/config';
@@ -25,7 +25,13 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRates } from '@/hooks/useRates';
 import { convert, getRate } from '@/lib/currency/convert';
-import { describeAge, formatCurrency, formatRate, isStale } from '@/lib/currency/format';
+import {
+  describeAge,
+  formatCurrency,
+  formatRate,
+  isStale,
+  readableRate,
+} from '@/lib/currency/format';
 import { isFavourite, type Favourite } from '@/lib/favourites/favourites';
 import { applyVariant, resolveVariant, variantsFor } from '@/lib/rates/variants';
 import type { PartialShareState } from '@/lib/share/url';
@@ -63,6 +69,9 @@ export function Converter() {
   const tRates = useTranslations('rates');
   const tError = useTranslations('errors');
   const tVariants = useTranslations('rateVariants');
+  // El título de la hoja de compartir vive en `share`, junto al resto de textos
+  // de ese control — no en `converter`, que es donde se pedía.
+  const tShare = useTranslations('share');
   const rates = useRates();
   const isOnline = useOnlineStatus();
 
@@ -117,14 +126,21 @@ export function Converter() {
     const converted = convert(amount, table, from, to);
     if (rate === null || converted === null) return null;
 
+    // La línea se muestra en la dirección cuya cifra es legible. Solo cambia el
+    // texto: `converted` de arriba usa la tasa tal cual la devolvió `getRate`.
+    const shown = readableRate(rate, from, to);
+
     return {
       converted: formatCurrency(converted, to, LOCALE),
       // La variante se nombra en la propia línea de tasa. Sin eso el número
       // queda sin atribuir, que es justo el fallo que ADR-013 existe para
       // evitar — y no cuesta una línea extra de alto.
       rateLine:
-        t('rateLine', { from, to, rate: formatRate(rate, LOCALE) }) +
-        (activeVariant ? ` · ${tVariants(`${activeVariant.id}.short`)}` : ''),
+        t('rateLine', {
+          from: shown.from,
+          to: shown.to,
+          rate: formatRate(shown.rate, LOCALE),
+        }) + (activeVariant ? ` · ${tVariants(`${activeVariant.id}.short`)}` : ''),
     };
   }, [rates, amount, from, to, t, tVariants, activeVariant]);
 
@@ -262,7 +278,6 @@ export function Converter() {
           exactamente igual que antes. */}
       {activeVariant && variants.length > 1 && (
         <RateVariantPicker
-          className="-mt-1"
           variants={variants}
           selectedId={activeVariant.id}
           onSelect={(variantId) => select(from, variantId)}
@@ -282,7 +297,10 @@ export function Converter() {
         autoFocus
         enterKeyHint="done"
         placeholder={t('amountPlaceholder')}
-        leading={getCurrency(from).symbol}
+        // El código cuando el símbolo no identifica nada: «$ 25.000» en
+        // Argentina se lee como dólares, y el error va en la dirección
+        // peligrosa. `currencyMarker` lo decide desde la propia tabla.
+        leading={currencyMarker(from)}
         value={amountText}
         inputRef={amountField.inputRef}
         onChange={amountField.onChange}
@@ -345,10 +363,15 @@ export function Converter() {
         />
       )}
 
-      <ShareControls url={shareUrl} title={t('shareTitle', { from, to })} />
+      <ShareControls url={shareUrl} title={tShare('shareTitle', { from, to })} />
 
       {freshness && (
-        <RateFreshness age={freshness.age} isStale={freshness.stale} isOffline={!isOnline} />
+        <RateFreshness
+          age={freshness.age}
+          isStale={freshness.stale}
+          isOffline={!isOnline}
+          isDegraded={rates.snapshot.degraded}
+        />
       )}
     </Card>
   );

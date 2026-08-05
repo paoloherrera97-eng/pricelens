@@ -263,3 +263,29 @@ export function getCurrency(code: CurrencyCode): CurrencyMeta {
   }
   return currency;
 }
+
+/** Symbols worn by more than one currency, so they cannot identify one. */
+const AMBIGUOUS_SYMBOLS: ReadonlySet<string> = new Set(
+  CURRENCIES.map((currency) => currency.symbol).filter(
+    (symbol, index, all) => all.indexOf(symbol) !== index,
+  ),
+);
+
+/**
+ * What leads the amount field, so the traveler knows what they are typing.
+ *
+ * The symbol, unless the symbol identifies nothing: 48 of these currencies
+ * share one with another and 28 of them use `$`. A field reading `$ 25.000`
+ * in Argentina says "dollars" to almost everyone, and the mistake runs in the
+ * dangerous direction — believing you are entering dollars while entering
+ * pesos.
+ *
+ * Derived from the table rather than from a hand-kept list of offenders, so a
+ * collision introduced by a future regeneration is covered the day it appears.
+ * It is also the call CLDR already makes for the formatted result, where es-ES
+ * renders ARS as `25.000,00 ARS` and never as `$`.
+ */
+export function currencyMarker(code: CurrencyCode): string {
+  const { symbol } = getCurrency(code);
+  return AMBIGUOUS_SYMBOLS.has(symbol) ? code : symbol;
+}

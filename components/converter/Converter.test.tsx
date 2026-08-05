@@ -6,6 +6,16 @@ import { render, screen, waitFor, within } from '@/tests/render';
 
 import { Converter } from './Converter';
 
+/**
+ * The rate line, whichever way round it reads.
+ *
+ * The line is shown in the direction whose figure is at least 1, so which code
+ * leads depends on the pair — asserting on a fixed one would test the pair
+ * rather than the behaviour. Where the direction itself is the point, the test
+ * says so explicitly.
+ */
+const RATE_LINE = /1 [A-Z]{3} = /;
+
 const SNAPSHOT = {
   base: 'USD',
   rates: { USD: 1, EUR: 0.92, THB: 35, JPY: 150, VND: 25_000 },
@@ -24,10 +34,19 @@ function mockRates(response: unknown, ok = true) {
   return fetchMock;
 }
 
-/** The big number, read from the live region. */
+/**
+ * The big number, read from the element that renders it.
+ *
+ * Not from the live region: that carries the settled announcement, which by
+ * design lags the visible value while the user is still typing.
+ */
 async function resultText(): Promise<string> {
-  const region = document.querySelector('[aria-live="polite"]')!;
-  return region.textContent ?? '';
+  return document.querySelector('.fit-container')?.textContent ?? '';
+}
+
+/** What a screen reader is told. */
+function announcementText(): string {
+  return document.querySelector('[aria-live="polite"]')?.textContent ?? '';
 }
 
 beforeEach(() => {
@@ -45,7 +64,7 @@ describe('Converter — loading and ready', () => {
     render(<Converter />);
 
     expect(await screen.findByLabelText('Importe')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
   });
 
   it('fetches the rate table exactly once per session (ADR-001)', async () => {
@@ -98,7 +117,72 @@ describe('Converter — conversion', () => {
   it('shows the effective rate so the working is visible', async () => {
     mockRates(SNAPSHOT);
     render(<Converter />);
-    expect(await screen.findByText(/1 USD = 0,92 EUR/)).toBeInTheDocument();
+    expect(await screen.findByText(/1 EUR = 1,08696 USD/)).toBeInTheDocument();
+  });
+
+  it('anuncia el resultado una sola vez, no una por tecla', async () => {
+    // Un lector de pantalla encola cada cambio de una región viva y se
+    // interrumpe a sí mismo: cinco dígitos producían cinco fragmentos en vez
+    // de una respuesta.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    const input = await screen.findByLabelText('Importe');
+    const seen = new Set<string>();
+    for (const key of '12500') {
+      await user.type(input, key);
+      seen.add(announcementText());
+    }
+    // Mientras se escribe, la región no va cambiando bajo el lector.
+    expect(seen.size).toBeLessThanOrEqual(1);
+
+    // Y cuando se para, dice la frase entera, una vez.
+    // (es-ES separa el símbolo con un espacio duro, de ahí el `\s`.)
+    await waitFor(() => expect(announcementText()).toMatch(/equivale a/));
+    expect(announcementText()).toMatch(/12\.500,00\sUS\$ equivale a 11\.500,00\s€/);
+  });
+
+  it('no dice el número dos veces', async () => {
+    // El valor visible vivía dentro de la región: se anunciaba primero suelto
+    // y otra vez dentro de la frase.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '100');
+    await waitFor(() => expect(announcementText()).toMatch(/equivale a/));
+
+    expect(document.querySelector('.fit-container p')).toHaveAttribute('aria-hidden', 'true');
+    expect(announcementText().match(/92,00/g)).toHaveLength(1);
+  });
+
+  it('calla mientras no hay importe', async () => {
+    // Anunciar el marcador diría «0,00 US$ equivale a 0,00 €», una conversión
+    // que nadie ha pedido.
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
+    expect(announcementText()).toBe('');
+  });
+
+  it('anuncia el resultado desde un solo sitio', async () => {
+    // Dos regiones diciendo el mismo número compiten por el turno de habla.
+    // La de `ShareControls` es otra cosa —confirma que se copió el enlace— y
+    // no debe entrar en esta cuenta.
+    mockRates(SNAPSHOT);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.type(await screen.findByLabelText('Importe'), '100');
+    await waitFor(() => expect(announcementText()).toMatch(/equivale a/));
+
+    const saying = [...document.querySelectorAll('[aria-live]')].filter((region) =>
+      /equivale a/.test(region.textContent ?? ''),
+    );
+    expect(saying).toHaveLength(1);
   });
 
   it('shows when the rates were last updated', async () => {
@@ -190,7 +274,22 @@ describe('Converter — country-first selection (ADR-014)', () => {
     await user.click(screen.getByRole('option', { name: /Tailandia/ }));
 
     // The traveler picked a country; the app worked out THB.
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('THB'));
+  });
+
+  it('muestra la tasa en la dirección legible, no en la que salga', async () => {
+    // 1 ARS = 0,000911 EUR es correcto y no le sirve a nadie. La línea se da
+    // siempre en la dirección cuya cifra llega a 1.
+    mockRates({ ...SNAPSHOT, rates: { ...SNAPSHOT.rates, ARS: 1010 } });
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    await user.click(await screen.findByRole('button', { name: /país viajas/ }));
+    await user.type(screen.getByRole('combobox'), 'Argentina');
+    await user.click(screen.getByRole('option', { name: /Argentina/ }));
+
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('1 EUR ='));
+    expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('0,000');
   });
 
   it('searches countries by name, and by currency code for those who know it', async () => {
@@ -261,7 +360,7 @@ describe('Converter — failure states', () => {
 
     expect(await screen.findByText('No hemos podido obtener las tasas')).toBeInTheDocument();
     // ADR-013: no fabricated rates behind the error.
-    expect(screen.queryByText(/1 USD =/)).not.toBeInTheDocument();
+    expect(screen.queryByText(RATE_LINE)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument();
   });
 
@@ -276,7 +375,7 @@ describe('Converter — failure states', () => {
     render(<Converter />);
 
     await user.click(await screen.findByRole('button', { name: 'Reintentar' }));
-    expect(await screen.findByText(/1 USD = 0,92 EUR/)).toBeInTheDocument();
+    expect(await screen.findByText(/1 EUR = 1,08696 USD/)).toBeInTheDocument();
   });
 
   it('explains the failure differently when the device is offline', async () => {
@@ -287,6 +386,65 @@ describe('Converter — failure states', () => {
     expect(
       await screen.findByText('Conéctate a internet para obtener las tasas más recientes.'),
     ).toBeInTheDocument();
+  });
+
+  it('sigue convirtiendo con la última tabla cuando el proveedor falla', async () => {
+    // Una tabla de esta mañana convierte una cuenta de restaurante
+    // perfectamente; una pantalla de reintento no convierte nada, y aparece
+    // justo cuando el viajero está fuera con una conexión que ya le falla.
+    window.localStorage.setItem(
+      APP_CONFIG.storageKeys.lastRates,
+      JSON.stringify({ ...SNAPSHOT, fetchedAt: new Date(Date.now() - 3_600_000).toISOString() }),
+    );
+    mockRates({}, false);
+    const user = userEvent.setup();
+    render(<Converter />);
+
+    expect(await screen.findByText(RATE_LINE)).toBeInTheDocument();
+    expect(screen.queryByText('No hemos podido obtener las tasas')).not.toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Importe'), '100');
+    await waitFor(async () => expect(await resultText()).toMatch(/92/));
+  });
+
+  it('dice que la cotización no es de ahora, en lugar de presentarla como fresca', async () => {
+    window.localStorage.setItem(APP_CONFIG.storageKeys.lastRates, JSON.stringify(SNAPSHOT));
+    mockRates({}, false);
+    render(<Converter />);
+
+    expect(await screen.findByText(/Última cotización disponible/)).toBeInTheDocument();
+    expect(screen.queryByText(/^Actualizado/)).not.toBeInTheDocument();
+  });
+
+  it('guarda cada tabla que llega, para la próxima vez', async () => {
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await screen.findByLabelText('Importe');
+
+    await waitFor(() =>
+      expect(window.localStorage.getItem(APP_CONFIG.storageKeys.lastRates)).toContain('"base"'),
+    );
+  });
+
+  it('muestra el estado vacío solo cuando nunca hubo datos', async () => {
+    // Sin nada guardado no hay nada honesto que enseñar: ADR-013 prohíbe
+    // inventarse una tasa para rellenar la pantalla.
+    mockRates({}, false);
+    render(<Converter />);
+
+    expect(await screen.findByText('No hemos podido obtener las tasas')).toBeInTheDocument();
+    expect(screen.queryByText(RATE_LINE)).not.toBeInTheDocument();
+  });
+
+  it('descarta una tabla guardada corrupta en vez de convertir con ella', async () => {
+    window.localStorage.setItem(
+      APP_CONFIG.storageKeys.lastRates,
+      JSON.stringify({ ...SNAPSHOT, rates: { USD: 1, EUR: 0 } }),
+    );
+    mockRates({}, false);
+    render(<Converter />);
+
+    expect(await screen.findByText('No hemos podido obtener las tasas')).toBeInTheDocument();
   });
 
   it('says so plainly when a pair has no rate rather than showing zero (E12)', async () => {
@@ -338,7 +496,7 @@ describe('Converter — home currency detection', () => {
     render(<Converter />);
 
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD = /)).toHaveTextContent('GBP'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('GBP'));
     expect(window.localStorage.getItem(APP_CONFIG.storageKeys.homeCurrency)).toBe('GBP');
   });
 
@@ -351,9 +509,9 @@ describe('Converter — home currency detection', () => {
     render(<Converter />);
 
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
 
-    expect(screen.getByText(/1 USD =/)).toHaveTextContent('JPY');
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY');
     expect(window.localStorage.getItem(APP_CONFIG.storageKeys.homeCurrency)).toBe('JPY');
   });
 
@@ -363,8 +521,8 @@ describe('Converter — home currency detection', () => {
     render(<Converter />);
 
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
-    expect(screen.getByText(/1 USD =/)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
   });
 
   it('moves the destination when the detected currency is the one being converted from', async () => {
@@ -389,7 +547,7 @@ describe('Converter — favourites', () => {
 
   async function ready() {
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
   }
 
   function star() {
@@ -443,7 +601,7 @@ describe('Converter — favourites', () => {
 
     await user.click(screen.getByRole('button', { name: /Tailandia, de THB a JPY/ }));
 
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY'));
     expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
   });
 
@@ -510,7 +668,7 @@ describe('Converter — share', () => {
 
   async function ready() {
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 [A-Z]{3} =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
   }
 
   it('restores country, currency and amount from a shared link', async () => {
@@ -523,7 +681,7 @@ describe('Converter — share', () => {
     // A link may have been hand-written, so its amount is read the same way the
     // conversion reads it and then shown grouped, like anything else typed.
     expect(screen.getByLabelText('Importe')).toHaveValue('1.890');
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY'));
   });
 
   it('shows a hand-written decimal amount as the number it means', async () => {
@@ -546,7 +704,7 @@ describe('Converter — share', () => {
     render(<Converter />);
     await ready();
 
-    await waitFor(() => expect(screen.getByText(/1 THB =/)).toHaveTextContent('JPY'));
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toHaveTextContent('JPY'));
   });
 
   it('ignores the broken half of a mangled link', async () => {
@@ -556,7 +714,7 @@ describe('Converter — share', () => {
     await ready();
 
     expect(screen.getByRole('button', { name: /país viajas/ })).toHaveTextContent('Tailandia');
-    expect(screen.getByText(/1 THB =/)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent(APP_CONFIG.defaultHomeCurrency);
   });
 
   it('writes the conversion into the address bar', async () => {
@@ -602,6 +760,25 @@ describe('Converter — share', () => {
 
     await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
     expect(share.mock.calls[0]?.[0]?.url).toContain('country=US');
+    // El título salía como «converter.shareTitle»: se pedía al espacio
+    // `converter` una clave que vive en `share`, y next-intl devuelve la ruta
+    // de la clave cuando no la encuentra. Un fallo silencioso que solo se ve
+    // en la hoja nativa, que es justo donde nadie mira al probar.
+    expect(share.mock.calls[0]?.[0]?.title).toBe('PriceLens — USD a EUR');
+  });
+
+  it('no deja ninguna clave de traducción sin resolver en pantalla', async () => {
+    // La forma general del fallo anterior: next-intl devuelve la ruta de la
+    // clave en lugar de lanzar, así que una clave mal pedida se ve como texto
+    // plausible y pasa desapercibida.
+    mockRates(SNAPSHOT);
+    render(<Converter />);
+    await ready();
+
+    const namespaces = ['converter', 'rates', 'errors', 'share', 'favourites', 'rateVariants'];
+    for (const namespace of namespaces) {
+      expect(document.body.textContent).not.toContain(`${namespace}.`);
+    }
   });
 
   it('copies to the clipboard when there is no share sheet', async () => {
@@ -697,7 +874,101 @@ describe('Converter — tipo de cambio en Argentina', () => {
     const blue = await screen.findByRole('radio', { name: /Blue/ });
     expect(blue).toHaveAttribute('aria-checked', 'true');
     // 1 ARS = 0,92/1250 EUR con el blue, no 0,92/1000 con el oficial.
-    expect(screen.getByText(/1 ARS =/)).toHaveTextContent('Blue');
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent('Blue');
+  });
+
+  it('lleva su título a la vista, como el resto de controles', async () => {
+    // Era el único control de la pantalla cuyo título vivía solo en un
+    // `aria-label`: quien miraba veía tres pastillas sin explicar.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const label = await screen.findByText('Tipo de cambio');
+    expect(label).toBeVisible();
+    // Y un solo nombre accesible, el de la etiqueta visible — no dos.
+    expect(screen.getByRole('radiogroup', { name: 'Tipo de cambio' })).toHaveAttribute(
+      'aria-labelledby',
+      label.id,
+    );
+  });
+
+  it('explica qué significa la cotización elegida', async () => {
+    // «Blue» no le dice nada a quien llega por primera vez, y hasta ahora esa
+    // explicación solo existía en el nombre accesible del botón.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    expect(
+      await screen.findByText('Cambio en efectivo utilizado habitualmente por los viajeros.'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: /Tarjeta/ }));
+    expect(await screen.findByText('Tipo aplicado al pagar con tarjeta.')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Cambio en efectivo utilizado habitualmente por los viajeros.'),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: /Oficial/ }));
+    expect(await screen.findByText('Tipo de cambio oficial del país.')).toBeInTheDocument();
+  });
+
+  it('reserva la altura de la explicación, para que cambiar de opción no mueva nada', async () => {
+    // Las frases ocupan una o dos líneas según la opción y el ancho. Sin
+    // reserva, cada toque desplazaría todo lo de abajo — el mismo temblor que
+    // la tarjeta del resultado ya evita reservando alto.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const hint = await screen.findByText(/Cambio en efectivo/);
+    expect(hint.className).toMatch(/min-h-/);
+
+    await user.click(screen.getByRole('radio', { name: /Oficial/ }));
+    expect(await screen.findByText(/Tipo de cambio oficial del país/)).toHaveClass(
+      ...hint.className.split(' '),
+    );
+  });
+
+  it('no repite la explicación a un lector de pantalla', async () => {
+    // El nombre accesible del botón ya la lleva; la línea visible es para
+    // quien ve la pantalla, y anunciarla otra vez sería decirlo dos veces.
+    mockRates(WITH_VARIANTS);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    const hint = await screen.findByText(
+      'Cambio en efectivo utilizado habitualmente por los viajeros.',
+    );
+    expect(hint).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('se queda sin línea, no rota, ante una cotización que no conoce', async () => {
+    // `variantsFor` conserva a propósito lo que no reconoce: un «mep» que
+    // añada la fuente mañana llega hasta aquí sin texto que mostrar.
+    const withMep = {
+      ...SNAPSHOT,
+      rates: { ...SNAPSHOT.rates, ARS: 1000 },
+      variants: {
+        ARS: [
+          { id: 'mep', rate: 1180, source: 'test', fetchedAt: new Date().toISOString() },
+          { id: 'official', rate: 1000, source: 'test', fetchedAt: new Date().toISOString() },
+        ],
+      },
+    };
+    mockRates(withMep);
+    const user = userEvent.setup();
+    render(<Converter />);
+    await argentina(user);
+
+    expect(await screen.findByRole('radiogroup')).toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: /mep/i }));
+    expect(screen.getByText(RATE_LINE)).toBeInTheDocument();
   });
 
   it('cambia el resultado al cambiar de cotización', async () => {
@@ -713,7 +984,7 @@ describe('Converter — tipo de cambio en Argentina', () => {
     const conOficial = await resultText();
     expect(conOficial).not.toBe(conBlue);
     // El oficial sobrevalora el peso, así que el mismo precio cuesta más.
-    expect(screen.getByText(/1 ARS =/)).toHaveTextContent('Oficial');
+    expect(screen.getByText(RATE_LINE)).toHaveTextContent('Oficial');
   });
 
   it('recuerda la elección entre visitas', async () => {
@@ -746,10 +1017,10 @@ describe('Converter — tipo de cambio en Argentina', () => {
     mockRates(WITH_VARIANTS);
     render(<Converter />);
     await screen.findByLabelText('Importe');
-    await waitFor(() => expect(screen.getByText(/1 USD =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
 
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-    expect(screen.getByText(/1 USD =/)).not.toHaveTextContent('·');
+    expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('·');
   });
 
   it('cae a la tasa oficial sin selector cuando la superposición falla', async () => {
@@ -760,8 +1031,8 @@ describe('Converter — tipo de cambio en Argentina', () => {
     render(<Converter />);
     await argentina(user);
 
-    await waitFor(() => expect(screen.getByText(/1 ARS =/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(RATE_LINE)).toBeInTheDocument());
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-    expect(screen.getByText(/1 ARS =/)).not.toHaveTextContent('·');
+    expect(screen.getByText(RATE_LINE)).not.toHaveTextContent('·');
   });
 });

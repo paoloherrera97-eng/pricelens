@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { convert, getRate } from './convert';
-import { describeAge, formatCurrency, formatRate, isStale } from './format';
+import { describeAge, formatCurrency, formatRate, isStale, readableRate } from './format';
 import { normaliseAmount, parseAmount, sanitizeAmountInput } from './parse';
 
 const ES = 'es-ES';
@@ -206,13 +206,70 @@ describe('formatCurrency', () => {
     expect(formatCurrency(0, 'EUR', ES)).toMatch(/0,00/);
   });
 
-  it('compacts very large amounts so the line cannot overflow (E6)', () => {
-    const out = formatCurrency(2_500_000_000, 'VND', ES);
-    expect(out.length).toBeLessThan(20);
+  it('writes very large amounts in full, never compacted (E6)', () => {
+    // Compact notation collapsed distinct prices onto one string and read
+    // differently in Spanish and English. Fitting the result is `text-fit`'s
+    // job, not the formatter's.
+    expect(formatCurrency(25_399_974_600, 'VND', ES)).toContain('25.399.974.600');
+    expect(formatCurrency(1_250_000, 'EUR', ES)).toContain('1.250.000');
+  });
+
+  it.each([
+    [999_999, 'VND'],
+    [1_000_000, 'VND'],
+    [1_000_001, 'VND'],
+  ])('gives %d %s a string of its own', (value, code) => {
+    // The defect this replaces: 999.999 and 1.000.000 both rendered "25,4 mil M₫".
+    const others = [999_999, 1_000_000, 1_000_001].filter((v) => v !== value);
+    for (const other of others) {
+      expect(formatCurrency(value, code as 'VND', ES)).not.toBe(
+        formatCurrency(other, code as 'VND', ES),
+      );
+    }
+  });
+
+  it.each([['mil M'], ['B'], ['M']])('never emits the compact marker %o', (marker) => {
+    for (const value of [1e9, 2.5e9, 1e12, 25_399_974_600]) {
+      expect(formatCurrency(value, 'VND', ES)).not.toContain(marker);
+    }
   });
 
   it('returns empty string for non-finite input rather than "NaN €"', () => {
     expect(formatCurrency(Number.NaN, 'EUR', ES)).toBe('');
+  });
+});
+
+describe('readableRate', () => {
+  it('inverts a rate below 1 so the figure is one a person can read', () => {
+    // The line this replaces: "1 ARS = 0,000628 EUR".
+    const shown = readableRate(0.92 / 1010, 'ARS', 'EUR');
+    expect(shown).toMatchObject({ from: 'EUR', to: 'ARS' });
+    expect(shown.rate).toBeGreaterThan(1);
+  });
+
+  it('leaves a rate of 1 or more alone', () => {
+    expect(readableRate(35.4, 'USD', 'THB')).toEqual({ from: 'USD', to: 'THB', rate: 35.4 });
+    expect(readableRate(1, 'EUR', 'EUR')).toEqual({ from: 'EUR', to: 'EUR', rate: 1 });
+  });
+
+  it('always yields a figure of at least 1, whichever way the pair runs', () => {
+    for (const rate of [0.92, 0.0000362, 25_400, 1.0869, 0.5]) {
+      expect(readableRate(rate, 'USD', 'EUR').rate).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it.each([[0], [-1], [Number.NaN], [Number.POSITIVE_INFINITY]])(
+    'hands back %o untouched rather than dividing by it',
+    (rate) => {
+      // 1/0 is Infinity, and "1 EUR = ∞ ARS" is worse than the empty string
+      // `formatRate` already returns for these.
+      expect(readableRate(rate, 'ARS', 'EUR')).toEqual({ from: 'ARS', to: 'EUR', rate });
+    },
+  );
+
+  it('round-trips: inverting the inverse returns the original pair', () => {
+    const once = readableRate(0.0000362, 'VND', 'EUR');
+    expect(readableRate(once.rate, once.from, once.to)).toEqual(once);
   });
 });
 

@@ -8,38 +8,15 @@
  */
 
 import type { CurrencyCode, ProviderId } from '@/config';
-import type { RateTable, RateVariant } from '@/types';
+import type { RateSnapshot, RateTable, RateVariant } from '@/types';
 
 /**
- * Rates expressed against a single base currency (ADR-001). Defined in `types/`
- * so pure `lib/` code can use it without importing across a boundary.
+ * Defined in `types/` so pure `lib/` code can use them without importing across
+ * a boundary (docs/ARCHITECTURE.md §5). Re-exported here because this module is
+ * the provider contract, and a provider author should not have to know which
+ * side of that boundary each type happens to live on.
  */
-export type { RateTable, RateVariant };
-
-export interface RateSnapshot {
-  /** The currency all rates in `rates` are quoted against. */
-  readonly base: CurrencyCode;
-  readonly rates: RateTable;
-  /** When this data was retrieved, ISO 8601. */
-  readonly fetchedAt: string;
-  /** Which provider produced it — surfaced to the user for transparency. */
-  readonly source: ProviderId;
-  /**
-   * True when this is fallback data rather than a live fetch. The UI must
-   * distinguish the two: presenting degraded data as live is the one thing this
-   * product must never do (PROJECT_BIBLE, Value #4).
-   */
-  readonly degraded: boolean;
-  /**
-   * Alternative quotations, keyed by currency code. Absent for every currency
-   * with a single rate, which is nearly all of them.
-   *
-   * `rates` above is left exactly as the base provider returned it — the server
-   * does not choose on the user's behalf. The client substitutes the selected
-   * variant into its own copy of the table before converting.
-   */
-  readonly variants?: Readonly<Record<string, readonly RateVariant[]>>;
-}
+export type { RateSnapshot, RateTable, RateVariant };
 
 /**
  * Supplies alternative quotations for a single currency.
